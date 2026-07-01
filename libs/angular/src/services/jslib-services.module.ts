@@ -75,7 +75,6 @@ import {
   OrgDomainServiceAbstraction,
 } from "@bitwarden/common/admin-console/abstractions/organization-domain/org-domain.service.abstraction";
 import { OrganizationManagementPreferencesService } from "@bitwarden/common/admin-console/abstractions/organization-management-preferences/organization-management-preferences.service";
-import { InternalNewPolicyService } from "@bitwarden/common/admin-console/abstractions/policy/new-policy.service.abstraction";
 import { PolicyApiServiceAbstraction } from "@bitwarden/common/admin-console/abstractions/policy/policy-api.service.abstraction";
 import {
   InternalPolicyService,
@@ -88,7 +87,6 @@ import { OrganizationApiService } from "@bitwarden/common/admin-console/services
 import { OrgDomainApiService } from "@bitwarden/common/admin-console/services/organization-domain/org-domain-api.service";
 import { OrgDomainService } from "@bitwarden/common/admin-console/services/organization-domain/org-domain.service";
 import { DefaultOrganizationManagementPreferencesService } from "@bitwarden/common/admin-console/services/organization-management-preferences/default-organization-management-preferences.service";
-import { DefaultNewPolicyService } from "@bitwarden/common/admin-console/services/policy/default-new-policy.service";
 import { DefaultPolicyService } from "@bitwarden/common/admin-console/services/policy/default-policy.service";
 import { PolicyApiService } from "@bitwarden/common/admin-console/services/policy/policy-api.service";
 import { ProviderApiService } from "@bitwarden/common/admin-console/services/provider/provider-api.service";
@@ -971,7 +969,6 @@ const safeProviders: SafeProvider[] = [
       CollectionService,
       MessagingServiceAbstraction,
       InternalPolicyService,
-      InternalNewPolicyService,
       InternalSendService,
       LogService,
       KeyConnectorServiceAbstraction,
@@ -1235,46 +1232,21 @@ const safeProviders: SafeProvider[] = [
       stateProvider: StateProvider,
       organizationService: OrganizationServiceAbstraction,
       accountService: AccountServiceAbstraction,
-      newPolicyService: InternalNewPolicyService,
       injector: Injector,
     ) =>
-      new DefaultPolicyService(
-        stateProvider,
-        organizationService,
-        accountService,
-        newPolicyService,
-        () => injector.get(ConfigService),
+      new DefaultPolicyService(stateProvider, organizationService, accountService, () =>
+        injector.get(SdkService),
       ),
-    deps: [
-      StateProvider,
-      OrganizationServiceAbstraction,
-      AccountServiceAbstraction,
-      InternalNewPolicyService,
-      Injector,
-    ],
+    deps: [StateProvider, OrganizationServiceAbstraction, AccountServiceAbstraction, Injector],
   }),
   safeProvider({
     provide: PolicyServiceAbstraction,
     useExisting: InternalPolicyService,
   }),
   safeProvider({
-    provide: InternalNewPolicyService,
-    useFactory: (
-      stateProvider: StateProvider,
-      organizationService: OrganizationServiceAbstraction,
-      injector: Injector,
-    ) =>
-      new DefaultNewPolicyService(
-        stateProvider,
-        () => injector.get(SdkService),
-        organizationService,
-      ),
-    deps: [StateProvider, OrganizationServiceAbstraction, Injector],
-  }),
-  safeProvider({
     provide: PolicyApiServiceAbstraction,
     useClass: PolicyApiService,
-    deps: [InternalPolicyService, InternalNewPolicyService, ApiServiceAbstraction, AccountService],
+    deps: [InternalPolicyService, ApiServiceAbstraction, AccountService],
   }),
   safeProvider({
     provide: InternalMasterPasswordServiceAbstraction,
