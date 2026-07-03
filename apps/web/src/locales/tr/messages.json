@@ -1190,6 +1190,42 @@
   "viewItem": {
     "message": "Kaydı göster"
   },
+  "addItemHeaderLogin": {
+    "message": "Hesap ekle",
+    "description": "Header for new login item type"
+  },
+  "addItemHeaderCard": {
+    "message": "Kart ekle",
+    "description": "Header for new card item type"
+  },
+  "addItemHeaderIdentity": {
+    "message": "Kimlik ekle",
+    "description": "Header for new identity item type"
+  },
+  "addItemHeaderNote": {
+    "message": "Not ekle",
+    "description": "Header for new note item type"
+  },
+  "addItemHeaderSecureNote": {
+    "message": "Güvenli not ekle",
+    "description": "Header for new secure note item type"
+  },
+  "addItemHeaderSshKey": {
+    "message": "SSH anahtarı ekle",
+    "description": "Header for new SSH key item type"
+  },
+  "addItemHeaderBankAccount": {
+    "message": "Banka hesabı ekle",
+    "description": "Header for new bank account item type"
+  },
+  "addItemHeaderDriversLicense": {
+    "message": "Ehliyet ekle",
+    "description": "Header for new license item type"
+  },
+  "addItemHeaderPassport": {
+    "message": "Pasaport ekle",
+    "description": "Header for new passport item type"
+  },
   "newItemHeaderLogin": {
     "message": "Yeni hesap",
     "description": "Header for new login item type"
@@ -1254,6 +1290,22 @@
     "message": "Güvenli notu düzenle",
     "description": "Header for edit secure note item type"
   },
+  "editItemHeaderLoginSentenceCase": {
+    "message": "Hesabı düzenle",
+    "description": "Header for edit login item type"
+  },
+  "editItemHeaderCardSentenceCase": {
+    "message": "Kartı düzenle",
+    "description": "Header for edit card item type"
+  },
+  "editItemHeaderIdentitySentenceCase": {
+    "message": "Kimliği düzenle",
+    "description": "Header for edit identity item type"
+  },
+  "editItemHeaderNoteSentenceCase": {
+    "message": "Notu düzenle",
+    "description": "Header for edit note item type"
+  },
   "editItemHeaderSshKey": {
     "message": "SSH anahtarını düzenle",
     "description": "Header for edit SSH key item type"
@@ -1313,6 +1365,26 @@
   "viewItemHeaderPassport": {
     "message": "Pasaportu görüntüle",
     "description": "Header for view passport item type"
+  },
+  "viewItemHeaderLoginSentenceCase": {
+    "message": "Hesabı göster",
+    "description": "Header for view login item type"
+  },
+  "viewItemHeaderCardSentenceCase": {
+    "message": "Kartı göster",
+    "description": "Header for view card item type"
+  },
+  "viewItemHeaderIdentitySentenceCase": {
+    "message": "Kimliği göster",
+    "description": "Header for view identity item type"
+  },
+  "viewItemHeaderNoteSentenceCase": {
+    "message": "Notu göster",
+    "description": "Header for view note item type"
+  },
+  "create": {
+    "message": "Oluştur",
+    "description": "for adding new items"
   },
   "new": {
     "message": "Yeni",
@@ -2481,6 +2553,9 @@
     "message": "En az özel karakter",
     "description": "Minimum special characters"
   },
+  "minSpecialCharacters": {
+    "message": "Minimum special characters"
+  },
   "ambiguous": {
     "message": "Okurken karışabilecek karakterleri kullanma",
     "description": "deprecated. Use avoidAmbiguous instead."
@@ -2903,6 +2978,9 @@
   },
   "newCustomDomain": {
     "message": "Yeni özel alan adı"
+  },
+  "addCustomDomain": {
+    "message": "Özel alan adı ekle"
   },
   "newCustomDomainDesc": {
     "message": "Alan adları listesini virgülle ayırarak girin. Sadece ana alan adlarına izin verilir. Alt alan adları girmeyin. Örneğin, \"www.google.com\" yerine \"google.com\" yazmalısınız. Bir Android uygulamasını diğer web sitesi alan adlarıyla eşleştirmek için \"androiduygulaması://paket.ismi\" girebilirsiniz."
@@ -5040,6 +5118,15 @@
       }
     }
   },
+  "stagedUserId": {
+    "message": "Staged user $ID$ added.",
+    "placeholders": {
+      "id": {
+        "content": "$1",
+        "example": "John Smith"
+      }
+    }
+  },
   "revokedEmailError": {
     "message": "1 or more emails belong to revoked members. Restore their access to reinvite."
   },
@@ -6295,6 +6382,27 @@
   "masterPassPolicyDesc": {
     "message": "Ana parola gücü gereksinimlerini ayarlayın."
   },
+  "enablePolicy": {
+    "message": "Enable policy"
+  },
+  "minCharacterLength": {
+    "message": "Minimum karakter uzunluğu"
+  },
+  "characterRequirements": {
+    "message": "Karakter gereksinimleri"
+  },
+  "specialCharactersPolicy": {
+    "message": "Özel karakterler (örn. !, @, $)"
+  },
+  "uppercasePolicy": {
+    "message": "Büyük harf"
+  },
+  "lowercasePolicy": {
+    "message": "Küçük harf"
+  },
+  "numbersPolicy": {
+    "message": "Rakam"
+  },
   "passwordStrengthScore": {
     "message": "Parola gücü puanı: $SCORE$",
     "placeholders": {
@@ -6324,6 +6432,15 @@
   },
   "passwordGeneratorPolicyDesc": {
     "message": "Parola üreticisi gereksinimleri ayarlayın."
+  },
+  "passwordGeneratorPolicyDescV2": {
+    "message": "Select a set of minimum requirements for any member-generated passwords."
+  },
+  "generatedPassword": {
+    "message": "Generated password"
+  },
+  "generatedPassphrase": {
+    "message": "Generated passphrase"
   },
   "masterPasswordPolicyInEffect": {
     "message": "Bir veya daha fazla kuruluş ilkesi gereğince ana parolanız aşağıdaki gereksinimleri karşılamalıdır:"
@@ -6573,6 +6690,9 @@
   "singleOrgPolicyDesc": {
     "message": "Üyelerin diğer kuruluşlara katılmasını kısıtlayın. Bu ilke, etki alanı doğrulamasını etkinleştirmiş kuruluşlar için gereklidir."
   },
+  "singleOrgPolicyDescV2": {
+    "message": "Members of this organization cannot join other organizations. Existing members who belong to other organizations will have their access revoked when this policy is enabled. This policy won't be enforced for owners and admins."
+  },
   "singleOrgBlockCreateMessage": {
     "message": "Mevcut kuruluşunuzun birden fazla kuruluşa katılmanıza izin vermeyen bir ilkesi var. Lütfen kuruluş yöneticilerinizle iletişime geçin veya farklı bir Bitwarden hesabı açın."
   },
@@ -6638,6 +6758,10 @@
   },
   "createSend": {
     "message": "Yeni Send",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "createSendV2": {
+    "message": "Send oluştur",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "editSend": {
@@ -6732,6 +6856,12 @@
   },
   "accepted": {
     "message": "Kabul edildi"
+  },
+  "staged": {
+    "message": "Staged"
+  },
+  "stagedMemberTooltip": {
+    "message": "Hesap davetiyesi bekleniyor"
   },
   "sendLink": {
     "message": "Send bağlantısı",
@@ -7008,9 +7138,6 @@
   "promptUsersToMoveItemsV2": {
     "message": "Prompt users to move their vault items to the organization"
   },
-  "enablePolicy": {
-    "message": "Enable policy"
-  },
   "organizationDataOwnership": {
     "message": "Kuruluş veri sahipliğini zorunlu kılın"
   },
@@ -7115,6 +7242,30 @@
   },
   "autoConfirmDisabledByPortal": {
     "message": "Removed Automatic user confirmation policy"
+  },
+  "inviteLinkEventCreated": {
+    "message": "Created invite link"
+  },
+  "inviteLinkEventDomainsEdited": {
+    "message": "Edited allowed domains for invite link"
+  },
+  "inviteLinkEventDeleted": {
+    "message": "Deleted invite link"
+  },
+  "inviteLinkEventCopied": {
+    "message": "Copied invite link"
+  },
+  "inviteLinkEventRegenerated": {
+    "message": "Regenerated invite link"
+  },
+  "inviteLinkEventAccepted": {
+    "message": "Member $ID$ accepted invitation through invite link",
+    "placeholders": {
+      "id": {
+        "content": "$1",
+        "example": "First 8 characters of a GUID"
+      }
+    }
   },
   "system": {
     "message": "Sistem"
@@ -7612,6 +7763,18 @@
   },
   "accountRecoverySingleOrgRequirementDesc": {
     "message": "Bu ilkeyi etkinleştirmeden önce tek kuruluş kurumsal ilkesi etkinleştirilmelidir."
+  },
+  "accountRecoveryPolicySingleOrgReqV2": {
+    "message": "You must enable the single organization policy before enabling this one."
+  },
+  "accountRecoveryPolicyDescV3Part1": {
+    "message": "Allow admins to help members regain access to their accounts when they're enrolled in "
+  },
+  "accountRecoveryDescLinkText": {
+    "message": "account recovery"
+  },
+  "accountRecoveryPolicyDescV3Part2": {
+    "message": ". Once this policy is turned on, existing members can enroll and, if you choose, new members will be automatically enrolled."
   },
   "resetPasswordPolicyAutoEnroll": {
     "message": "Otomatik eklenme"
@@ -8111,8 +8274,17 @@
   "activateAutofillPolicy": {
     "message": "Otomatik doldurmayı etkinleştir"
   },
+  "enableAutofillOnPageLoad": {
+    "message": "Enable autofill on page load"
+  },
   "activateAutofillPolicyDescription": {
     "message": "Tüm mevcut ve yeni üyeler için tarayıcı uzantısındaki \"sayfa yüklendiğinde otomatik doldur\" ayarını etkinleştir."
+  },
+  "activateAutofillPolicyDescV2": {
+    "message": "Enable autofill on page load setting in the browser extension for all existing and new members. Be aware that compromised or untrustworthy websites can"
+  },
+  "exploitAutofillOnPageLoad": {
+    "message": "exploit autofill on page load"
   },
   "autofillOnPageLoadExploitWarning": {
     "message": "Ele geçirilmiş veya güvenilmeyen web siteleri sayfa yüklenirken otomatik doldurmayı suistimal edebilir."
@@ -9903,6 +10075,9 @@
   "newDomain": {
     "message": "Yeni alan adı"
   },
+  "addDomain": {
+    "message": "Alan adı ekle"
+  },
   "noDomains": {
     "message": "Alan adı yok"
   },
@@ -11080,6 +11255,12 @@
   "editedCollection": {
     "message": "Koleksiyon düzenlendi"
   },
+  "collectionEdited": {
+    "message": "Collection edited"
+  },
+  "collectionsEdited": {
+    "message": "Collections edited"
+  },
   "baseUrl": {
     "message": "Sunucu URL'si"
   },
@@ -11587,6 +11768,10 @@
     "message": "Yeni makine hesabı",
     "description": "Title for creating a new machine account."
   },
+  "addMachineAccount": {
+    "message": "Makine hesabı ekle",
+    "description": "Title for creating a new machine account."
+  },
   "machineAccountsNoItemsMessage": {
     "message": "Sır erişimini otomatikleştirmeye başlamak için yeni bir makine hesabı oluşturun.",
     "description": "Message to encourage the user to start creating machine accounts."
@@ -11708,6 +11893,15 @@
       "count": {
         "content": "$1",
         "example": "50"
+      }
+    }
+  },
+  "graceMachineAccounts": {
+    "message": "You have $COUNT$ machine accounts from your previous plan.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "30"
       }
     }
   },
@@ -13263,8 +13457,31 @@
     "message": "Kaydı arşivle",
     "description": "Verb"
   },
+  "archiveItemsPlural": {
+    "message": "$NUM$ kaydı arşivle",
+    "description": "Title of the archive items dialog when multiple items are selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "archiveItemsSingular": {
+    "message": "$NUM$ kaydı arşivle",
+    "description": "Title of the archive items dialog when a single item is selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
   "archiveItemDialogContent": {
     "message": "Once archived, this item will be excluded from search results and autofill suggestions."
+  },
+  "archiveItemsPluralDescription": {
+    "message": "Bu kayıtlar arşivlendikten sonra arama sonuçlarından ve otomatik doldurma önerilerinden çıkarılacaktır."
   },
   "archiveBulkItems": {
     "message": "Kayıtları arşivle",
@@ -14793,5 +15010,15 @@
   },
   "cannotSaveItemNoConfirmedOrgs": {
     "message": "Unable to save item. You must be confirmed to the organization to save items."
+  },
+  "labelWithNotification": {
+    "message": "$LABEL$: New notification",
+    "description": "Label for the notification with a new login suggestion.",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Login"
+      }
+    }
   }
 }

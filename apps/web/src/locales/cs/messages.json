@@ -1190,6 +1190,42 @@
   "viewItem": {
     "message": "Zobrazit položku"
   },
+  "addItemHeaderLogin": {
+    "message": "Přidat přihlašovací údaje",
+    "description": "Header for new login item type"
+  },
+  "addItemHeaderCard": {
+    "message": "Přidat kartu",
+    "description": "Header for new card item type"
+  },
+  "addItemHeaderIdentity": {
+    "message": "Přidat identitu",
+    "description": "Header for new identity item type"
+  },
+  "addItemHeaderNote": {
+    "message": "Přidat poznámku",
+    "description": "Header for new note item type"
+  },
+  "addItemHeaderSecureNote": {
+    "message": "Přidat bezpečnou poznámku",
+    "description": "Header for new secure note item type"
+  },
+  "addItemHeaderSshKey": {
+    "message": "Přidat SSH klíč",
+    "description": "Header for new SSH key item type"
+  },
+  "addItemHeaderBankAccount": {
+    "message": "Přidat bankovní účet",
+    "description": "Header for new bank account item type"
+  },
+  "addItemHeaderDriversLicense": {
+    "message": "Přidat řidičský průkaz",
+    "description": "Header for new license item type"
+  },
+  "addItemHeaderPassport": {
+    "message": "Přidat pas",
+    "description": "Header for new passport item type"
+  },
   "newItemHeaderLogin": {
     "message": "Nové přihlášení",
     "description": "Header for new login item type"
@@ -1254,6 +1290,22 @@
     "message": "Upravit bezpečnou poznámku",
     "description": "Header for edit secure note item type"
   },
+  "editItemHeaderLoginSentenceCase": {
+    "message": "Upravit přihlašovací údaje",
+    "description": "Header for edit login item type"
+  },
+  "editItemHeaderCardSentenceCase": {
+    "message": "Upravit kartu",
+    "description": "Header for edit card item type"
+  },
+  "editItemHeaderIdentitySentenceCase": {
+    "message": "Upravit identitu",
+    "description": "Header for edit identity item type"
+  },
+  "editItemHeaderNoteSentenceCase": {
+    "message": "Upravit poznámku",
+    "description": "Header for edit note item type"
+  },
   "editItemHeaderSshKey": {
     "message": "Upravit SSH klíč",
     "description": "Header for edit SSH key item type"
@@ -1313,6 +1365,26 @@
   "viewItemHeaderPassport": {
     "message": "Zobrazit pas",
     "description": "Header for view passport item type"
+  },
+  "viewItemHeaderLoginSentenceCase": {
+    "message": "Zobrazit přihlašovací údaje",
+    "description": "Header for view login item type"
+  },
+  "viewItemHeaderCardSentenceCase": {
+    "message": "Zobrazit kartu",
+    "description": "Header for view card item type"
+  },
+  "viewItemHeaderIdentitySentenceCase": {
+    "message": "Zobrazit identitu",
+    "description": "Header for view identity item type"
+  },
+  "viewItemHeaderNoteSentenceCase": {
+    "message": "Zobrazit poznámku",
+    "description": "Header for view note item type"
+  },
+  "create": {
+    "message": "Vytořit",
+    "description": "for adding new items"
   },
   "new": {
     "message": "Nová",
@@ -2481,6 +2553,9 @@
     "message": "Minimální počet speciálních znaků",
     "description": "Minimum special characters"
   },
+  "minSpecialCharacters": {
+    "message": "Minimální počet speciálních znaků"
+  },
   "ambiguous": {
     "message": "Nepoužívat zaměnitelné znaky",
     "description": "deprecated. Use avoidAmbiguous instead."
@@ -2903,6 +2978,9 @@
   },
   "newCustomDomain": {
     "message": "Nová vlastní doména"
+  },
+  "addCustomDomain": {
+    "message": "Přidat vlastní doménu"
   },
   "newCustomDomainDesc": {
     "message": "Zadejte seznam domén oddělených čárkou. Povolené jsou pouze \"základní\" domény. Nezadávejte subdomény. Například, místo \"vault.bitwarden.com\" zadejte \"bitwarden.com\". Pokud chcete přiřadit Android aplikaci k ostatním webovým doménám, můžete také zadat \"androidapp://package.name\"."
@@ -5040,6 +5118,15 @@
       }
     }
   },
+  "stagedUserId": {
+    "message": "Byl přidán dočasný uživatel $ID$.",
+    "placeholders": {
+      "id": {
+        "content": "$1",
+        "example": "John Smith"
+      }
+    }
+  },
   "revokedEmailError": {
     "message": "1 nebo více e-mailů patří odvolaným členům. Pro opětovné pozvání obnovte jejich přístup."
   },
@@ -5047,7 +5134,7 @@
     "message": "Nebyl logován žádný důvod"
   },
   "revocationReasonManual": {
-    "message": "Zrušeno administrátorem"
+    "message": "Zrušeno správcem"
   },
   "revocationReasonTwoFactorNonCompliance": {
     "message": "Není v souladu s pravidly dvoufázového přihlášení"
@@ -6295,6 +6382,27 @@
   "masterPassPolicyDesc": {
     "message": "Nastavte minimální požadavky pro sílu hlavního hesla."
   },
+  "enablePolicy": {
+    "message": "Povolit zásadu"
+  },
+  "minCharacterLength": {
+    "message": "Minimální délka znaku"
+  },
+  "characterRequirements": {
+    "message": "Požadavky na znaky"
+  },
+  "specialCharactersPolicy": {
+    "message": "Speciální znaky (např. !, @, $)"
+  },
+  "uppercasePolicy": {
+    "message": "Velká písmena"
+  },
+  "lowercasePolicy": {
+    "message": "Malá písmena"
+  },
+  "numbersPolicy": {
+    "message": "Čísla"
+  },
   "passwordStrengthScore": {
     "message": "Skóre síly hesla: $SCORE$",
     "placeholders": {
@@ -6311,19 +6419,28 @@
     "message": "Bude požadovat po uživatelích nastavení dvoufázového přihlášení pro jejich osobní účty."
   },
   "twoStepLoginPolicyDescV2": {
-    "message": "Require members to set up two-step login. This policy won't be enforced for owners and admins."
+    "message": "Vyžadujte od členů, aby si nastavili dvoufázové přihlášení. Tato zásada se nebude vztahovat na vlastníky a správce."
   },
   "twoStepLoginPolicyWarning": {
     "message": "Členové organizace, kteří nejsou vlastníky nebo správci a kteří nemají povoleno dvoufázové přihlášení pro svůj osobní účet, budou odebráni z organizace a obdrží e-mail, který je o změně informuje."
   },
   "twoStepLoginPolicyWarningV2": {
-    "message": "Enabling this policy will revoke any users who do not have two-step login enabled on their accounts. Affected users will be notified by email."
+    "message": "Aktivací této zásady budou odhlášeni všichni uživatelé, kteří nemají ve svých účtech zapnuté dvoufázové ověření. Dotčení uživatelé budou informováni e-mailem."
   },
   "twoStepLoginPolicyUserWarning": {
     "message": "Jste členem organizace, která vyžaduje použití dvoufázového přihlášení na Vašem uživatelském účtu. Pokud zakážete všechny poskytovatele dvoufázového přihlášení, budete z takovýchto organizací automaticky odebráni."
   },
   "passwordGeneratorPolicyDesc": {
     "message": "Nastaví požadavky pro generátor hesel."
+  },
+  "passwordGeneratorPolicyDescV2": {
+    "message": "Vyberte sadu minimálních požadavků na hesla vytvářená uživateli."
+  },
+  "generatedPassword": {
+    "message": "Vygenerované heslo"
+  },
+  "generatedPassphrase": {
+    "message": "Vygenerovaná přístupová fráze"
   },
   "masterPasswordPolicyInEffect": {
     "message": "Jedna nebo více zásad organizace vyžaduje, aby hlavní heslo splňovalo následující požadavky:"
@@ -6573,6 +6690,9 @@
   "singleOrgPolicyDesc": {
     "message": "Omezí členům vstup do jiných organizací. Tato zásada je vyžadována u organizací, které povolily ověřování domény."
   },
+  "singleOrgPolicyDescV2": {
+    "message": "Členové této organizace se nemohou stát členy jiných organizací. Stávajícím členům, kteří jsou členy jiných organizací, bude po aktivaci této zásady odebrán přístup. Tato zásada se nevztahuje na vlastníky a správce."
+  },
   "singleOrgBlockCreateMessage": {
     "message": "Vaše aktuální organizace má pravidla, která Vám nedovolují připojit se k více než jedné organizaci. Obraťte se na správce organizace nebo se zaregistrujte z jiného účtu na Bitwardenu."
   },
@@ -6586,10 +6706,10 @@
     "message": "Vyžaduje přihlášení uživatelů pomocí metody jednotného podnikového přihlášení."
   },
   "requireSsoPolicyTitle": {
-    "message": "Require single sign-on (SSO)"
+    "message": "Vyžadovat jednotné přihlášení (SSO)"
   },
   "requireSsoPolicyDescV2": {
-    "message": "Require members to log in using SSO. This policy won't be enforced for owners and admins."
+    "message": "Vyžaduje, aby se členové přihlašovali pomocí SSO. Tato zásada se nebude vztahovat na vlastníky a správce."
   },
   "prerequisite": {
     "message": "Předpoklady"
@@ -6598,7 +6718,7 @@
     "message": "Před aktivací této zásady musí být povolena jednotná pravidla organizace."
   },
   "requireSsoPolicyReqV2": {
-    "message": "You must enable the single organization policy before enabling this one."
+    "message": "Než tuto zásadu povolíte, musíte nejprve povolit zásadu pro jednu organizaci."
   },
   "requireSsoPolicyReqError": {
     "message": "Jednotná pravidla organizace nebyla nastavena."
@@ -6638,6 +6758,10 @@
   },
   "createSend": {
     "message": "Nový Send",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "createSendV2": {
+    "message": "Vytvořit Send",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "editSend": {
@@ -6732,6 +6856,12 @@
   },
   "accepted": {
     "message": "Přijato"
+  },
+  "staged": {
+    "message": "Připraveno"
+  },
+  "stagedMemberTooltip": {
+    "message": "Čekající pozvánka k účtu"
   },
   "sendLink": {
     "message": "Odkaz pro Send",
@@ -7008,9 +7138,6 @@
   "promptUsersToMoveItemsV2": {
     "message": "Vyzvat uživatele k přesunutí jejich položek trezoru do organizace"
   },
-  "enablePolicy": {
-    "message": "Povolit zásadu"
-  },
   "organizationDataOwnership": {
     "message": "Vynutit vlastnictví dat organizace"
   },
@@ -7115,6 +7242,30 @@
   },
   "autoConfirmDisabledByPortal": {
     "message": "Odebrána zásada automatického potvrzování uživatele"
+  },
+  "inviteLinkEventCreated": {
+    "message": "Odkaz pro pozvánku vytvořen"
+  },
+  "inviteLinkEventDomainsEdited": {
+    "message": "Upraveny povolené domény pro odkaz pozvánky"
+  },
+  "inviteLinkEventDeleted": {
+    "message": "Odkaz pro pozvánku smazán"
+  },
+  "inviteLinkEventCopied": {
+    "message": "Odkaz pro pozvánku zkopírován"
+  },
+  "inviteLinkEventRegenerated": {
+    "message": "Odkaz pro pozvánku znovu vygenerován"
+  },
+  "inviteLinkEventAccepted": {
+    "message": "Člen $ID$ přijal pozvánku prostřednictvím odkazu pozvánky",
+    "placeholders": {
+      "id": {
+        "content": "$1",
+        "example": "First 8 characters of a GUID"
+      }
+    }
   },
   "system": {
     "message": "Systém"
@@ -7395,7 +7546,7 @@
     "message": "Potřebujete schválení správce, abyste mohli vyzkoušet Správce tajných klíčů."
   },
   "smAccessRequestEmailSent": {
-    "message": "Žádost o přístup ke Správci tajných klíčů byla odeslána e-mailem administrátorům."
+    "message": "Žádost o přístup ke Správci tajných klíčů byla odeslána e-mailem správcům."
   },
   "requestAccessSMDefaultEmailContent": {
     "message": "Zdravím,\n\nžádám o předplatné Správce tajných klíčů Bitwarden pro náš tým. Vaše podpora by pro nás znamenala mnoho!\n\nSprávce tajných klíčů Bitwarden je end-to-end řešení pro správu šifrovaných tajných klíčů pro bezpečné ukládání, sdílení a nasazení strojových pověření, jako jsou klíče API, databázová hesla a ověřovací certifikáty.\n\nSprávce klíčů nám pomůže:\n\n- zlepšit zabezpečení\n- zjednodušit provoz\n- zabránit nákladným únikům tajných klíčů\n\nChcete-li požádat o bezplatnou zkušební verzi pro náš tým, obraťte se na společnost Bitwarden.\n\nDěkujeme Vám za pomoc!"
@@ -7612,6 +7763,18 @@
   },
   "accountRecoverySingleOrgRequirementDesc": {
     "message": "Před aktivací této zásady musí být povolena jednotná pravidla organizace."
+  },
+  "accountRecoveryPolicySingleOrgReqV2": {
+    "message": "Než tuto zásadu povolíte, musíte nejprve povolit zásadu pro jednu organizaci."
+  },
+  "accountRecoveryPolicyDescV3Part1": {
+    "message": "Umožní správcům pomáhat členům s obnovením přístupu k jejich účtům, pokud jsou zaregistrováni v "
+  },
+  "accountRecoveryDescLinkText": {
+    "message": "obnovení účtu"
+  },
+  "accountRecoveryPolicyDescV3Part2": {
+    "message": ". Jakmile bude tato zásada aktivována, budou se moci stávající členové zaregistrovat a, pokud se tak rozhodnete, budou noví členové zaregistrováni automaticky."
   },
   "resetPasswordPolicyAutoEnroll": {
     "message": "Automatická registrace"
@@ -8100,7 +8263,7 @@
     "message": "Nedovolí, aby členové exportovali svá osobní data trezoru."
   },
   "disablePersonalVaultExportDescriptionV2": {
-    "message": "Do not allow members to export data from their individual vaults. This policy won't be enforced for owners and admins."
+    "message": "Neumožní členům exportovat data z jejich individuálních úložišť. Tato zásada se nevztahuje na vlastníky a správce."
   },
   "vaultExportDisabled": {
     "message": "Export trezoru byl odebrán"
@@ -8111,8 +8274,17 @@
   "activateAutofillPolicy": {
     "message": "Aktivovat automatické vyplnění"
   },
+  "enableAutofillOnPageLoad": {
+    "message": "Povolit automatické vyplňování při načítání stránky"
+  },
   "activateAutofillPolicyDescription": {
     "message": "Aktivuje automatické vyplnění při načítání stránky pro rozšíření prohlížeče pro všechny existující i nové členy."
+  },
+  "activateAutofillPolicyDescV2": {
+    "message": "V rozšíření prohlížeče povolte nastavení automatického vyplňování při načtení stránky pro všechny stávající i nové členy. Mějte na paměti, že napadené nebo nedůvěryhodné webové stránky mohou"
+  },
+  "exploitAutofillOnPageLoad": {
+    "message": "využít funkci automatického vyplňování při načtení stránky"
   },
   "autofillOnPageLoadExploitWarning": {
     "message": "Kompromitované nebo nedůvěryhodné webové stránky mohou zneužívat automatické vyplňování při načítání stránky."
@@ -9903,6 +10075,9 @@
   "newDomain": {
     "message": "Nová doména"
   },
+  "addDomain": {
+    "message": "Přidat doménu"
+  },
   "noDomains": {
     "message": "Žádné domény"
   },
@@ -11080,6 +11255,12 @@
   "editedCollection": {
     "message": "Upravená sbírka"
   },
+  "collectionEdited": {
+    "message": "Sbírka byla upravena"
+  },
+  "collectionsEdited": {
+    "message": "Sbírky byly upraveny"
+  },
   "baseUrl": {
     "message": "URL serveru"
   },
@@ -11587,6 +11768,10 @@
     "message": "Nový strojový účet",
     "description": "Title for creating a new machine account."
   },
+  "addMachineAccount": {
+    "message": "Přidat strojový účet",
+    "description": "Title for creating a new machine account."
+  },
   "machineAccountsNoItemsMessage": {
     "message": "Abyste mohli začít automatizovat přístup k tajnému kliči, vytvořte nový strojový účet.",
     "description": "Message to encourage the user to start creating machine accounts."
@@ -11708,6 +11893,15 @@
       "count": {
         "content": "$1",
         "example": "50"
+      }
+    }
+  },
+  "graceMachineAccounts": {
+    "message": "Máte $COUNT$ strojových účtů z Vašeho předchozího plánu.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "30"
       }
     }
   },
@@ -13201,7 +13395,7 @@
     "message": "Nepovolí členům odemknout svůj účet pomocí PIN."
   },
   "removeUnlockWithPinPolicyDescV2": {
-    "message": "Members will not be allowed to unlock their account with a PIN."
+    "message": "Členové nebudou moci odemknout svůj účet pomocí PIN kódu."
   },
   "upgradeForFullEventsMessage": {
     "message": "Logy událostí nejsou uloženy pro Vaši organizaci. Aktualizujte na Týmy nebo plán Enterprise a získejte plný přístup k logům událostí."
@@ -13263,8 +13457,31 @@
     "message": "Archivovat položku",
     "description": "Verb"
   },
+  "archiveItemsPlural": {
+    "message": "Archivovat $NUM$ položek",
+    "description": "Title of the archive items dialog when multiple items are selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "archiveItemsSingular": {
+    "message": "Archivovat $NUM$ položku",
+    "description": "Title of the archive items dialog when a single item is selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
   "archiveItemDialogContent": {
     "message": "Jakmile bude tato položka archivována, bude vyloučena z výsledků vyhledávání a z návrhů automatického vyplňování."
+  },
+  "archiveItemsPluralDescription": {
+    "message": "Jakmile budou tyto položky archivovány, budou vyloučeny z výsledků vyhledávání a z návrhů automatického vyplňování."
   },
   "archiveBulkItems": {
     "message": "Archivovat položky",
@@ -14793,5 +15010,15 @@
   },
   "cannotSaveItemNoConfirmedOrgs": {
     "message": "Položku nelze uložit. Musíte potvrdit organizaci pro uložení položek."
+  },
+  "labelWithNotification": {
+    "message": "$LABEL$: Nové oznámení",
+    "description": "Label for the notification with a new login suggestion.",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Login"
+      }
+    }
   }
 }

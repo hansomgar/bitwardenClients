@@ -1190,6 +1190,42 @@
   "viewItem": {
     "message": "Visa objekt"
   },
+  "addItemHeaderLogin": {
+    "message": "Add login",
+    "description": "Header for new login item type"
+  },
+  "addItemHeaderCard": {
+    "message": "Add card",
+    "description": "Header for new card item type"
+  },
+  "addItemHeaderIdentity": {
+    "message": "Add identity",
+    "description": "Header for new identity item type"
+  },
+  "addItemHeaderNote": {
+    "message": "Add note",
+    "description": "Header for new note item type"
+  },
+  "addItemHeaderSecureNote": {
+    "message": "Add secure note",
+    "description": "Header for new secure note item type"
+  },
+  "addItemHeaderSshKey": {
+    "message": "Add SSH key",
+    "description": "Header for new SSH key item type"
+  },
+  "addItemHeaderBankAccount": {
+    "message": "Add bank account",
+    "description": "Header for new bank account item type"
+  },
+  "addItemHeaderDriversLicense": {
+    "message": "Add license",
+    "description": "Header for new license item type"
+  },
+  "addItemHeaderPassport": {
+    "message": "Add passport",
+    "description": "Header for new passport item type"
+  },
   "newItemHeaderLogin": {
     "message": "Ny inloggning",
     "description": "Header for new login item type"
@@ -1254,6 +1290,22 @@
     "message": "Edit secure note",
     "description": "Header for edit secure note item type"
   },
+  "editItemHeaderLoginSentenceCase": {
+    "message": "Edit login",
+    "description": "Header for edit login item type"
+  },
+  "editItemHeaderCardSentenceCase": {
+    "message": "Edit card",
+    "description": "Header for edit card item type"
+  },
+  "editItemHeaderIdentitySentenceCase": {
+    "message": "Edit identity",
+    "description": "Header for edit identity item type"
+  },
+  "editItemHeaderNoteSentenceCase": {
+    "message": "Edit note",
+    "description": "Header for edit note item type"
+  },
   "editItemHeaderSshKey": {
     "message": "Redigera SSH-nyckel",
     "description": "Header for edit SSH key item type"
@@ -1313,6 +1365,26 @@
   "viewItemHeaderPassport": {
     "message": "View passport",
     "description": "Header for view passport item type"
+  },
+  "viewItemHeaderLoginSentenceCase": {
+    "message": "View login",
+    "description": "Header for view login item type"
+  },
+  "viewItemHeaderCardSentenceCase": {
+    "message": "View card",
+    "description": "Header for view card item type"
+  },
+  "viewItemHeaderIdentitySentenceCase": {
+    "message": "View identity",
+    "description": "Header for view identity item type"
+  },
+  "viewItemHeaderNoteSentenceCase": {
+    "message": "View note",
+    "description": "Header for view note item type"
+  },
+  "create": {
+    "message": "Create",
+    "description": "for adding new items"
   },
   "new": {
     "message": "Nytt",
@@ -2481,6 +2553,9 @@
     "message": "Minsta antal speciella tecken",
     "description": "Minimum special characters"
   },
+  "minSpecialCharacters": {
+    "message": "Minimum special characters"
+  },
   "ambiguous": {
     "message": "Undvik tvetydiga tecken",
     "description": "deprecated. Use avoidAmbiguous instead."
@@ -2903,6 +2978,9 @@
   },
   "newCustomDomain": {
     "message": "Ny anpassad domän"
+  },
+  "addCustomDomain": {
+    "message": "Add custom domain"
   },
   "newCustomDomainDesc": {
     "message": "Ange en lista av domäner separerade med kommatecken. Endast basdomäner är tillåtna. Ange inte underdomäner. Ange till exempel \"google.com\" istället för \"www.google.com\". Du kan också ange \"androidapp://package.name\" för att associera en Android-app med andra webbplatsdomäner."
@@ -5040,6 +5118,15 @@
       }
     }
   },
+  "stagedUserId": {
+    "message": "Staged user $ID$ added.",
+    "placeholders": {
+      "id": {
+        "content": "$1",
+        "example": "John Smith"
+      }
+    }
+  },
   "revokedEmailError": {
     "message": "1 or more emails belong to revoked members. Restore their access to reinvite."
   },
@@ -6295,6 +6382,27 @@
   "masterPassPolicyDesc": {
     "message": "Ange minimikrav för huvudlösenordsstyrka."
   },
+  "enablePolicy": {
+    "message": "Enable policy"
+  },
+  "minCharacterLength": {
+    "message": "Minimum character length"
+  },
+  "characterRequirements": {
+    "message": "Character requirements"
+  },
+  "specialCharactersPolicy": {
+    "message": "Special characters (e.g. !, @, $)"
+  },
+  "uppercasePolicy": {
+    "message": "Uppercase"
+  },
+  "lowercasePolicy": {
+    "message": "Lowercase"
+  },
+  "numbersPolicy": {
+    "message": "Numbers"
+  },
   "passwordStrengthScore": {
     "message": "Lösenordsstyrka $SCORE$",
     "placeholders": {
@@ -6324,6 +6432,15 @@
   },
   "passwordGeneratorPolicyDesc": {
     "message": "Ange minimikrav för lösenordsgeneratorn."
+  },
+  "passwordGeneratorPolicyDescV2": {
+    "message": "Select a set of minimum requirements for any member-generated passwords."
+  },
+  "generatedPassword": {
+    "message": "Generated password"
+  },
+  "generatedPassphrase": {
+    "message": "Generated passphrase"
   },
   "masterPasswordPolicyInEffect": {
     "message": "En eller flera organisationspolicyer kräver att ditt huvudlösenord uppfyller följande krav:"
@@ -6573,6 +6690,9 @@
   "singleOrgPolicyDesc": {
     "message": "Begränsa medlemmar från att gå med i andra organisationer. Den här principen krävs för organisationer som har aktiverat domänverifiering."
   },
+  "singleOrgPolicyDescV2": {
+    "message": "Members of this organization cannot join other organizations. Existing members who belong to other organizations will have their access revoked when this policy is enabled. This policy won't be enforced for owners and admins."
+  },
   "singleOrgBlockCreateMessage": {
     "message": "Din nuvarande organisation har en policy som hindrar dig från att gå med i fler än en organisation. Vänligen kontakta din organisations administratörer eller registrera ett annat Bitwarden-konto."
   },
@@ -6638,6 +6758,10 @@
   },
   "createSend": {
     "message": "Ny Send",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "createSendV2": {
+    "message": "Create Send",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "editSend": {
@@ -6732,6 +6856,12 @@
   },
   "accepted": {
     "message": "Accepterade"
+  },
+  "staged": {
+    "message": "Staged"
+  },
+  "stagedMemberTooltip": {
+    "message": "Pending account invitation"
   },
   "sendLink": {
     "message": "Send-länk",
@@ -7008,9 +7138,6 @@
   "promptUsersToMoveItemsV2": {
     "message": "Prompt users to move their vault items to the organization"
   },
-  "enablePolicy": {
-    "message": "Enable policy"
-  },
   "organizationDataOwnership": {
     "message": "Genomför äganderätt till organisationsdata"
   },
@@ -7115,6 +7242,30 @@
   },
   "autoConfirmDisabledByPortal": {
     "message": "Removed Automatic user confirmation policy"
+  },
+  "inviteLinkEventCreated": {
+    "message": "Created invite link"
+  },
+  "inviteLinkEventDomainsEdited": {
+    "message": "Edited allowed domains for invite link"
+  },
+  "inviteLinkEventDeleted": {
+    "message": "Deleted invite link"
+  },
+  "inviteLinkEventCopied": {
+    "message": "Copied invite link"
+  },
+  "inviteLinkEventRegenerated": {
+    "message": "Regenerated invite link"
+  },
+  "inviteLinkEventAccepted": {
+    "message": "Member $ID$ accepted invitation through invite link",
+    "placeholders": {
+      "id": {
+        "content": "$1",
+        "example": "First 8 characters of a GUID"
+      }
+    }
   },
   "system": {
     "message": "System"
@@ -7612,6 +7763,18 @@
   },
   "accountRecoverySingleOrgRequirementDesc": {
     "message": "Företagspolicyn för en enda organisation måste vara aktiverad innan den här policyn aktiveras."
+  },
+  "accountRecoveryPolicySingleOrgReqV2": {
+    "message": "You must enable the single organization policy before enabling this one."
+  },
+  "accountRecoveryPolicyDescV3Part1": {
+    "message": "Allow admins to help members regain access to their accounts when they're enrolled in "
+  },
+  "accountRecoveryDescLinkText": {
+    "message": "account recovery"
+  },
+  "accountRecoveryPolicyDescV3Part2": {
+    "message": ". Once this policy is turned on, existing members can enroll and, if you choose, new members will be automatically enrolled."
   },
   "resetPasswordPolicyAutoEnroll": {
     "message": "Automatiskt deltagande"
@@ -8111,8 +8274,17 @@
   "activateAutofillPolicy": {
     "message": "Aktivera autofyll"
   },
+  "enableAutofillOnPageLoad": {
+    "message": "Enable autofill on page load"
+  },
   "activateAutofillPolicyDescription": {
     "message": "Aktivera autofyll på sidladdningsinställningar på webbläsartillägget för alla befintliga och nya medlemmar."
+  },
+  "activateAutofillPolicyDescV2": {
+    "message": "Enable autofill on page load setting in the browser extension for all existing and new members. Be aware that compromised or untrustworthy websites can"
+  },
+  "exploitAutofillOnPageLoad": {
+    "message": "exploit autofill on page load"
   },
   "autofillOnPageLoadExploitWarning": {
     "message": "Komprometterade eller ej betrodda webbplatser kan utnyttja automatisk ifyllnad vid sidladdning."
@@ -9903,6 +10075,9 @@
   "newDomain": {
     "message": "Ny domän"
   },
+  "addDomain": {
+    "message": "Add domain"
+  },
   "noDomains": {
     "message": "Inga domäner"
   },
@@ -11080,6 +11255,12 @@
   "editedCollection": {
     "message": "Edited collection"
   },
+  "collectionEdited": {
+    "message": "Collection edited"
+  },
+  "collectionsEdited": {
+    "message": "Collections edited"
+  },
   "baseUrl": {
     "message": "Server-URL"
   },
@@ -11587,6 +11768,10 @@
     "message": "Nytt maskinkonto",
     "description": "Title for creating a new machine account."
   },
+  "addMachineAccount": {
+    "message": "Add machine account",
+    "description": "Title for creating a new machine account."
+  },
   "machineAccountsNoItemsMessage": {
     "message": "Skapa ett nytt maskinkonto för att komma igång med att automatisera hemlig åtkomst.",
     "description": "Message to encourage the user to start creating machine accounts."
@@ -11708,6 +11893,15 @@
       "count": {
         "content": "$1",
         "example": "50"
+      }
+    }
+  },
+  "graceMachineAccounts": {
+    "message": "You have $COUNT$ machine accounts from your previous plan.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "30"
       }
     }
   },
@@ -13263,8 +13457,31 @@
     "message": "Arkivera objekt",
     "description": "Verb"
   },
+  "archiveItemsPlural": {
+    "message": "Archive $NUM$ items",
+    "description": "Title of the archive items dialog when multiple items are selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "archiveItemsSingular": {
+    "message": "Archive $NUM$ item",
+    "description": "Title of the archive items dialog when a single item is selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
   "archiveItemDialogContent": {
     "message": "När du har arkiverat kommer detta objekt att uteslutas från sökresultat och förslag till autofyll."
+  },
+  "archiveItemsPluralDescription": {
+    "message": "Once archived, these items will be excluded from search results and autofill suggestions."
   },
   "archiveBulkItems": {
     "message": "Arkivera objekt",
@@ -14793,5 +15010,15 @@
   },
   "cannotSaveItemNoConfirmedOrgs": {
     "message": "Unable to save item. You must be confirmed to the organization to save items."
+  },
+  "labelWithNotification": {
+    "message": "$LABEL$: New notification",
+    "description": "Label for the notification with a new login suggestion.",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Login"
+      }
+    }
   }
 }

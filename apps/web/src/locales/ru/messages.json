@@ -1190,6 +1190,42 @@
   "viewItem": {
     "message": "Просмотр элемента"
   },
+  "addItemHeaderLogin": {
+    "message": "Добавить логин",
+    "description": "Header for new login item type"
+  },
+  "addItemHeaderCard": {
+    "message": "Добавить карту",
+    "description": "Header for new card item type"
+  },
+  "addItemHeaderIdentity": {
+    "message": "Добавить личную информацию",
+    "description": "Header for new identity item type"
+  },
+  "addItemHeaderNote": {
+    "message": "Добавить заметку",
+    "description": "Header for new note item type"
+  },
+  "addItemHeaderSecureNote": {
+    "message": "Добавить защищенную заметку",
+    "description": "Header for new secure note item type"
+  },
+  "addItemHeaderSshKey": {
+    "message": "Добавить ключ SSH",
+    "description": "Header for new SSH key item type"
+  },
+  "addItemHeaderBankAccount": {
+    "message": "Добавить банковский счет",
+    "description": "Header for new bank account item type"
+  },
+  "addItemHeaderDriversLicense": {
+    "message": "Добавить водительское удостоверение",
+    "description": "Header for new license item type"
+  },
+  "addItemHeaderPassport": {
+    "message": "Добавить паспорт",
+    "description": "Header for new passport item type"
+  },
   "newItemHeaderLogin": {
     "message": "Новый логин",
     "description": "Header for new login item type"
@@ -1254,6 +1290,22 @@
     "message": "Изменить защищенную заметку",
     "description": "Header for edit secure note item type"
   },
+  "editItemHeaderLoginSentenceCase": {
+    "message": "Изменить логин",
+    "description": "Header for edit login item type"
+  },
+  "editItemHeaderCardSentenceCase": {
+    "message": "Редактировать карту",
+    "description": "Header for edit card item type"
+  },
+  "editItemHeaderIdentitySentenceCase": {
+    "message": "Редактировать личную информацию",
+    "description": "Header for edit identity item type"
+  },
+  "editItemHeaderNoteSentenceCase": {
+    "message": "Редактировать заметку",
+    "description": "Header for edit note item type"
+  },
   "editItemHeaderSshKey": {
     "message": "Редактировать ключ SSH",
     "description": "Header for edit SSH key item type"
@@ -1313,6 +1365,26 @@
   "viewItemHeaderPassport": {
     "message": "Просмотреть паспорт",
     "description": "Header for view passport item type"
+  },
+  "viewItemHeaderLoginSentenceCase": {
+    "message": "Просмотр логина",
+    "description": "Header for view login item type"
+  },
+  "viewItemHeaderCardSentenceCase": {
+    "message": "Просмотр карты",
+    "description": "Header for view card item type"
+  },
+  "viewItemHeaderIdentitySentenceCase": {
+    "message": "Просмотр личной информации",
+    "description": "Header for view identity item type"
+  },
+  "viewItemHeaderNoteSentenceCase": {
+    "message": "Просмотр заметки",
+    "description": "Header for view note item type"
+  },
+  "create": {
+    "message": "Создать",
+    "description": "for adding new items"
   },
   "new": {
     "message": "Новый",
@@ -2481,6 +2553,9 @@
     "message": "Минимум символов",
     "description": "Minimum special characters"
   },
+  "minSpecialCharacters": {
+    "message": "Минимум специальных символов"
+  },
   "ambiguous": {
     "message": "Избегать неоднозначных символов",
     "description": "deprecated. Use avoidAmbiguous instead."
@@ -2903,6 +2978,9 @@
   },
   "newCustomDomain": {
     "message": "Новый пользовательский домен"
+  },
+  "addCustomDomain": {
+    "message": "Добавить пользовательский домен"
   },
   "newCustomDomainDesc": {
     "message": "Введите список доменов, разделенных запятыми. Допускаются только базовые домены. Не вводите субдомены. Например, вводите \"google.com\" вместо \"www.google.com\". Также вы можете ввести \"androidapp://package.name\", чтобы связать приложение Android с другими доменами сайта."
@@ -5040,6 +5118,15 @@
       }
     }
   },
+  "stagedUserId": {
+    "message": "Staged user $ID$ added.",
+    "placeholders": {
+      "id": {
+        "content": "$1",
+        "example": "John Smith"
+      }
+    }
+  },
   "revokedEmailError": {
     "message": "Один или несколько адресов email принадлежат пользователям, чьи аккаунтам были заблокированы. Восстановите их доступ, чтобы снова их пригласить.."
   },
@@ -6295,6 +6382,27 @@
   "masterPassPolicyDesc": {
     "message": "Установите требования к надежности мастер-пароля."
   },
+  "enablePolicy": {
+    "message": "Включить политику"
+  },
+  "minCharacterLength": {
+    "message": "Минимальное количество символов"
+  },
+  "characterRequirements": {
+    "message": "Требования к символам"
+  },
+  "specialCharactersPolicy": {
+    "message": "Специальные символы (например, !, @, $)"
+  },
+  "uppercasePolicy": {
+    "message": "Заглавные буквы"
+  },
+  "lowercasePolicy": {
+    "message": "Строчные буквы"
+  },
+  "numbersPolicy": {
+    "message": "Цифры"
+  },
   "passwordStrengthScore": {
     "message": "Оценка надежности пароля $SCORE$",
     "placeholders": {
@@ -6311,19 +6419,28 @@
     "message": "Требовать от пользователей настройки двухэтапной аутентификации."
   },
   "twoStepLoginPolicyDescV2": {
-    "message": "Require members to set up two-step login. This policy won't be enforced for owners and admins."
+    "message": "Требовать от пользователей настройки двухэтапной аутентификации при входе. Эта политика не будет применяться к владельцам и администраторам."
   },
   "twoStepLoginPolicyWarning": {
     "message": "Пользователи организации, которые не являются владельцами или администраторами и не настроили двухэтапную аутентификацию для своего аккаунта, будут удалены из организации и получат об этом уведомление по email."
   },
   "twoStepLoginPolicyWarningV2": {
-    "message": "Enabling this policy will revoke any users who do not have two-step login enabled on their accounts. Affected users will be notified by email."
+    "message": "Включение этой политики приведет к отзыву всех пользователей, у которых в аккаунтах не включена двухэтапная аутентификация при входе. Затронутые пользователи будут уведомлены по email."
   },
   "twoStepLoginPolicyUserWarning": {
     "message": "Вы участник организации, которая требует, чтобы в вашем аккаунте была настроена двухэтапная аутентификация. Если вы отключите всех провайдеров двухэтапной аутентификации, то будете автоматически удалены из этих организаций."
   },
   "passwordGeneratorPolicyDesc": {
     "message": "Установить требования к генератору паролей."
+  },
+  "passwordGeneratorPolicyDescV2": {
+    "message": "Выберите набор минимальных требований к паролям, создаваемым пользователями."
+  },
+  "generatedPassword": {
+    "message": "Сгенерированный пароль"
+  },
+  "generatedPassphrase": {
+    "message": "Сгенерированная парольная фраза"
   },
   "masterPasswordPolicyInEffect": {
     "message": "Согласно одной или нескольким политикам организации необходимо, чтобы ваш мастер-пароль отвечал следующим требованиям:"
@@ -6573,6 +6690,9 @@
   "singleOrgPolicyDesc": {
     "message": "Запретить членам организации присоединяться к другим организациям. Эта политика необходима для организаций, в которых включена проверка домена."
   },
+  "singleOrgPolicyDescV2": {
+    "message": "Члены этой организации не могут вступать в другие организации. При включении этой политики у существующих пользователей, принадлежащим к другим организациям, будет отозван доступ. Эта политика не будет применяться к владельцам и администраторам."
+  },
   "singleOrgBlockCreateMessage": {
     "message": "Политика вашей текущей организации не позволяет вам присоединиться к более чем одной организации. Пожалуйста, свяжитесь с администраторами вашей организации или авторизуйтесь под другим аккаунтом Bitwarden."
   },
@@ -6586,10 +6706,10 @@
     "message": "Требовать от участников входа с помощью единой корпоративной авторизации."
   },
   "requireSsoPolicyTitle": {
-    "message": "Require single sign-on (SSO)"
+    "message": "Требовать единый вход в систему (SSO)"
   },
   "requireSsoPolicyDescV2": {
-    "message": "Require members to log in using SSO. This policy won't be enforced for owners and admins."
+    "message": "Требовать от пользователей авторизации с использованием единого входа. Эта политика не будет применяться к владельцам и администраторам."
   },
   "prerequisite": {
     "message": "Обязательное условие"
@@ -6598,7 +6718,7 @@
     "message": "Перед активацией этой политики необходимо включить политику Единого входа (SSO)."
   },
   "requireSsoPolicyReqV2": {
-    "message": "You must enable the single organization policy before enabling this one."
+    "message": "Перед включением этой политики необходимо включить политику единой организации."
   },
   "requireSsoPolicyReqError": {
     "message": "Не включена политика единой организации."
@@ -6638,6 +6758,10 @@
   },
   "createSend": {
     "message": "Новая Send",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "createSendV2": {
+    "message": "Создать Send",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "editSend": {
@@ -6732,6 +6856,12 @@
   },
   "accepted": {
     "message": "Принято"
+  },
+  "staged": {
+    "message": "Staged"
+  },
+  "stagedMemberTooltip": {
+    "message": "Pending account invitation"
   },
   "sendLink": {
     "message": "Ссылка на Send",
@@ -7008,9 +7138,6 @@
   "promptUsersToMoveItemsV2": {
     "message": "Предложить пользователям переместить их элементы хранилища в организацию"
   },
-  "enablePolicy": {
-    "message": "Включить политику"
-  },
   "organizationDataOwnership": {
     "message": "Принудительное соблюдение прав собственности на данные организации"
   },
@@ -7115,6 +7242,30 @@
   },
   "autoConfirmDisabledByPortal": {
     "message": "Удалена политика автоматического подтверждения пользователей"
+  },
+  "inviteLinkEventCreated": {
+    "message": "Ссылка для приглашения создана"
+  },
+  "inviteLinkEventDomainsEdited": {
+    "message": "Изменен список разрешенных доменов ссылки для приглашения"
+  },
+  "inviteLinkEventDeleted": {
+    "message": "Ссылка для приглашения удалена"
+  },
+  "inviteLinkEventCopied": {
+    "message": "Ссылка для приглашения скопирована"
+  },
+  "inviteLinkEventRegenerated": {
+    "message": "Ссылка для приглашения создана повторно"
+  },
+  "inviteLinkEventAccepted": {
+    "message": "Пользователь $ID$ принял приглашение по ссылке",
+    "placeholders": {
+      "id": {
+        "content": "$1",
+        "example": "First 8 characters of a GUID"
+      }
+    }
   },
   "system": {
     "message": "Система"
@@ -7613,6 +7764,18 @@
   "accountRecoverySingleOrgRequirementDesc": {
     "message": "Перед активацией этой политики необходимо включить политику Единого входа (SSO)."
   },
+  "accountRecoveryPolicySingleOrgReqV2": {
+    "message": "Перед включением этой политики необходимо включить политику единой организации."
+  },
+  "accountRecoveryPolicyDescV3Part1": {
+    "message": "Разрешить администраторам помогать участникам восстанавливать доступ к своим аккаунтам, если они зарегистрированы в "
+  },
+  "accountRecoveryDescLinkText": {
+    "message": "восстановлении аккаунта"
+  },
+  "accountRecoveryPolicyDescV3Part2": {
+    "message": ". После включения этой политики существующие пользователи смогут зарегистрироваться, а новые пользователи, если вы это разрешите, будут регистрироваться автоматически."
+  },
   "resetPasswordPolicyAutoEnroll": {
     "message": "Автоматическое регистрация"
   },
@@ -8100,7 +8263,7 @@
     "message": "Запретить пользователям экспортировать данные из их собственного хранилища."
   },
   "disablePersonalVaultExportDescriptionV2": {
-    "message": "Do not allow members to export data from their individual vaults. This policy won't be enforced for owners and admins."
+    "message": "Не разрешать пользователям экспортировать данные из своих личных хранилищ. Эта политика не распространяется на владельцев и администраторов."
   },
   "vaultExportDisabled": {
     "message": "Экспорт хранилища отключен"
@@ -8111,8 +8274,17 @@
   "activateAutofillPolicy": {
     "message": "Активировать автозаполнение"
   },
+  "enableAutofillOnPageLoad": {
+    "message": "Включить автозаполнение при загрузке страницы"
+  },
   "activateAutofillPolicyDescription": {
     "message": "Включить автозаполнение при загрузке страницы в расширении браузера для всех существующих и новых участников."
+  },
+  "activateAutofillPolicyDescV2": {
+    "message": "Включите автозаполнение при загрузке страницы в расширении браузера для всех существующих и новых пользователей. Имейте в виду, что скомпрометированные или ненадежные сайты могут"
+  },
+  "exploitAutofillOnPageLoad": {
+    "message": "использовать автозаполнение при загрузке страницы"
   },
   "autofillOnPageLoadExploitWarning": {
     "message": "Взломанные или недоверенные сайты могут внедрить вредоносный код во время автозаполнения при загрузке страницы."
@@ -9903,6 +10075,9 @@
   "newDomain": {
     "message": "Новый домен"
   },
+  "addDomain": {
+    "message": "Добавить домен"
+  },
   "noDomains": {
     "message": "Нет доменов"
   },
@@ -11080,6 +11255,12 @@
   "editedCollection": {
     "message": "Измененная коллекция"
   },
+  "collectionEdited": {
+    "message": "Коллекция изменена"
+  },
+  "collectionsEdited": {
+    "message": "Коллекции изменены"
+  },
   "baseUrl": {
     "message": "URL сервера"
   },
@@ -11587,6 +11768,10 @@
     "message": "Новый аккаунт компьютера",
     "description": "Title for creating a new machine account."
   },
+  "addMachineAccount": {
+    "message": "Добавить аккаунт компьютера",
+    "description": "Title for creating a new machine account."
+  },
   "machineAccountsNoItemsMessage": {
     "message": "Чтобы приступить к автоматизации секретного доступа, создайте новый аккаунт компьютера.",
     "description": "Message to encourage the user to start creating machine accounts."
@@ -11708,6 +11893,15 @@
       "count": {
         "content": "$1",
         "example": "50"
+      }
+    }
+  },
+  "graceMachineAccounts": {
+    "message": "У вас есть $COUNT$ аккаунтов компьютеров от предыдущего тарифа.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "30"
       }
     }
   },
@@ -13201,7 +13395,7 @@
     "message": "Не разрешать пользователям разблокировать свои аккаунты с помощью PIN-кода."
   },
   "removeUnlockWithPinPolicyDescV2": {
-    "message": "Members will not be allowed to unlock their account with a PIN."
+    "message": "Пользователями не будет разрешено разблокировать свой аккаунт с помощью PIN-кода."
   },
   "upgradeForFullEventsMessage": {
     "message": "Логи событий не сохраняются для вашей организации. Перейдите на тариф Teams или Enterprise для получения полного доступа к логам событий организации."
@@ -13263,7 +13457,30 @@
     "message": "Архивировать элемент",
     "description": "Verb"
   },
+  "archiveItemsPlural": {
+    "message": "Архивировать $NUM$ элементов",
+    "description": "Title of the archive items dialog when multiple items are selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "archiveItemsSingular": {
+    "message": "Архивировать $NUM$ элемент",
+    "description": "Title of the archive items dialog when a single item is selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
   "archiveItemDialogContent": {
+    "message": "После архивации этот элемент будет исключен из результатов поиска и предложений по автозаполнению."
+  },
+  "archiveItemsPluralDescription": {
     "message": "После архивации этот элемент будет исключен из результатов поиска и предложений по автозаполнению."
   },
   "archiveBulkItems": {
@@ -14793,5 +15010,15 @@
   },
   "cannotSaveItemNoConfirmedOrgs": {
     "message": "Не удалось сохранить элемент. Для сохранения элементов необходимо подтвердить свою принадлежность к организации."
+  },
+  "labelWithNotification": {
+    "message": "$LABEL$: Новое уведомление",
+    "description": "Label for the notification with a new login suggestion.",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Login"
+      }
+    }
   }
 }

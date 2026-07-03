@@ -1190,6 +1190,42 @@
   "viewItem": {
     "message": "Ver item"
   },
+  "addItemHeaderLogin": {
+    "message": "Adicionar credencial",
+    "description": "Header for new login item type"
+  },
+  "addItemHeaderCard": {
+    "message": "Adicionar cartão",
+    "description": "Header for new card item type"
+  },
+  "addItemHeaderIdentity": {
+    "message": "Adicionar identidade",
+    "description": "Header for new identity item type"
+  },
+  "addItemHeaderNote": {
+    "message": "Adicionar nota",
+    "description": "Header for new note item type"
+  },
+  "addItemHeaderSecureNote": {
+    "message": "Adicionar nota segura",
+    "description": "Header for new secure note item type"
+  },
+  "addItemHeaderSshKey": {
+    "message": "Adicionar chave SSH",
+    "description": "Header for new SSH key item type"
+  },
+  "addItemHeaderBankAccount": {
+    "message": "Adicionar conta bancária",
+    "description": "Header for new bank account item type"
+  },
+  "addItemHeaderDriversLicense": {
+    "message": "Adicionar carta de condução",
+    "description": "Header for new license item type"
+  },
+  "addItemHeaderPassport": {
+    "message": "Adicionar passaporte",
+    "description": "Header for new passport item type"
+  },
   "newItemHeaderLogin": {
     "message": "Nova credencial",
     "description": "Header for new login item type"
@@ -1254,6 +1290,22 @@
     "message": "Editar nota segura",
     "description": "Header for edit secure note item type"
   },
+  "editItemHeaderLoginSentenceCase": {
+    "message": "Editar credencial",
+    "description": "Header for edit login item type"
+  },
+  "editItemHeaderCardSentenceCase": {
+    "message": "Editar cartão",
+    "description": "Header for edit card item type"
+  },
+  "editItemHeaderIdentitySentenceCase": {
+    "message": "Editar identidade",
+    "description": "Header for edit identity item type"
+  },
+  "editItemHeaderNoteSentenceCase": {
+    "message": "Editar nota",
+    "description": "Header for edit note item type"
+  },
   "editItemHeaderSshKey": {
     "message": "Editar chave SSH",
     "description": "Header for edit SSH key item type"
@@ -1313,6 +1365,26 @@
   "viewItemHeaderPassport": {
     "message": "Ver passaporte",
     "description": "Header for view passport item type"
+  },
+  "viewItemHeaderLoginSentenceCase": {
+    "message": "Ver credencial",
+    "description": "Header for view login item type"
+  },
+  "viewItemHeaderCardSentenceCase": {
+    "message": "Ver cartão",
+    "description": "Header for view card item type"
+  },
+  "viewItemHeaderIdentitySentenceCase": {
+    "message": "Ver identidade",
+    "description": "Header for view identity item type"
+  },
+  "viewItemHeaderNoteSentenceCase": {
+    "message": "Ver nota",
+    "description": "Header for view note item type"
+  },
+  "create": {
+    "message": "Criar",
+    "description": "for adding new items"
   },
   "new": {
     "message": "Novo",
@@ -2481,6 +2553,9 @@
     "message": "Mínimo de caracteres especiais",
     "description": "Minimum special characters"
   },
+  "minSpecialCharacters": {
+    "message": "Mínimo de caracteres especiais"
+  },
   "ambiguous": {
     "message": "Evitar caracteres ambíguos",
     "description": "deprecated. Use avoidAmbiguous instead."
@@ -2903,6 +2978,9 @@
   },
   "newCustomDomain": {
     "message": "Novo domínio personalizado"
+  },
+  "addCustomDomain": {
+    "message": "Adicionar domínio personalizado"
   },
   "newCustomDomainDesc": {
     "message": "Introduza uma lista de domínios separados por vírgulas. Só são permitidos os domínios \"base\". Não introduza subdomínios. Por exemplo, introduza \"google.com\" em vez de \"www.google.com\". Também pode introduzir \"androidapp://package.name\" para associar uma aplicação android a outros domínios de sites."
@@ -5040,6 +5118,15 @@
       }
     }
   },
+  "stagedUserId": {
+    "message": "Utilizador em preparação $ID$ adicionado.",
+    "placeholders": {
+      "id": {
+        "content": "$1",
+        "example": "John Smith"
+      }
+    }
+  },
   "revokedEmailError": {
     "message": "Um ou mais e-mails pertencem a membros com acesso revogado. Restaure o acesso para os voltar a convidar."
   },
@@ -6295,6 +6382,27 @@
   "masterPassPolicyDesc": {
     "message": "Definir requisitos para a força da palavra-passe mestra."
   },
+  "enablePolicy": {
+    "message": "Ativar política"
+  },
+  "minCharacterLength": {
+    "message": "Comprimento mínimo de caracteres"
+  },
+  "characterRequirements": {
+    "message": "Requisitos de caracteres"
+  },
+  "specialCharactersPolicy": {
+    "message": "Caracteres especiais (ex.: !, @, $)"
+  },
+  "uppercasePolicy": {
+    "message": "Maiúsculas"
+  },
+  "lowercasePolicy": {
+    "message": "Minúsculas"
+  },
+  "numbersPolicy": {
+    "message": "Números"
+  },
   "passwordStrengthScore": {
     "message": "Pontuação da força da palavra-passe: $SCORE$",
     "placeholders": {
@@ -6311,19 +6419,28 @@
     "message": "Exigir que os membros configurem a verificação de dois passos."
   },
   "twoStepLoginPolicyDescV2": {
-    "message": "Require members to set up two-step login. This policy won't be enforced for owners and admins."
+    "message": "Exigir que os membros configurem a verificação de dois passos. Esta política não será aplicada aos proprietários nem aos administradores."
   },
   "twoStepLoginPolicyWarning": {
     "message": "Os membros da organização que não sejam proprietários ou administradores e que não tenham configurado a verificação de dois passos para a sua conta serão removidos da organização e receberão um e-mail a notificá-los da alteração."
   },
   "twoStepLoginPolicyWarningV2": {
-    "message": "Enabling this policy will revoke any users who do not have two-step login enabled on their accounts. Affected users will be notified by email."
+    "message": "A ativação desta política revogará o acesso de todos os utilizadores que não tenham a verificação de dois passos ativada nas respetivas contas. Os utilizadores afetados serão notificados por e-mail."
   },
   "twoStepLoginPolicyUserWarning": {
     "message": "É membro de uma organização que exige que a verificação de dois passos seja configurada na sua conta de utilizador. Se desativar todos os fornecedores de verificação de dois passos, será automaticamente removido destas organizações."
   },
   "passwordGeneratorPolicyDesc": {
     "message": "Definir requisitos para o gerador de palavras-passe."
+  },
+  "passwordGeneratorPolicyDescV2": {
+    "message": "Selecione um conjunto de requisitos mínimos para todas as palavras-passe geradas pelos membros."
+  },
+  "generatedPassword": {
+    "message": "Palavra-passe gerada"
+  },
+  "generatedPassphrase": {
+    "message": "Frase de acesso gerada"
   },
   "masterPasswordPolicyInEffect": {
     "message": "Uma ou mais políticas da organização exigem que a sua palavra-passe mestra cumpra os seguintes requisitos:"
@@ -6573,6 +6690,9 @@
   "singleOrgPolicyDesc": {
     "message": "Restringir a adesão de membros a outras organizações. Esta política é necessária para organizações que tenham ativado a verificação de domínio."
   },
+  "singleOrgPolicyDescV2": {
+    "message": "Os membros desta organização não podem aderir a outras organizações. Os membros existentes que pertençam a outras organizações terão o respetivo acesso revogado quando esta política for ativada. Esta política não será aplicada aos proprietários nem aos administradores."
+  },
   "singleOrgBlockCreateMessage": {
     "message": "A sua organização atual tem uma política que não lhe permite aderir a mais do que uma organização. Por favor, contacte os administradores da sua organização ou registe-se a partir de uma conta Bitwarden diferente."
   },
@@ -6586,10 +6706,10 @@
     "message": "Exigir que os membros iniciem sessão com o método de início de sessão único Empresarial."
   },
   "requireSsoPolicyTitle": {
-    "message": "Require single sign-on (SSO)"
+    "message": "Exigir início de sessão único (SSO)"
   },
   "requireSsoPolicyDescV2": {
-    "message": "Require members to log in using SSO. This policy won't be enforced for owners and admins."
+    "message": "Exigir que os membros iniciem sessão utilizando SSO. Esta política não será aplicada aos proprietários nem aos administradores."
   },
   "prerequisite": {
     "message": "Pré-requisito"
@@ -6598,7 +6718,7 @@
     "message": "A política empresarial de organização única tem de estar ativada antes de ativar esta política."
   },
   "requireSsoPolicyReqV2": {
-    "message": "You must enable the single organization policy before enabling this one."
+    "message": "Tem de ativar a política de organização única antes de ativar esta."
   },
   "requireSsoPolicyReqError": {
     "message": "Política de organização única não definida."
@@ -6638,6 +6758,10 @@
   },
   "createSend": {
     "message": "Novo Send",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "createSendV2": {
+    "message": "Criar Send",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "editSend": {
@@ -6732,6 +6856,12 @@
   },
   "accepted": {
     "message": "Aceite"
+  },
+  "staged": {
+    "message": "Em preparação"
+  },
+  "stagedMemberTooltip": {
+    "message": "Convite de conta pendente"
   },
   "sendLink": {
     "message": "Link do Send",
@@ -7008,9 +7138,6 @@
   "promptUsersToMoveItemsV2": {
     "message": "Pedir aos utilizadores para moverem os seus itens do cofre para a organização"
   },
-  "enablePolicy": {
-    "message": "Ativar política"
-  },
   "organizationDataOwnership": {
     "message": "Reforçar a propriedade dos dados da organização"
   },
@@ -7115,6 +7242,30 @@
   },
   "autoConfirmDisabledByPortal": {
     "message": "Política de confirmação automática de utilizadores removida"
+  },
+  "inviteLinkEventCreated": {
+    "message": "Created invite link"
+  },
+  "inviteLinkEventDomainsEdited": {
+    "message": "Edited allowed domains for invite link"
+  },
+  "inviteLinkEventDeleted": {
+    "message": "Deleted invite link"
+  },
+  "inviteLinkEventCopied": {
+    "message": "Copied invite link"
+  },
+  "inviteLinkEventRegenerated": {
+    "message": "Regenerated invite link"
+  },
+  "inviteLinkEventAccepted": {
+    "message": "Member $ID$ accepted invitation through invite link",
+    "placeholders": {
+      "id": {
+        "content": "$1",
+        "example": "First 8 characters of a GUID"
+      }
+    }
   },
   "system": {
     "message": "Sistema"
@@ -7613,6 +7764,18 @@
   "accountRecoverySingleOrgRequirementDesc": {
     "message": "A política empresarial de organização única tem de estar ativada antes de ativar esta política."
   },
+  "accountRecoveryPolicySingleOrgReqV2": {
+    "message": "Tem de ativar a política de organização única antes de ativar esta."
+  },
+  "accountRecoveryPolicyDescV3Part1": {
+    "message": "Permitir que os administradores ajudem os membros a recuperar o acesso às suas contas quando estes estiverem inscritos na "
+  },
+  "accountRecoveryDescLinkText": {
+    "message": "recuperação de conta"
+  },
+  "accountRecoveryPolicyDescV3Part2": {
+    "message": ". Depois de esta política ser ativada, os membros existentes poderão inscrever-se e, se assim o escolher, os novos membros serão inscritos automaticamente."
+  },
   "resetPasswordPolicyAutoEnroll": {
     "message": "Inscrição automática"
   },
@@ -8100,7 +8263,7 @@
     "message": "Não permitir que os membros exportem dados do seu cofre individual."
   },
   "disablePersonalVaultExportDescriptionV2": {
-    "message": "Do not allow members to export data from their individual vaults. This policy won't be enforced for owners and admins."
+    "message": "Não permitir que os membros exportem dados dos seus cofres individuais. Esta política não será aplicada aos proprietários nem aos administradores."
   },
   "vaultExportDisabled": {
     "message": "Exportação do cofre removida"
@@ -8111,8 +8274,17 @@
   "activateAutofillPolicy": {
     "message": "Ativar o preenchimento automático"
   },
+  "enableAutofillOnPageLoad": {
+    "message": "Ativar preenchimento automático ao carregar a página"
+  },
   "activateAutofillPolicyDescription": {
     "message": "Ative a definição de preenchimento automático ao carregar a página na extensão do navegador para todos os membros atuais e novos."
+  },
+  "activateAutofillPolicyDescV2": {
+    "message": "Ativar a definição de preenchimento automático ao carregar a página na extensão do navegador para todos os membros, atuais e novos. Tenha em atenção que sites comprometidos ou não fidedignos podem"
+  },
+  "exploitAutofillOnPageLoad": {
+    "message": "explorar o preenchimento automático ao carregar a página"
   },
   "autofillOnPageLoadExploitWarning": {
     "message": "Os sites comprometidos ou não confiáveis podem explorar o preenchimento automático ao carregar a página."
@@ -9903,6 +10075,9 @@
   "newDomain": {
     "message": "Novo domínio"
   },
+  "addDomain": {
+    "message": "Adicionar domínio"
+  },
   "noDomains": {
     "message": "Sem domínios"
   },
@@ -11080,6 +11255,12 @@
   "editedCollection": {
     "message": "Coleção editada"
   },
+  "collectionEdited": {
+    "message": "Collection edited"
+  },
+  "collectionsEdited": {
+    "message": "Collections edited"
+  },
   "baseUrl": {
     "message": "URL do servidor"
   },
@@ -11587,6 +11768,10 @@
     "message": "Nova conta automática",
     "description": "Title for creating a new machine account."
   },
+  "addMachineAccount": {
+    "message": "Adicionar conta automática",
+    "description": "Title for creating a new machine account."
+  },
   "machineAccountsNoItemsMessage": {
     "message": "Crie uma nova conta automática para começar a automatizar o acesso a segredos.",
     "description": "Message to encourage the user to start creating machine accounts."
@@ -11708,6 +11893,15 @@
       "count": {
         "content": "$1",
         "example": "50"
+      }
+    }
+  },
+  "graceMachineAccounts": {
+    "message": "You have $COUNT$ machine accounts from your previous plan.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "30"
       }
     }
   },
@@ -13201,7 +13395,7 @@
     "message": "Não permitir que os membros desbloqueiem a sua conta com um PIN."
   },
   "removeUnlockWithPinPolicyDescV2": {
-    "message": "Members will not be allowed to unlock their account with a PIN."
+    "message": "Os membros não poderão desbloquear a sua conta com um PIN."
   },
   "upgradeForFullEventsMessage": {
     "message": "Os registos de eventos não são armazenados para a sua organização. Atualize para um plano Equipas ou Empresarial para obter acesso total aos registos de eventos da organização."
@@ -13263,8 +13457,31 @@
     "message": "Arquivar item",
     "description": "Verb"
   },
+  "archiveItemsPlural": {
+    "message": "Arquivar $NUM$ itens",
+    "description": "Title of the archive items dialog when multiple items are selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "archiveItemsSingular": {
+    "message": "Arquivar $NUM$ item",
+    "description": "Title of the archive items dialog when a single item is selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
   "archiveItemDialogContent": {
     "message": "Depois de arquivado, este item será excluído dos resultados de pesquisa e das sugestões de preenchimento automático."
+  },
+  "archiveItemsPluralDescription": {
+    "message": "Depois de arquivados, estes itens serão excluídos dos resultados de pesquisa e das sugestões de preenchimento automático."
   },
   "archiveBulkItems": {
     "message": "Arquivar itens",
@@ -14793,5 +15010,15 @@
   },
   "cannotSaveItemNoConfirmedOrgs": {
     "message": "Não foi possível guardar o item. Tem de estar confirmado na organização para poder guardar itens."
+  },
+  "labelWithNotification": {
+    "message": "$LABEL$: New notification",
+    "description": "Label for the notification with a new login suggestion.",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Login"
+      }
+    }
   }
 }
