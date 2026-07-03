@@ -614,6 +614,29 @@
   "upgradeToUseArchive": {
     "message": "アーカイブを使用するにはプレミアムメンバーシップが必要です。"
   },
+  "archiveItemsPlural": {
+    "message": "$NUM$ 個のアイテムをアーカイブ",
+    "description": "Title of the archive items dialog when multiple items are selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "archiveItemsSingular": {
+    "message": "$NUM$ 個のアイテムをアーカイブ",
+    "description": "Title of the archive items dialog when a single item is selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "archiveItemsPluralDescription": {
+    "message": "アーカイブすると、これらのアイテムは検索結果と自動入力の候補から除外されます。"
+  },
   "itemRestored": {
     "message": "アイテムをリストアしました"
   },
@@ -2321,6 +2344,42 @@
   "licenseClass": {
     "message": "免許種別"
   },
+  "addItemHeaderLogin": {
+    "message": "ログイン情報を追加",
+    "description": "Header for new login item type"
+  },
+  "addItemHeaderCard": {
+    "message": "カードを追加",
+    "description": "Header for new card item type"
+  },
+  "addItemHeaderIdentity": {
+    "message": "ID を追加",
+    "description": "Header for new identity item type"
+  },
+  "addItemHeaderNote": {
+    "message": "メモを追加",
+    "description": "Header for new note item type"
+  },
+  "addItemHeaderSecureNote": {
+    "message": "セキュアメモを追加",
+    "description": "Header for new secure note item type"
+  },
+  "addItemHeaderSshKey": {
+    "message": "SSH 鍵を追加",
+    "description": "Header for new SSH key item type"
+  },
+  "addItemHeaderBankAccount": {
+    "message": "銀行口座を追加",
+    "description": "Header for new bank account item type"
+  },
+  "addItemHeaderDriversLicense": {
+    "message": "免許証を追加",
+    "description": "Header for new license item type"
+  },
+  "addItemHeaderPassport": {
+    "message": "パスポートを追加",
+    "description": "Header for new passport item type"
+  },
   "newItemHeaderLogin": {
     "message": "新規ログイン",
     "description": "Header for new login item type"
@@ -2384,6 +2443,22 @@
   "editItemHeaderSecureNote": {
     "message": "セキュアメモを編集",
     "description": "Header for edit secure note item type"
+  },
+  "editItemHeaderLoginSentenceCase": {
+    "message": "ログイン情報の編集",
+    "description": "Header for edit login item type"
+  },
+  "editItemHeaderCardSentenceCase": {
+    "message": "カードの編集",
+    "description": "Header for edit card item type"
+  },
+  "editItemHeaderIdentitySentenceCase": {
+    "message": "ID の編集",
+    "description": "Header for edit identity item type"
+  },
+  "editItemHeaderNoteSentenceCase": {
+    "message": "メモの編集",
+    "description": "Header for edit note item type"
   },
   "editItemHeaderSshKey": {
     "message": "SSH キーを編集",
@@ -3146,6 +3221,18 @@
       }
     }
   },
+  "reviewXAtRiskPassword": {
+    "message": "リスクのあるパスワード1件を確認"
+  },
+  "reviewXAtRiskPasswordsPlural": {
+    "message": "リスクのあるパスワード$COUNT$件を確認",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
   "changeAtRiskPasswordsFaster": {
     "message": "危険なパスワードをより素早く変更する"
   },
@@ -3342,6 +3429,10 @@
   },
   "createSend": {
     "message": "新しい Send を作成",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "createSendV2": {
+    "message": "Send を作成",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "newPassword": {
@@ -5032,11 +5123,26 @@
   "defaultPasswordManagerPromptTitle": {
     "message": "Bitwarden をブラウザのデフォルトパスワードマネージャーにする"
   },
+  "defaultPasswordManagerPromptTitleV2": {
+    "message": "Bitwarden をデフォルトのパスワードマネージャーにする",
+    "description": "Label for the setting to make Bitwarden the default password manager"
+  },
+  "defaultPasswordManagerSettingHintV2": {
+    "message": "競合を避けるためにブラウザの自動入力設定をオフにしてください。",
+    "description": "Hint text for the default password manager setting. Followed by a link to browser autofill settings."
+  },
+  "defaultPasswordManagerSettingHintLinkV2": {
+    "message": "ブラウザの設定を管理する",
+    "description": "Link text to browser autofill settings in the default password manager setting hint."
+  },
   "defaultPasswordManagerPromptStep2AfterAllow": {
     "message": "ブラウザプロンプトから、Bitwarden に設定を変更する許可を与えてください。"
   },
   "defaultPasswordManagerPromptStep3": {
     "message": "ブラウザの内蔵パスワードマネージャーをオフにして、安全なログイン体験ができるようにします。"
+  },
+  "defaultPasswordManagerSuccessToast": {
+    "message": "Bitwarden をブラウザのデフォルトパスワードマネージャーにしました"
   },
   "allow": {
     "message": "許可",
@@ -5298,6 +5404,29 @@
         "example": "Work"
       }
     }
+  },
+  "viewItemHeaderLoginSentenceCase": {
+    "message": "ログイン情報を表示",
+    "description": "Header for view login item type"
+  },
+  "viewItemHeaderCardSentenceCase": {
+    "message": "カードを表示",
+    "description": "Header for view card item type"
+  },
+  "viewItemHeaderIdentitySentenceCase": {
+    "message": "ID を表示",
+    "description": "Header for view identity item type"
+  },
+  "viewItemHeaderNoteSentenceCase": {
+    "message": "メモを表示",
+    "description": "Header for view note item type"
+  },
+  "create": {
+    "message": "作成",
+    "description": "for adding new items"
+  },
+  "addCollection": {
+    "message": "コレクションを追加"
   },
   "new": {
     "message": "新規作成"

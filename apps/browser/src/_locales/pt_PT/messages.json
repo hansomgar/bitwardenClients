@@ -614,6 +614,29 @@
   "upgradeToUseArchive": {
     "message": "É necessária uma subscrição Premium para utilizar o Arquivo."
   },
+  "archiveItemsPlural": {
+    "message": "Arquivar $NUM$ itens",
+    "description": "Title of the archive items dialog when multiple items are selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "archiveItemsSingular": {
+    "message": "Arquivar $NUM$ item",
+    "description": "Title of the archive items dialog when a single item is selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "archiveItemsPluralDescription": {
+    "message": "Depois de arquivados, estes itens serão excluídos dos resultados de pesquisa e das sugestões de preenchimento automático."
+  },
   "itemRestored": {
     "message": "O item foi restaurado"
   },
@@ -2321,6 +2344,42 @@
   "licenseClass": {
     "message": "Categoria da carta de condução"
   },
+  "addItemHeaderLogin": {
+    "message": "Adicionar credencial",
+    "description": "Header for new login item type"
+  },
+  "addItemHeaderCard": {
+    "message": "Adicionar cartão",
+    "description": "Header for new card item type"
+  },
+  "addItemHeaderIdentity": {
+    "message": "Adicionar identidade",
+    "description": "Header for new identity item type"
+  },
+  "addItemHeaderNote": {
+    "message": "Adicionar nota",
+    "description": "Header for new note item type"
+  },
+  "addItemHeaderSecureNote": {
+    "message": "Adicionar nota segura",
+    "description": "Header for new secure note item type"
+  },
+  "addItemHeaderSshKey": {
+    "message": "Adicionar chave SSH",
+    "description": "Header for new SSH key item type"
+  },
+  "addItemHeaderBankAccount": {
+    "message": "Adicionar conta bancária",
+    "description": "Header for new bank account item type"
+  },
+  "addItemHeaderDriversLicense": {
+    "message": "Adicionar carta de condução",
+    "description": "Header for new license item type"
+  },
+  "addItemHeaderPassport": {
+    "message": "Adicionar passaporte",
+    "description": "Header for new passport item type"
+  },
   "newItemHeaderLogin": {
     "message": "Nova credencial",
     "description": "Header for new login item type"
@@ -2384,6 +2443,22 @@
   "editItemHeaderSecureNote": {
     "message": "Editar nota segura",
     "description": "Header for edit secure note item type"
+  },
+  "editItemHeaderLoginSentenceCase": {
+    "message": "Editar credencial",
+    "description": "Header for edit login item type"
+  },
+  "editItemHeaderCardSentenceCase": {
+    "message": "Editar cartão",
+    "description": "Header for edit card item type"
+  },
+  "editItemHeaderIdentitySentenceCase": {
+    "message": "Editar identidade",
+    "description": "Header for edit identity item type"
+  },
+  "editItemHeaderNoteSentenceCase": {
+    "message": "Editar nota",
+    "description": "Header for edit note item type"
   },
   "editItemHeaderSshKey": {
     "message": "Editar chave SSH",
@@ -3146,6 +3221,18 @@
       }
     }
   },
+  "reviewXAtRiskPassword": {
+    "message": "Rever 1 palavra-passe em risco"
+  },
+  "reviewXAtRiskPasswordsPlural": {
+    "message": "Rever $COUNT$ palavras-passe em risco",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
   "changeAtRiskPasswordsFaster": {
     "message": "Alterar mais rapidamente as palavras-passe em risco"
   },
@@ -3342,6 +3429,10 @@
   },
   "createSend": {
     "message": "Novo Send",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "createSendV2": {
+    "message": "Criar Send",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "newPassword": {
@@ -5032,11 +5123,26 @@
   "defaultPasswordManagerPromptTitle": {
     "message": "Defina o Bitwarden como o gestor de palavras-passe predefinido do seu navegador"
   },
+  "defaultPasswordManagerPromptTitleV2": {
+    "message": "Make Bitwarden your default password manager",
+    "description": "Label for the setting to make Bitwarden the default password manager"
+  },
+  "defaultPasswordManagerSettingHintV2": {
+    "message": "Turn off the browser autofill settings to avoid conflicts.",
+    "description": "Hint text for the default password manager setting. Followed by a link to browser autofill settings."
+  },
+  "defaultPasswordManagerSettingHintLinkV2": {
+    "message": "Manage browser settings",
+    "description": "Link text to browser autofill settings in the default password manager setting hint."
+  },
   "defaultPasswordManagerPromptStep2AfterAllow": {
     "message": "do pedido do navegador para conceder permissão ao Bitwarden para alterar as suas definições."
   },
   "defaultPasswordManagerPromptStep3": {
     "message": "Desativaremos o gestor de palavras-passe integrado do seu navegador para que possa usufruir de uma experiência de início de sessão segura."
+  },
+  "defaultPasswordManagerSuccessToast": {
+    "message": "O Bitwarden foi definido como o gestor de palavras-passe predefinido do navegador"
   },
   "allow": {
     "message": "Permitir",
@@ -5298,6 +5404,29 @@
         "example": "Work"
       }
     }
+  },
+  "viewItemHeaderLoginSentenceCase": {
+    "message": "Ver credencial",
+    "description": "Header for view login item type"
+  },
+  "viewItemHeaderCardSentenceCase": {
+    "message": "Ver cartão",
+    "description": "Header for view card item type"
+  },
+  "viewItemHeaderIdentitySentenceCase": {
+    "message": "Ver identidade",
+    "description": "Header for view identity item type"
+  },
+  "viewItemHeaderNoteSentenceCase": {
+    "message": "Ver nota",
+    "description": "Header for view note item type"
+  },
+  "create": {
+    "message": "Criar",
+    "description": "for adding new items"
+  },
+  "addCollection": {
+    "message": "Adicionar coleção"
   },
   "new": {
     "message": "Novo"

@@ -614,6 +614,29 @@
   "upgradeToUseArchive": {
     "message": "Arşivi kullanmak için premium üyelik gereklidir."
   },
+  "archiveItemsPlural": {
+    "message": "$NUM$ kaydı arşivle",
+    "description": "Title of the archive items dialog when multiple items are selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "archiveItemsSingular": {
+    "message": "$NUM$ kaydı arşivle",
+    "description": "Title of the archive items dialog when a single item is selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "archiveItemsPluralDescription": {
+    "message": "Bu kayıtlar arşivlendikten sonra arama sonuçlarından ve otomatik doldurma önerilerinden çıkarılacaktır."
+  },
   "itemRestored": {
     "message": "Kayıt geri yüklendi"
   },
@@ -2321,6 +2344,42 @@
   "licenseClass": {
     "message": "Ehliyet sınıfı"
   },
+  "addItemHeaderLogin": {
+    "message": "Hesap ekle",
+    "description": "Header for new login item type"
+  },
+  "addItemHeaderCard": {
+    "message": "Kart ekle",
+    "description": "Header for new card item type"
+  },
+  "addItemHeaderIdentity": {
+    "message": "Kimlik ekle",
+    "description": "Header for new identity item type"
+  },
+  "addItemHeaderNote": {
+    "message": "Not ekle",
+    "description": "Header for new note item type"
+  },
+  "addItemHeaderSecureNote": {
+    "message": "Güvenli notu düzenle",
+    "description": "Header for new secure note item type"
+  },
+  "addItemHeaderSshKey": {
+    "message": "SSH anahtarı ekle",
+    "description": "Header for new SSH key item type"
+  },
+  "addItemHeaderBankAccount": {
+    "message": "Banka hesabı ekle",
+    "description": "Header for new bank account item type"
+  },
+  "addItemHeaderDriversLicense": {
+    "message": "Ehliyet ekle",
+    "description": "Header for new license item type"
+  },
+  "addItemHeaderPassport": {
+    "message": "Pasaport ekle",
+    "description": "Header for new passport item type"
+  },
   "newItemHeaderLogin": {
     "message": "Yeni hesap",
     "description": "Header for new login item type"
@@ -2384,6 +2443,22 @@
   "editItemHeaderSecureNote": {
     "message": "Güvenli notu düzenle",
     "description": "Header for edit secure note item type"
+  },
+  "editItemHeaderLoginSentenceCase": {
+    "message": "Hesabı düzenle",
+    "description": "Header for edit login item type"
+  },
+  "editItemHeaderCardSentenceCase": {
+    "message": "Kartı düzenle",
+    "description": "Header for edit card item type"
+  },
+  "editItemHeaderIdentitySentenceCase": {
+    "message": "Kimliği düzenle",
+    "description": "Header for edit identity item type"
+  },
+  "editItemHeaderNoteSentenceCase": {
+    "message": "Notu düzenle",
+    "description": "Header for edit note item type"
   },
   "editItemHeaderSshKey": {
     "message": "SSH anahtarını düzenle",
@@ -3146,6 +3221,18 @@
       }
     }
   },
+  "reviewXAtRiskPassword": {
+    "message": "Risk altındaki 1 parolalayı incele"
+  },
+  "reviewXAtRiskPasswordsPlural": {
+    "message": "Risk altındaki $COUNT$ parolayı incele",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
   "changeAtRiskPasswordsFaster": {
     "message": "Risk altındaki parolaları daha hızlı değiştirin"
   },
@@ -3342,6 +3429,10 @@
   },
   "createSend": {
     "message": "Yeni Send",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "createSendV2": {
+    "message": "Send oluştur",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "newPassword": {
@@ -5032,11 +5123,26 @@
   "defaultPasswordManagerPromptTitle": {
     "message": "Bitwarden'ı tarayıcınızın varsayılan parola yöneticisi yapın"
   },
+  "defaultPasswordManagerPromptTitleV2": {
+    "message": "Bitwarden'ı varsayılan parola yöneticiniz yapın",
+    "description": "Label for the setting to make Bitwarden the default password manager"
+  },
+  "defaultPasswordManagerSettingHintV2": {
+    "message": "Turn off the browser autofill settings to avoid conflicts.",
+    "description": "Hint text for the default password manager setting. Followed by a link to browser autofill settings."
+  },
+  "defaultPasswordManagerSettingHintLinkV2": {
+    "message": "Tarayıcı ayarlarını yönet",
+    "description": "Link text to browser autofill settings in the default password manager setting hint."
+  },
   "defaultPasswordManagerPromptStep2AfterAllow": {
     "message": "from the browser prompt to give Bitwarden permission to change your settings."
   },
   "defaultPasswordManagerPromptStep3": {
     "message": "We'll turn off your browser's built-in password manager so you can enjoy a secure login experience."
+  },
+  "defaultPasswordManagerSuccessToast": {
+    "message": "Bitwarden tarayıcınızın varsayılan parola yöneticisi yapıldı"
   },
   "allow": {
     "message": "İzin ver",
@@ -5298,6 +5404,29 @@
         "example": "Work"
       }
     }
+  },
+  "viewItemHeaderLoginSentenceCase": {
+    "message": "Hesabı göster",
+    "description": "Header for view login item type"
+  },
+  "viewItemHeaderCardSentenceCase": {
+    "message": "Kartı göster",
+    "description": "Header for view card item type"
+  },
+  "viewItemHeaderIdentitySentenceCase": {
+    "message": "Kimliği göster",
+    "description": "Header for view identity item type"
+  },
+  "viewItemHeaderNoteSentenceCase": {
+    "message": "Notu göster",
+    "description": "Header for view note item type"
+  },
+  "create": {
+    "message": "Oluştur",
+    "description": "for adding new items"
+  },
+  "addCollection": {
+    "message": "Koleksiyon ekle"
   },
   "new": {
     "message": "Yeni"

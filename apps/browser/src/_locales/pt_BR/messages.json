@@ -38,7 +38,7 @@
     "message": "A sua organização requer o uso da autenticação única."
   },
   "loginPageMasterPasswordEntryScreenTitle": {
-    "message": "Conectar-se"
+    "message": "Conecte-se"
   },
   "setAStrongPassword": {
     "message": "Configure uma senha forte"
@@ -614,6 +614,29 @@
   "upgradeToUseArchive": {
     "message": "Um plano Premium é necessário para usar o arquivamento."
   },
+  "archiveItemsPlural": {
+    "message": "Arquivar $NUM$ itens",
+    "description": "Title of the archive items dialog when multiple items are selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "archiveItemsSingular": {
+    "message": "Arquivar $NUM$ item",
+    "description": "Title of the archive items dialog when a single item is selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "archiveItemsPluralDescription": {
+    "message": "Ao arquivar, esses itens serão excluídos dos resultados de busca e das sugestões de preenchimento automático."
+  },
   "itemRestored": {
     "message": "O item foi restaurado"
   },
@@ -979,7 +1002,7 @@
     "message": "Entrar"
   },
   "loginPageEmailEntryScreenTitle": {
-    "message": "Conectar-se"
+    "message": "Conecte-se"
   },
   "enterTheCodeSentToYourEmail": {
     "message": "Digite o código enviado para o seu e-mail"
@@ -2262,7 +2285,7 @@
     "message": "Conta bancária"
   },
   "bankAccountDetails": {
-    "message": "Detalhes da conta de banco"
+    "message": "Detalhes da conta bancária"
   },
   "typeNote": {
     "message": "Anotação"
@@ -2310,7 +2333,7 @@
     "message": "Carteira de habilitação"
   },
   "typeDriversLicenseSubtitle": {
-    "message": "Carteira de motorista ou identidade"
+    "message": "Carteira de habilitação ou identidade"
   },
   "driversLicenseDetails": {
     "message": "Detalhes da habilitação"
@@ -2320,6 +2343,42 @@
   },
   "licenseClass": {
     "message": "Classe da carteira de habilitação"
+  },
+  "addItemHeaderLogin": {
+    "message": "Adicionar credencial",
+    "description": "Header for new login item type"
+  },
+  "addItemHeaderCard": {
+    "message": "Adicionar cartão",
+    "description": "Header for new card item type"
+  },
+  "addItemHeaderIdentity": {
+    "message": "Adicionar identidade",
+    "description": "Header for new identity item type"
+  },
+  "addItemHeaderNote": {
+    "message": "Adicionar anotação",
+    "description": "Header for new note item type"
+  },
+  "addItemHeaderSecureNote": {
+    "message": "Adicionar anotação segura",
+    "description": "Header for new secure note item type"
+  },
+  "addItemHeaderSshKey": {
+    "message": "Adicionar chave SSH",
+    "description": "Header for new SSH key item type"
+  },
+  "addItemHeaderBankAccount": {
+    "message": "Adicionar conta bancária",
+    "description": "Header for new bank account item type"
+  },
+  "addItemHeaderDriversLicense": {
+    "message": "Adicionar habilitação",
+    "description": "Header for new license item type"
+  },
+  "addItemHeaderPassport": {
+    "message": "Adicionar passaporte",
+    "description": "Header for new passport item type"
   },
   "newItemHeaderLogin": {
     "message": "Nova credencial",
@@ -2384,6 +2443,22 @@
   "editItemHeaderSecureNote": {
     "message": "Editar anotação segura",
     "description": "Header for edit secure note item type"
+  },
+  "editItemHeaderLoginSentenceCase": {
+    "message": "Editar credencial",
+    "description": "Header for edit login item type"
+  },
+  "editItemHeaderCardSentenceCase": {
+    "message": "Editar cartão",
+    "description": "Header for edit card item type"
+  },
+  "editItemHeaderIdentitySentenceCase": {
+    "message": "Editar identidade",
+    "description": "Header for edit identity item type"
+  },
+  "editItemHeaderNoteSentenceCase": {
+    "message": "Editar anotação",
+    "description": "Header for edit note item type"
   },
   "editItemHeaderSshKey": {
     "message": "Editar chave SSH",
@@ -2507,7 +2582,7 @@
     "message": "Selecionado"
   },
   "selectedLowercase": {
-    "message": "selected",
+    "message": "selecionados",
     "description": "Lowercase 'selected' used inline after a count in the bulk-actions bar, e.g. '4 selected'."
   },
   "bulkActionsBar": {
@@ -3146,6 +3221,18 @@
       }
     }
   },
+  "reviewXAtRiskPassword": {
+    "message": "Revisar 1 senha em risco"
+  },
+  "reviewXAtRiskPasswordsPlural": {
+    "message": "Reviasr $COUNT$ senhas em risco",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
   "changeAtRiskPasswordsFaster": {
     "message": "Altere senhas em risco com mais rapidez"
   },
@@ -3342,6 +3429,10 @@
   },
   "createSend": {
     "message": "Novo Send",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "createSendV2": {
+    "message": "Criar Send",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "newPassword": {
@@ -5030,13 +5121,28 @@
     "description": "Button text for the setting that allows overriding the default browser autofill settings"
   },
   "defaultPasswordManagerPromptTitle": {
-    "message": "Tornar o Bitwarden o gerenciador de senhas padrão do seu navegador"
+    "message": "Torne o Bitwarden o gerenciador de senhas padrão do seu navegador"
+  },
+  "defaultPasswordManagerPromptTitleV2": {
+    "message": "Tornar o Bitwarden o gerenciador de senhas padrão",
+    "description": "Label for the setting to make Bitwarden the default password manager"
+  },
+  "defaultPasswordManagerSettingHintV2": {
+    "message": "Desative as configurações do preenchimento automático do navegador para evitar conflitos.",
+    "description": "Hint text for the default password manager setting. Followed by a link to browser autofill settings."
+  },
+  "defaultPasswordManagerSettingHintLinkV2": {
+    "message": "Gerenciar configurações do navegador",
+    "description": "Link text to browser autofill settings in the default password manager setting hint."
   },
   "defaultPasswordManagerPromptStep2AfterAllow": {
-    "message": "from the browser prompt to give Bitwarden permission to change your settings."
+    "message": "pelo pedido do navegador de dar a permissão ao Bitwarden para alterar suas configurações."
   },
   "defaultPasswordManagerPromptStep3": {
-    "message": "We'll turn off your browser's built-in password manager so you can enjoy a secure login experience."
+    "message": "Desativaremos o gerenciador de senhas embutido no seu navegador para que possa aproveitar uma experiência de autenticação segura."
+  },
+  "defaultPasswordManagerSuccessToast": {
+    "message": "O Bitwarden se tornou o gerenciador de senhas padrão do seu navegador"
   },
   "allow": {
     "message": "Permitir",
@@ -5298,6 +5404,29 @@
         "example": "Work"
       }
     }
+  },
+  "viewItemHeaderLoginSentenceCase": {
+    "message": "Ver credencial",
+    "description": "Header for view login item type"
+  },
+  "viewItemHeaderCardSentenceCase": {
+    "message": "Ver cartão",
+    "description": "Header for view card item type"
+  },
+  "viewItemHeaderIdentitySentenceCase": {
+    "message": "Ver identidade",
+    "description": "Header for view identity item type"
+  },
+  "viewItemHeaderNoteSentenceCase": {
+    "message": "Ver anotação",
+    "description": "Header for view note item type"
+  },
+  "create": {
+    "message": "Criar",
+    "description": "for adding new items"
+  },
+  "addCollection": {
+    "message": "Adicionar conjunto"
   },
   "new": {
     "message": "Criar"
@@ -5720,10 +5849,10 @@
     "message": "Conjuntos atribuídos com sucesso"
   },
   "itemAssignedToCollections": {
-    "message": "Item assigned to collections"
+    "message": "Item atribuído às coleções"
   },
   "itemsAssignedToCollections": {
-    "message": "Items assigned to collections"
+    "message": "Itens atribuídos às coleções"
   },
   "nothingSelected": {
     "message": "Você não selecionou nada."
@@ -6616,7 +6745,7 @@
     "message": "Pessoa jurídica (empresa)"
   },
   "bankAccountTypeIndividual": {
-    "message": "Pessoa física (Individual)"
+    "message": "Pessoa física (individual)"
   },
   "accountNumber": {
     "message": "Número da conta"
@@ -6729,7 +6858,7 @@
     "description": "This is the name of a page component that displays progress to the user. This string will be used to label the progress bar for a screenreader when multiple progress bars are on a page, like 'Progress bar 1' and 'Progress bar 2'."
   },
   "hideEmailPolicyInEffect": {
-    "message": "Sua organização requer visibilidade de email. Desmarque a opção \"Ocultar e-mail dos visualizadores\" para salvar."
+    "message": "Sua organização requer visibilidade do e-mail. Desmarque a opção \"Ocultar e-mail dos visualizadores\" para salvar."
   },
   "domainNotAllowed": {
     "message": "Inclua apenas os seguintes domínios: $DOMAINS$. Revise e tente novamente",

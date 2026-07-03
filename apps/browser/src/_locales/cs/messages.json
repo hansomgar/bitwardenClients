@@ -614,6 +614,29 @@
   "upgradeToUseArchive": {
     "message": "Pro použití funkce Archiv je potřebné prémiové členství."
   },
+  "archiveItemsPlural": {
+    "message": "Archivovat $NUM$ položek",
+    "description": "Title of the archive items dialog when multiple items are selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "archiveItemsSingular": {
+    "message": "Archivovat $NUM$ položku",
+    "description": "Title of the archive items dialog when a single item is selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "archiveItemsPluralDescription": {
+    "message": "Jakmile budou tyto položky archivovány, budou vyloučeny z výsledků vyhledávání a z návrhů automatického vyplňování."
+  },
   "itemRestored": {
     "message": "Položka byla obnovena"
   },
@@ -2321,6 +2344,42 @@
   "licenseClass": {
     "message": "Skupina řidičského průkazu"
   },
+  "addItemHeaderLogin": {
+    "message": "Přidat přihlašovací údaje",
+    "description": "Header for new login item type"
+  },
+  "addItemHeaderCard": {
+    "message": "Přidat kartu",
+    "description": "Header for new card item type"
+  },
+  "addItemHeaderIdentity": {
+    "message": "Přidat identitu",
+    "description": "Header for new identity item type"
+  },
+  "addItemHeaderNote": {
+    "message": "Přidat poznámku",
+    "description": "Header for new note item type"
+  },
+  "addItemHeaderSecureNote": {
+    "message": "Přidat bezpečnou poznámku",
+    "description": "Header for new secure note item type"
+  },
+  "addItemHeaderSshKey": {
+    "message": "Přidat SSH klíč",
+    "description": "Header for new SSH key item type"
+  },
+  "addItemHeaderBankAccount": {
+    "message": "Přidat bankovní účet",
+    "description": "Header for new bank account item type"
+  },
+  "addItemHeaderDriversLicense": {
+    "message": "Přidat řidičský průkaz",
+    "description": "Header for new license item type"
+  },
+  "addItemHeaderPassport": {
+    "message": "Přidat pas",
+    "description": "Header for new passport item type"
+  },
   "newItemHeaderLogin": {
     "message": "Nové přihlášení",
     "description": "Header for new login item type"
@@ -2384,6 +2443,22 @@
   "editItemHeaderSecureNote": {
     "message": "Upravit bezpečnou poznámku",
     "description": "Header for edit secure note item type"
+  },
+  "editItemHeaderLoginSentenceCase": {
+    "message": "Upravit přihlašovací údaje",
+    "description": "Header for edit login item type"
+  },
+  "editItemHeaderCardSentenceCase": {
+    "message": "Upravit kartu",
+    "description": "Header for edit card item type"
+  },
+  "editItemHeaderIdentitySentenceCase": {
+    "message": "Upravit identitu",
+    "description": "Header for edit identity item type"
+  },
+  "editItemHeaderNoteSentenceCase": {
+    "message": "Upravit poznámku",
+    "description": "Header for edit note item type"
   },
   "editItemHeaderSshKey": {
     "message": "Upravit SSH klíč",
@@ -3146,6 +3221,18 @@
       }
     }
   },
+  "reviewXAtRiskPassword": {
+    "message": "Zkontrolovat 1 zranitelné heslo"
+  },
+  "reviewXAtRiskPasswordsPlural": {
+    "message": "Zkontrolovat $COUNT$ zranitelných hesel",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
   "changeAtRiskPasswordsFaster": {
     "message": "Změnit zranitelná hesla rychleji"
   },
@@ -3342,6 +3429,10 @@
   },
   "createSend": {
     "message": "Nový Send",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "createSendV2": {
+    "message": "Vytvořit Send",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "newPassword": {
@@ -5032,11 +5123,26 @@
   "defaultPasswordManagerPromptTitle": {
     "message": "Nastavit Bitwarden jako výchozí správce hesel Vašeho prohlížeče"
   },
+  "defaultPasswordManagerPromptTitleV2": {
+    "message": "Nastavit Bitwarden jako výchozí správce hesel",
+    "description": "Label for the setting to make Bitwarden the default password manager"
+  },
+  "defaultPasswordManagerSettingHintV2": {
+    "message": "Vypněte nastavení automatického vyplňování prohlížeče, abyste se vyhnuli konfliktům.",
+    "description": "Hint text for the default password manager setting. Followed by a link to browser autofill settings."
+  },
+  "defaultPasswordManagerSettingHintLinkV2": {
+    "message": "Spravovat nastavení prohlížeče",
+    "description": "Link text to browser autofill settings in the default password manager setting hint."
+  },
   "defaultPasswordManagerPromptStep2AfterAllow": {
     "message": "z výzvy prohlížeče, abyste udělili aplikaci Bitwarden oprávnění ke změně Vašich nastavení."
   },
   "defaultPasswordManagerPromptStep3": {
     "message": "Vypneme vestavěný správce hesel ve Vašem prohlížeči, abyste se mohli bezpečně přihlásit."
+  },
+  "defaultPasswordManagerSuccessToast": {
+    "message": "Bitwarden byl nastaven jako váš výchozí správce hesel prohlížeče"
   },
   "allow": {
     "message": "Povolit",
@@ -5298,6 +5404,29 @@
         "example": "Work"
       }
     }
+  },
+  "viewItemHeaderLoginSentenceCase": {
+    "message": "Zobrazit přihlašovací údaje",
+    "description": "Header for view login item type"
+  },
+  "viewItemHeaderCardSentenceCase": {
+    "message": "Zobrazit kartu",
+    "description": "Header for view card item type"
+  },
+  "viewItemHeaderIdentitySentenceCase": {
+    "message": "Zobrazit identitu",
+    "description": "Header for view identity item type"
+  },
+  "viewItemHeaderNoteSentenceCase": {
+    "message": "Zobrazit poznámku",
+    "description": "Header for view note item type"
+  },
+  "create": {
+    "message": "Vytořit",
+    "description": "for adding new items"
+  },
+  "addCollection": {
+    "message": "Přidat sbírku"
   },
   "new": {
     "message": "Nové"
@@ -6046,10 +6175,10 @@
     "description": "Represents the / key in screen reader content as a readable word"
   },
   "lowercaseAriaLabel": {
-    "message": "Všechna malá písmena"
+    "message": "Malá písmena"
   },
   "uppercaseAriaLabel": {
-    "message": "Všechna velká písmena"
+    "message": "Velká písmena"
   },
   "generatedPassword": {
     "message": "Vygenerované heslo"

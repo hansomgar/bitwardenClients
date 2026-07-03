@@ -557,7 +557,7 @@
     "message": "数字最少个数"
   },
   "minSpecial": {
-    "message": "符号最少个数"
+    "message": "特殊字符最少个数"
   },
   "avoidAmbiguous": {
     "message": "避免易混淆的字符",
@@ -603,7 +603,7 @@
     "message": "归档项目"
   },
   "archiveItemDialogContent": {
-    "message": "归档后，此项目将被排除在一般搜索结果和自动填充建议之外。"
+    "message": "归档后，此项目将被排除在搜索结果和自动填充建议之外。"
   },
   "archived": {
     "message": "已归档"
@@ -613,6 +613,29 @@
   },
   "upgradeToUseArchive": {
     "message": "需要高级版成员资格才能使用归档功能。"
+  },
+  "archiveItemsPlural": {
+    "message": "归档 $NUM$ 个项目",
+    "description": "Title of the archive items dialog when multiple items are selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "archiveItemsSingular": {
+    "message": "归档 $NUM$ 个项目",
+    "description": "Title of the archive items dialog when a single item is selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "archiveItemsPluralDescription": {
+    "message": "归档后，这些项目将被排除在搜索结果和自动填充建议之外。"
   },
   "itemRestored": {
     "message": "项目已恢复"
@@ -1200,7 +1223,7 @@
     "message": "保存"
   },
   "notificationViewAria": {
-    "message": "在新窗口中查看 $ITEMNAME$",
+    "message": "查看 $ITEMNAME$（在新窗口中打开）",
     "placeholders": {
       "itemName": {
         "content": "$1"
@@ -2321,6 +2344,42 @@
   "licenseClass": {
     "message": "驾驶证类别"
   },
+  "addItemHeaderLogin": {
+    "message": "添加登录",
+    "description": "Header for new login item type"
+  },
+  "addItemHeaderCard": {
+    "message": "添加支付卡",
+    "description": "Header for new card item type"
+  },
+  "addItemHeaderIdentity": {
+    "message": "添加身份",
+    "description": "Header for new identity item type"
+  },
+  "addItemHeaderNote": {
+    "message": "添加笔记",
+    "description": "Header for new note item type"
+  },
+  "addItemHeaderSecureNote": {
+    "message": "添加安全笔记",
+    "description": "Header for new secure note item type"
+  },
+  "addItemHeaderSshKey": {
+    "message": "添加 SSH 密钥",
+    "description": "Header for new SSH key item type"
+  },
+  "addItemHeaderBankAccount": {
+    "message": "添加银行账户",
+    "description": "Header for new bank account item type"
+  },
+  "addItemHeaderDriversLicense": {
+    "message": "添加驾驶证",
+    "description": "Header for new license item type"
+  },
+  "addItemHeaderPassport": {
+    "message": "添加护照",
+    "description": "Header for new passport item type"
+  },
   "newItemHeaderLogin": {
     "message": "新增登录",
     "description": "Header for new login item type"
@@ -2338,7 +2397,7 @@
     "description": "Header for new note item type"
   },
   "newItemHeaderSecureNote": {
-    "message": "新建安全笔记",
+    "message": "新增安全笔记",
     "description": "Header for new secure note item type"
   },
   "newItemHeaderSshKey": {
@@ -2384,6 +2443,22 @@
   "editItemHeaderSecureNote": {
     "message": "编辑安全笔记",
     "description": "Header for edit secure note item type"
+  },
+  "editItemHeaderLoginSentenceCase": {
+    "message": "编辑登录",
+    "description": "Header for edit login item type"
+  },
+  "editItemHeaderCardSentenceCase": {
+    "message": "编辑支付卡",
+    "description": "Header for edit card item type"
+  },
+  "editItemHeaderIdentitySentenceCase": {
+    "message": "编辑身份",
+    "description": "Header for edit identity item type"
+  },
+  "editItemHeaderNoteSentenceCase": {
+    "message": "编辑笔记",
+    "description": "Header for edit note item type"
   },
   "editItemHeaderSshKey": {
     "message": "编辑 SSH 密钥",
@@ -3034,7 +3109,7 @@
     "message": "无法导入支付卡项目类型"
   },
   "restrictCardTypeImportDesc": {
-    "message": "由 1 个或多个组织设置的策略阻止您将支付卡导入密码库。"
+    "message": "由 1 个或多个组织设置的策略阻止您将支付卡导入您的密码库。"
   },
   "domainsTitle": {
     "message": "域名",
@@ -3139,6 +3214,18 @@
   },
   "reviewAndChangeAtRiskPasswordsPlural": {
     "message": "审查并更改 $COUNT$ 个存在风险的密码",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "reviewXAtRiskPassword": {
+    "message": "审查 1 个存在风险的密码"
+  },
+  "reviewXAtRiskPasswordsPlural": {
+    "message": "审查 $COUNT$ 个存在风险的密码",
     "placeholders": {
       "count": {
         "content": "$1",
@@ -3341,6 +3428,10 @@
     "message": "自定义"
   },
   "createSend": {
+    "message": "创建 Send",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "createSendV2": {
     "message": "创建 Send",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
@@ -5004,11 +5095,11 @@
     "description": "Label for the setting that allows overriding the default browser autofill settings"
   },
   "defaultPasswordManagerCalloutTitle": {
-    "message": "使您的自动填充体验更好",
+    "message": "提升您的自动填充体验",
     "description": "Title for the callout that prompts users to set Bitwarden as their default password manager"
   },
   "defaultPasswordManagerCalloutDesc": {
-    "message": "系统会请求您授予 $BROWSER$ 浏览器权限，将 Bitwarden 设置为您的默认密码管理器。",
+    "message": "您将被请求授予 $BROWSER$ 浏览器权限，以将 Bitwarden 设为默认密码管理器。",
     "description": "Description for the callout that prompts users to set Bitwarden as their default password manager",
     "placeholders": {
       "browser": {
@@ -5032,11 +5123,26 @@
   "defaultPasswordManagerPromptTitle": {
     "message": "将 Bitwarden 设置为浏览器的默认密码管理器"
   },
+  "defaultPasswordManagerPromptTitleV2": {
+    "message": "将 Bitwarden 设置为默认密码管理器",
+    "description": "Label for the setting to make Bitwarden the default password manager"
+  },
+  "defaultPasswordManagerSettingHintV2": {
+    "message": "关闭浏览器自动填充设置以避免冲突。",
+    "description": "Hint text for the default password manager setting. Followed by a link to browser autofill settings."
+  },
+  "defaultPasswordManagerSettingHintLinkV2": {
+    "message": "管理浏览器设置",
+    "description": "Link text to browser autofill settings in the default password manager setting hint."
+  },
   "defaultPasswordManagerPromptStep2AfterAllow": {
     "message": "根据浏览器提示授予 Bitwarden 更改您的设置的权限。"
   },
   "defaultPasswordManagerPromptStep3": {
     "message": "我们将停用您浏览器的内置密码管理器，以便您可以享受安全的登录体验。"
+  },
+  "defaultPasswordManagerSuccessToast": {
+    "message": "将 Bitwarden 设置为浏览器的默认密码管理器"
   },
   "allow": {
     "message": "允许",
@@ -5298,6 +5404,29 @@
         "example": "Work"
       }
     }
+  },
+  "viewItemHeaderLoginSentenceCase": {
+    "message": "查看登录",
+    "description": "Header for view login item type"
+  },
+  "viewItemHeaderCardSentenceCase": {
+    "message": "查看支付卡",
+    "description": "Header for view card item type"
+  },
+  "viewItemHeaderIdentitySentenceCase": {
+    "message": "查看身份",
+    "description": "Header for view identity item type"
+  },
+  "viewItemHeaderNoteSentenceCase": {
+    "message": "查看笔记",
+    "description": "Header for view note item type"
+  },
+  "create": {
+    "message": "创建",
+    "description": "for adding new items"
+  },
+  "addCollection": {
+    "message": "添加集合"
   },
   "new": {
     "message": "新增"

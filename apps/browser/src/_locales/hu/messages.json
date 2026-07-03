@@ -614,6 +614,29 @@
   "upgradeToUseArchive": {
     "message": "Az Archívum használatához prémium tagság szükséges."
   },
+  "archiveItemsPlural": {
+    "message": "$NUM$ elem archiválása",
+    "description": "Title of the archive items dialog when multiple items are selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "archiveItemsSingular": {
+    "message": "$NUM$ elem archiválása",
+    "description": "Title of the archive items dialog when a single item is selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "archiveItemsPluralDescription": {
+    "message": "Az archiválás után ezek az elemek kizárásra kerülnek a keresési eredményekből és az automatikus kitöltési javaslatokból."
+  },
   "itemRestored": {
     "message": "Az elem visszaállításra került."
   },
@@ -2321,6 +2344,42 @@
   "licenseClass": {
     "message": "Licensz osztály"
   },
+  "addItemHeaderLogin": {
+    "message": "Bejelentkezés hozzáadása",
+    "description": "Header for new login item type"
+  },
+  "addItemHeaderCard": {
+    "message": "Kártya hozzáadása",
+    "description": "Header for new card item type"
+  },
+  "addItemHeaderIdentity": {
+    "message": "Személyazonossság hozzáadása",
+    "description": "Header for new identity item type"
+  },
+  "addItemHeaderNote": {
+    "message": "Jegyzet hozzáadása",
+    "description": "Header for new note item type"
+  },
+  "addItemHeaderSecureNote": {
+    "message": "Biztonságos jegyzet hozzáadása",
+    "description": "Header for new secure note item type"
+  },
+  "addItemHeaderSshKey": {
+    "message": "SSH kulcs hozzáadása",
+    "description": "Header for new SSH key item type"
+  },
+  "addItemHeaderBankAccount": {
+    "message": "Bankszámla hozzáadása",
+    "description": "Header for new bank account item type"
+  },
+  "addItemHeaderDriversLicense": {
+    "message": "Licensz hozzáadása",
+    "description": "Header for new license item type"
+  },
+  "addItemHeaderPassport": {
+    "message": "Útlevél hozzáadása",
+    "description": "Header for new passport item type"
+  },
   "newItemHeaderLogin": {
     "message": "Új bejelentkezés",
     "description": "Header for new login item type"
@@ -2384,6 +2443,22 @@
   "editItemHeaderSecureNote": {
     "message": "Biztonságos jegyzet szerkesztése",
     "description": "Header for edit secure note item type"
+  },
+  "editItemHeaderLoginSentenceCase": {
+    "message": "Bejelentkezés szerkesztése",
+    "description": "Header for edit login item type"
+  },
+  "editItemHeaderCardSentenceCase": {
+    "message": "Kártya szerkesztése",
+    "description": "Header for edit card item type"
+  },
+  "editItemHeaderIdentitySentenceCase": {
+    "message": "Személyazonossság szerkesztése",
+    "description": "Header for edit identity item type"
+  },
+  "editItemHeaderNoteSentenceCase": {
+    "message": "Jegyzet szerkesztése",
+    "description": "Header for edit note item type"
   },
   "editItemHeaderSshKey": {
     "message": "SSH kulcs szerkesztése",
@@ -3146,6 +3221,18 @@
       }
     }
   },
+  "reviewXAtRiskPassword": {
+    "message": "1 veszélyeztetett jelszó felülvizsgálata"
+  },
+  "reviewXAtRiskPasswordsPlural": {
+    "message": "$COUNT$ veszélyeztetett jelszó felülvizsgálata",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
   "changeAtRiskPasswordsFaster": {
     "message": "Változtassuk meg gyorsabban a veszélyeztetett jelszavakat."
   },
@@ -3342,6 +3429,10 @@
   },
   "createSend": {
     "message": "Új Send",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "createSendV2": {
+    "message": "Send elem hozzáadása",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "newPassword": {
@@ -5032,11 +5123,26 @@
   "defaultPasswordManagerPromptTitle": {
     "message": "Legyen a Bitwarden az alapértelmezett böngésző jelszókezelő."
   },
+  "defaultPasswordManagerPromptTitleV2": {
+    "message": "Legyen a Bitwarden az alapértelmezett jelszókezelő",
+    "description": "Label for the setting to make Bitwarden the default password manager"
+  },
+  "defaultPasswordManagerSettingHintV2": {
+    "message": "Kapcsoljuk ki a böngésző automatikus kitöltési beállításait az ütközések elkerülése érdekében.",
+    "description": "Hint text for the default password manager setting. Followed by a link to browser autofill settings."
+  },
+  "defaultPasswordManagerSettingHintLinkV2": {
+    "message": "Böngésző beállítások kezelése",
+    "description": "Link text to browser autofill settings in the default password manager setting hint."
+  },
   "defaultPasswordManagerPromptStep2AfterAllow": {
     "message": "a böngésző felszólításából, hogy adjunk engedélyt a Bitwardennek a beállítások módosítására."
   },
   "defaultPasswordManagerPromptStep3": {
     "message": "A böngésző beépített jelszókezelője kikapcsolásra kerül, hogy biztonságos bejelentkezési élményt kapjunk."
+  },
+  "defaultPasswordManagerSuccessToast": {
+    "message": "Legyen a Bitwarden az alapértelmezett jelszókezelő"
   },
   "allow": {
     "message": "Engedélyezés",
@@ -5298,6 +5404,29 @@
         "example": "Work"
       }
     }
+  },
+  "viewItemHeaderLoginSentenceCase": {
+    "message": "Bejelentkezés megtekintése",
+    "description": "Header for view login item type"
+  },
+  "viewItemHeaderCardSentenceCase": {
+    "message": "Kártya megtekintése",
+    "description": "Header for view card item type"
+  },
+  "viewItemHeaderIdentitySentenceCase": {
+    "message": "Személyazonosság megtekintése",
+    "description": "Header for view identity item type"
+  },
+  "viewItemHeaderNoteSentenceCase": {
+    "message": "Jegyzet megtekintése",
+    "description": "Header for view note item type"
+  },
+  "create": {
+    "message": "Létrehozás",
+    "description": "for adding new items"
+  },
+  "addCollection": {
+    "message": "Gyűjtemény hozzáadása"
   },
   "new": {
     "message": "Új"

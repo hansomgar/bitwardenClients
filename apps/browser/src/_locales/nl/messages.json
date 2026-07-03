@@ -614,6 +614,29 @@
   "upgradeToUseArchive": {
     "message": "Je hebt een Premium-abonnement nodig om te kunnen archiveren."
   },
+  "archiveItemsPlural": {
+    "message": "$NUM$ items archiveren",
+    "description": "Title of the archive items dialog when multiple items are selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "archiveItemsSingular": {
+    "message": "$NUM$ item archiveren",
+    "description": "Title of the archive items dialog when a single item is selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "archiveItemsPluralDescription": {
+    "message": "Eenmaal gearchiveerd worden deze items uitgesloten van zoekresultaten en suggesties voor automatisch invullen."
+  },
   "itemRestored": {
     "message": "Item is hersteld"
   },
@@ -2321,6 +2344,42 @@
   "licenseClass": {
     "message": "Rijbewijsklasse"
   },
+  "addItemHeaderLogin": {
+    "message": "Login toevoegen",
+    "description": "Header for new login item type"
+  },
+  "addItemHeaderCard": {
+    "message": "Kaart toevoegen",
+    "description": "Header for new card item type"
+  },
+  "addItemHeaderIdentity": {
+    "message": "Identiteit toevoegen",
+    "description": "Header for new identity item type"
+  },
+  "addItemHeaderNote": {
+    "message": "Notitie toevogen",
+    "description": "Header for new note item type"
+  },
+  "addItemHeaderSecureNote": {
+    "message": "Veilige notitie toevoegen",
+    "description": "Header for new secure note item type"
+  },
+  "addItemHeaderSshKey": {
+    "message": "SSH-sleutel toevoegen",
+    "description": "Header for new SSH key item type"
+  },
+  "addItemHeaderBankAccount": {
+    "message": "Bankrekening toevoegen",
+    "description": "Header for new bank account item type"
+  },
+  "addItemHeaderDriversLicense": {
+    "message": "Rijbewijs toevoegen",
+    "description": "Header for new license item type"
+  },
+  "addItemHeaderPassport": {
+    "message": "Paspoort toevoegen",
+    "description": "Header for new passport item type"
+  },
   "newItemHeaderLogin": {
     "message": "Nieuwe login",
     "description": "Header for new login item type"
@@ -2384,6 +2443,22 @@
   "editItemHeaderSecureNote": {
     "message": "Veilige notitie bewerken",
     "description": "Header for edit secure note item type"
+  },
+  "editItemHeaderLoginSentenceCase": {
+    "message": "Login bewerken",
+    "description": "Header for edit login item type"
+  },
+  "editItemHeaderCardSentenceCase": {
+    "message": "Kaart bewerken",
+    "description": "Header for edit card item type"
+  },
+  "editItemHeaderIdentitySentenceCase": {
+    "message": "Identiteit bewerken",
+    "description": "Header for edit identity item type"
+  },
+  "editItemHeaderNoteSentenceCase": {
+    "message": "Notitie bewerken",
+    "description": "Header for edit note item type"
   },
   "editItemHeaderSshKey": {
     "message": "SSH-sleutel bewerken",
@@ -3146,6 +3221,18 @@
       }
     }
   },
+  "reviewXAtRiskPassword": {
+    "message": "1 risicovol wachtwoord beoordelen"
+  },
+  "reviewXAtRiskPasswordsPlural": {
+    "message": "$COUNT$ risicovolle wachtwoorden beoordelen",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
   "changeAtRiskPasswordsFaster": {
     "message": "Risicovolle wachtwoorden sneller wijzigen"
   },
@@ -3342,6 +3429,10 @@
   },
   "createSend": {
     "message": "Nieuwe Send aanmaken",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "createSendV2": {
+    "message": "Send aanmaken",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "newPassword": {
@@ -4992,7 +5083,7 @@
     "description": "Body content for dialog which asks if the user wants to proceed to the browser's keyboard shortcut settings page"
   },
   "overrideDefaultBrowserAutofillTitle": {
-    "message": "Bitwarden als je standaardwachtbeheerder gebruiken?",
+    "message": "Bitwarden als je standaardwachtwoordbeheerder gebruiken?",
     "description": "Dialog title facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutofillDescription": {
@@ -5000,7 +5091,7 @@
     "description": "Dialog message facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutoFillSettings": {
-    "message": "Maak van Bitwarden je standaardwachtbeheerder",
+    "message": "Bitwarden als je standaardwachtwoordbeheerder gebruiken",
     "description": "Label for the setting that allows overriding the default browser autofill settings"
   },
   "defaultPasswordManagerCalloutTitle": {
@@ -5018,7 +5109,7 @@
     }
   },
   "privacyPermissionAdditionNotGrantedTitle": {
-    "message": "Kan Bitwarden niet als standaardwachtbeheerder instellen",
+    "message": "Kan Bitwarden niet als standaardwachtwoordbeheerder instellen",
     "description": "Title for the dialog that appears when the user has not granted the extension permission to set privacy settings"
   },
   "privacyPermissionAdditionNotGrantedDescription": {
@@ -5030,13 +5121,28 @@
     "description": "Button text for the setting that allows overriding the default browser autofill settings"
   },
   "defaultPasswordManagerPromptTitle": {
-    "message": "Maak van Bitwarden de standaardwachtbeheerder van je webbrowser"
+    "message": "Maak van Bitwarden de standaardwachtwoordbeheerder van je webbrowser"
+  },
+  "defaultPasswordManagerPromptTitleV2": {
+    "message": "Bitwarden als je standaardwachtwoordbeheerder gebruiken",
+    "description": "Label for the setting to make Bitwarden the default password manager"
+  },
+  "defaultPasswordManagerSettingHintV2": {
+    "message": "Schakel de automatische invulinstellingen van de browser uit om conflicten te voorkomen.",
+    "description": "Hint text for the default password manager setting. Followed by a link to browser autofill settings."
+  },
+  "defaultPasswordManagerSettingHintLinkV2": {
+    "message": "Browserinstellingen beheren",
+    "description": "Link text to browser autofill settings in the default password manager setting hint."
   },
   "defaultPasswordManagerPromptStep2AfterAllow": {
     "message": "vanuit de browserprompt om Bitwarden toestemming te geven om je instellingen te wijzigen."
   },
   "defaultPasswordManagerPromptStep3": {
     "message": "We zullen de ingebouwde wachtwoordbeheerder van je browser uitschakelen zodat je kunt genieten van een veilige inlogervaring."
+  },
+  "defaultPasswordManagerSuccessToast": {
+    "message": "Bitwarden is nu je standaardwachtwoordbeheerder"
   },
   "allow": {
     "message": "Toestaan",
@@ -5298,6 +5404,29 @@
         "example": "Work"
       }
     }
+  },
+  "viewItemHeaderLoginSentenceCase": {
+    "message": "Login weergeven",
+    "description": "Header for view login item type"
+  },
+  "viewItemHeaderCardSentenceCase": {
+    "message": "Kaart weergeven",
+    "description": "Header for view card item type"
+  },
+  "viewItemHeaderIdentitySentenceCase": {
+    "message": "Identiteit weergeven",
+    "description": "Header for view identity item type"
+  },
+  "viewItemHeaderNoteSentenceCase": {
+    "message": "Notitie weergeven",
+    "description": "Header for view note item type"
+  },
+  "create": {
+    "message": "Aanmaken",
+    "description": "for adding new items"
+  },
+  "addCollection": {
+    "message": "Collectie toevoegen"
   },
   "new": {
     "message": "Nieuw"

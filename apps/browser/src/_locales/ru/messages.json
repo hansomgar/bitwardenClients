@@ -614,6 +614,29 @@
   "upgradeToUseArchive": {
     "message": "Для использования архива требуется премиум-статус."
   },
+  "archiveItemsPlural": {
+    "message": "Архивировать $NUM$ элементов",
+    "description": "Title of the archive items dialog when multiple items are selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "archiveItemsSingular": {
+    "message": "Архивировать $NUM$ элемент",
+    "description": "Title of the archive items dialog when a single item is selected",
+    "placeholders": {
+      "num": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "archiveItemsPluralDescription": {
+    "message": "После архивации этот элемент будет исключен из результатов поиска и предложений по автозаполнению."
+  },
   "itemRestored": {
     "message": "Элемент восстановлен"
   },
@@ -2321,6 +2344,42 @@
   "licenseClass": {
     "message": "Категории водительского удостоверения"
   },
+  "addItemHeaderLogin": {
+    "message": "Добавить логин",
+    "description": "Header for new login item type"
+  },
+  "addItemHeaderCard": {
+    "message": "Добавить карту",
+    "description": "Header for new card item type"
+  },
+  "addItemHeaderIdentity": {
+    "message": "Добавить личную информацию",
+    "description": "Header for new identity item type"
+  },
+  "addItemHeaderNote": {
+    "message": "Добавить заметку",
+    "description": "Header for new note item type"
+  },
+  "addItemHeaderSecureNote": {
+    "message": "Добавить защищенную заметку",
+    "description": "Header for new secure note item type"
+  },
+  "addItemHeaderSshKey": {
+    "message": "Добавить ключ SSH",
+    "description": "Header for new SSH key item type"
+  },
+  "addItemHeaderBankAccount": {
+    "message": "Добавить банковский счет",
+    "description": "Header for new bank account item type"
+  },
+  "addItemHeaderDriversLicense": {
+    "message": "Добавить водительское удостоверение",
+    "description": "Header for new license item type"
+  },
+  "addItemHeaderPassport": {
+    "message": "Добавить паспорт",
+    "description": "Header for new passport item type"
+  },
   "newItemHeaderLogin": {
     "message": "Новый логин",
     "description": "Header for new login item type"
@@ -2384,6 +2443,22 @@
   "editItemHeaderSecureNote": {
     "message": "Изменить защищенную заметку",
     "description": "Header for edit secure note item type"
+  },
+  "editItemHeaderLoginSentenceCase": {
+    "message": "Изменить логин",
+    "description": "Header for edit login item type"
+  },
+  "editItemHeaderCardSentenceCase": {
+    "message": "Редактировать карту",
+    "description": "Header for edit card item type"
+  },
+  "editItemHeaderIdentitySentenceCase": {
+    "message": "Редактировать личную информацию",
+    "description": "Header for edit identity item type"
+  },
+  "editItemHeaderNoteSentenceCase": {
+    "message": "Редактировать заметку",
+    "description": "Header for edit note item type"
   },
   "editItemHeaderSshKey": {
     "message": "Редактировать ключ SSH",
@@ -3146,6 +3221,18 @@
       }
     }
   },
+  "reviewXAtRiskPassword": {
+    "message": "Обзор 1 пароля, подверженного риску"
+  },
+  "reviewXAtRiskPasswordsPlural": {
+    "message": "Обзор $COUNT$ паролей, подверженных риску",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
   "changeAtRiskPasswordsFaster": {
     "message": "Меняйте пароли, подверженные риску, быстрее"
   },
@@ -3342,6 +3429,10 @@
   },
   "createSend": {
     "message": "Новая Send",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "createSendV2": {
+    "message": "Создать Send",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "newPassword": {
@@ -5032,11 +5123,26 @@
   "defaultPasswordManagerPromptTitle": {
     "message": "Сделайте Bitwarden менеджером паролей вашего браузера по умолчанию"
   },
+  "defaultPasswordManagerPromptTitleV2": {
+    "message": "Сделать Bitwarden менеджером паролей по умолчанию",
+    "description": "Label for the setting to make Bitwarden the default password manager"
+  },
+  "defaultPasswordManagerSettingHintV2": {
+    "message": "Отключите настройки автозаполнения в браузере, чтобы избежать конфликтов.",
+    "description": "Hint text for the default password manager setting. Followed by a link to browser autofill settings."
+  },
+  "defaultPasswordManagerSettingHintLinkV2": {
+    "message": "Управление настройками браузера",
+    "description": "Link text to browser autofill settings in the default password manager setting hint."
+  },
   "defaultPasswordManagerPromptStep2AfterAllow": {
     "message": "из запроса браузера, чтобы дать Bitwarden разрешение на изменение ваших настроек."
   },
   "defaultPasswordManagerPromptStep3": {
     "message": "Мы отключим встроенный менеджер паролей вашего браузера, чтобы вы могли насладиться безопасной авторизацией."
+  },
+  "defaultPasswordManagerSuccessToast": {
+    "message": "Bitwarden теперь менеджер паролей браузера по умолчанию."
   },
   "allow": {
     "message": "Разрешить",
@@ -5298,6 +5404,29 @@
         "example": "Work"
       }
     }
+  },
+  "viewItemHeaderLoginSentenceCase": {
+    "message": "Просмотр логина",
+    "description": "Header for view login item type"
+  },
+  "viewItemHeaderCardSentenceCase": {
+    "message": "Просмотр карты",
+    "description": "Header for view card item type"
+  },
+  "viewItemHeaderIdentitySentenceCase": {
+    "message": "Просмотр личной информации",
+    "description": "Header for view identity item type"
+  },
+  "viewItemHeaderNoteSentenceCase": {
+    "message": "Просмотр заметки",
+    "description": "Header for view note item type"
+  },
+  "create": {
+    "message": "Создать",
+    "description": "for adding new items"
+  },
+  "addCollection": {
+    "message": "Добавить коллекцию"
   },
   "new": {
     "message": "Новый"
