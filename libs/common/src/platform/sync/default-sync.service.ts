@@ -191,7 +191,8 @@ export class DefaultSyncService extends CoreSyncService {
       await this.syncCiphers(response.ciphers, response.profile.id);
       await this.syncSends(response.sends, response.profile.id);
       await this.syncSettings(response.domains, response.profile.id);
-      await this.syncPolicies(response.policiesNew, response.policies, response.profile.id);
+      await this.syncPolicies(response.policies, response.profile.id);
+      await this.syncNewPolicies(response.policiesNew, response.policies, response.profile.id);
 
       await this.setLastSync(now, userId);
       return this.syncCompleted(true, userId);
@@ -417,21 +418,32 @@ export class DefaultSyncService extends CoreSyncService {
     return this.domainSettingsService.setEquivalentDomains(eqDomains, userId);
   }
 
-  private async syncPolicies(
-    response: PolicyResponse[] | undefined,
-    fallback: PolicyResponse[] | undefined,
-    userId: UserId,
-  ) {
-    // Prefer `policiesNew`, falling back to `policies` when it is absent or empty
-    // (e.g. the server feature flag is off) so policy state is always seeded with data.
-    const source = response != null && response.length > 0 ? response : fallback;
+  private async syncPolicies(response: PolicyResponse[], userId: UserId) {
     const policies: { [id: string]: PolicyData } = {};
-    if (source != null) {
-      source.forEach((p) => {
+    if (response != null) {
+      response.forEach((p) => {
         policies[p.id] = new PolicyData(p);
       });
     }
     return await this.policyService.replace(policies, userId);
+  }
+
+  private async syncNewPolicies(
+    response: PolicyResponse[] | undefined,
+    fallback: PolicyResponse[] | undefined,
+    userId: UserId,
+  ) {
+    // Fall back to `policies` when `policiesNew` is absent or empty (e.g. the server
+    // feature flag is off) so the `policiesNew` data is always seeded.
+    const source = response != null && response.length > 0 ? response : fallback;
+    if (source == null || source.length === 0) {
+      return;
+    }
+    const policies: { [id: string]: PolicyData } = {};
+    source.forEach((p) => {
+      policies[p.id] = new PolicyData(p);
+    });
+    return await this.policyService.replaceNewPolicies(policies, userId);
   }
 
   private async syncUserDecryption(

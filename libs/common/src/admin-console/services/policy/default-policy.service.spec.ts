@@ -31,6 +31,7 @@ describe("PolicyService", () => {
   let organizationService: MockProxy<OrganizationService>;
   let sdkService: MockSdkService;
   let singleUserState: FakeSingleUserState<Record<PolicyId, PolicyData>>;
+  let newPolicyUserState: FakeSingleUserState<Record<PolicyId, PolicyData>>;
   const accountService = mockAccountServiceWith(userId);
 
   let policyService: DefaultPolicyService;
@@ -39,7 +40,8 @@ describe("PolicyService", () => {
     stateProvider = new FakeStateProvider(accountService);
     organizationService = mock<OrganizationService>();
     sdkService = new MockSdkService();
-    singleUserState = stateProvider.singleUser.getFake(userId, POLICIES_NEW);
+    singleUserState = stateProvider.singleUser.getFake(userId, POLICIES);
+    newPolicyUserState = stateProvider.singleUser.getFake(userId, POLICIES_NEW);
 
     organizationService.organizations$.calledWith(userId).mockReturnValue(of([]));
     organizationService.acceptedOrganizations$.calledWith(userId).mockReturnValue(of([]));
@@ -108,6 +110,42 @@ describe("PolicyService", () => {
         revisionDate: expect.any(Date),
       },
     ]);
+  });
+
+  it("upsertNewPolicy writes to the policiesNew state", async () => {
+    newPolicyUserState.nextState(
+      arrayToRecord([
+        policyData("1", "test-organization", PolicyType.MaximumVaultTimeout, true, { minutes: 14 }),
+      ]),
+    );
+
+    await policyService.upsertNewPolicy(
+      policyData("99", "test-organization", PolicyType.DisableSend, true),
+      userId,
+    );
+
+    const result = await firstValueFrom(newPolicyUserState.state$);
+    expect(Object.keys(result!)).toEqual(["1", "99"]);
+    // The legacy `policies$` state is untouched.
+    expect(await firstValueFrom(policyService.policies$(userId))).toEqual([]);
+  });
+
+  it("replaceNewPolicies writes to the policiesNew state", async () => {
+    newPolicyUserState.nextState(
+      arrayToRecord([
+        policyData("1", "test-organization", PolicyType.MaximumVaultTimeout, true, { minutes: 14 }),
+      ]),
+    );
+
+    await policyService.replaceNewPolicies(
+      { "2": policyData("2", "test-organization", PolicyType.DisableSend, true) },
+      userId,
+    );
+
+    const result = await firstValueFrom(newPolicyUserState.state$);
+    expect(Object.keys(result!)).toEqual(["2"]);
+    // The legacy `policies$` state is untouched.
+    expect(await firstValueFrom(policyService.policies$(userId))).toEqual([]);
   });
 
   describe("masterPasswordPolicyOptions", () => {
@@ -226,7 +264,7 @@ describe("PolicyService", () => {
         policyData(policyId1, orgId1, PolicyType.MaximumVaultTimeout, true, { minutes: 30 }),
         policyData(policyId2, orgId1, PolicyType.DisableSend, true),
       ];
-      singleUserState.nextState(arrayToRecord(policies));
+      newPolicyUserState.nextState(arrayToRecord(policies));
 
       const confirmed = [
         organization(orgId1, true, true, OrganizationUserStatusType.Confirmed, false),
@@ -273,7 +311,7 @@ describe("PolicyService", () => {
     });
 
     it("passes undefined to the SDK when a policy has no data", async () => {
-      singleUserState.nextState(
+      newPolicyUserState.nextState(
         arrayToRecord([policyData(policyId1, orgId1, PolicyType.DisableSend, true, null)]),
       );
       organizationService.organizations$
@@ -292,7 +330,7 @@ describe("PolicyService", () => {
     });
 
     it("maps an SDK PolicyView with no data back to a Policy with null data", async () => {
-      singleUserState.nextState(
+      newPolicyUserState.nextState(
         arrayToRecord([policyData(policyId1, orgId1, PolicyType.DisableSend, true)]),
       );
       organizationService.organizations$
@@ -507,49 +545,6 @@ describe("PolicyService", () => {
         },
         {
           id: "policy4",
-          organizationId: "org1",
-          type: PolicyType.DisablePersonalVaultExport,
-          enabled: true,
-          data: undefined,
-          revisionDate: expect.any(Date),
-        },
-      ]);
-    });
-
-    it("falls back to the legacy policies state before the new state is populated", async () => {
-      const legacyState = stateProvider.singleUser.getFake(userId, POLICIES);
-      legacyState.nextState(
-        arrayToRecord([policyData("legacy1", "org1", PolicyType.ActivateAutofill, true)]),
-      );
-
-      const result = await firstValueFrom(policyService.policies$(userId));
-
-      expect(result).toEqual([
-        {
-          id: "legacy1",
-          organizationId: "org1",
-          type: PolicyType.ActivateAutofill,
-          enabled: true,
-          data: undefined,
-          revisionDate: expect.any(Date),
-        },
-      ]);
-    });
-
-    it("prefers the new state over the legacy state when both are present", async () => {
-      const legacyState = stateProvider.singleUser.getFake(userId, POLICIES);
-      legacyState.nextState(
-        arrayToRecord([policyData("legacy1", "org1", PolicyType.ActivateAutofill, true)]),
-      );
-      singleUserState.nextState(
-        arrayToRecord([policyData("new1", "org1", PolicyType.DisablePersonalVaultExport, true)]),
-      );
-
-      const result = await firstValueFrom(policyService.policies$(userId));
-
-      expect(result).toEqual([
-        {
-          id: "new1",
           organizationId: "org1",
           type: PolicyType.DisablePersonalVaultExport,
           enabled: true,

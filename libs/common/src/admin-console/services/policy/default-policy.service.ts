@@ -39,21 +39,28 @@ export class DefaultPolicyService implements PolicyService {
   ) {}
 
   private policyState(userId: UserId) {
-    return this.stateProvider.getUser(userId, POLICIES_NEW);
+    return this.stateProvider.getUser(userId, POLICIES);
   }
 
   private policyData$(userId: UserId) {
-    // Reads the current `policiesNew` state, falling back to the legacy `policies`
-    // state to cover the window after an upgrade before the first sync repopulates
-    // `policiesNew`. This is the only remaining reader of the legacy `POLICIES` key.
-    return combineLatest([
-      this.stateProvider.getUser(userId, POLICIES_NEW).state$,
-      this.stateProvider.getUser(userId, POLICIES).state$,
-    ]).pipe(map(([newPolicies, oldPolicies]) => newPolicies ?? oldPolicies ?? {}));
+    return this.policyState(userId).state$.pipe(map((policyData) => policyData ?? {}));
   }
 
   policies$(userId: UserId) {
     return this.policyData$(userId).pipe(map((policyData) => policyRecordToArray(policyData)));
+  }
+
+  // `POLICIES_NEW` holds the policy data used by `policiesByType$`, covering
+  // organizations the user is in an accepted or confirmed status. It is kept
+  // separate from the `POLICIES` state that backs `policies$`.
+  private newPolicyState(userId: UserId) {
+    return this.stateProvider.getUser(userId, POLICIES_NEW);
+  }
+
+  private newPolicies$(userId: UserId) {
+    return this.newPolicyState(userId).state$.pipe(
+      map((policyData) => policyRecordToArray(policyData ?? {})),
+    );
   }
 
   policiesByType$(policyType: PolicyType, userId: UserId): Observable<Policy[]> {
@@ -68,7 +75,7 @@ export class DefaultPolicyService implements PolicyService {
     return combineLatest([
       this.organizationService.organizations$(userId),
       this.organizationService.acceptedOrganizations$(userId),
-      this.policies$(userId),
+      this.newPolicies$(userId),
       this.sdkService().client$,
     ]).pipe(
       map(([confirmedOrganizations, acceptedOrganizations, policies, sdkClient]) => {
@@ -291,6 +298,18 @@ export class DefaultPolicyService implements PolicyService {
   }
 
   async replace(policies: { [id: string]: PolicyData }, userId: UserId): Promise<void> {
+    await this.stateProvider.setUserState(POLICIES, policies, userId);
+  }
+
+  async upsertNewPolicy(policy: PolicyData, userId: UserId): Promise<void> {
+    await this.newPolicyState(userId).update((policies) => {
+      policies ??= {};
+      policies[policy.id] = policy;
+      return policies;
+    });
+  }
+
+  async replaceNewPolicies(policies: { [id: string]: PolicyData }, userId: UserId): Promise<void> {
     await this.stateProvider.setUserState(POLICIES_NEW, policies, userId);
   }
 

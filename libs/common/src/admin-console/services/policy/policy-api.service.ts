@@ -147,5 +147,6 @@ export class PolicyApiService implements PolicyApiServiceAbstraction {
     const policyResponse = new PolicyResponse(response);
     const data = new PolicyData(policyResponse);
     await this.policyService.upsert(data, userId);
+    await this.policyService.upsertNewPolicy(data, userId);
   }
 }

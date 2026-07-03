@@ -104,6 +104,21 @@ export abstract class InternalPolicyService extends PolicyService {
    */
   abstract replace: (policies: { [id: string]: PolicyData }, userId: UserId) => Promise<void>;
   /**
+   * Upsert a policy into the `policiesNew` local data used by {@link policiesByType$}, which covers
+   * organizations the user is in an accepted or confirmed status.
+   * This does not update any policies on the server.
+   */
+  abstract upsertNewPolicy: (policy: PolicyData, userId: UserId) => Promise<void>;
+  /**
+   * Replace all `policiesNew` local data used by {@link policiesByType$}, which covers
+   * organizations the user is in an accepted or confirmed status.
+   * This does not update any policies on the server.
+   */
+  abstract replaceNewPolicies: (
+    policies: { [id: string]: PolicyData },
+    userId: UserId,
+  ) => Promise<void>;
+  /**
    * Wrapper around upsert that uses account service to sync policies for the logged in user. This comes from
    * the server push notification to update local policies.
    */
