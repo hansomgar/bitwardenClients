@@ -706,7 +706,7 @@ export class AutofillInlineMenuList extends AutofillInlineMenuPageElement {
   private loadPageOfCiphers() {
     const lastIndex = this.ciphers.length;
     for (let cipherIndex = this.currentCipherIndex; cipherIndex < lastIndex; cipherIndex++) {
-      this.ciphersList.appendChild(this.buildInlineMenuListActionsItem(this.ciphers[cipherIndex]));
+      this.ciphersList.appendChild(this.buildInlineMenuListActionsItem(this.ciphers[cipherIndex], cipherIndex + 1));
       this.currentCipherIndex++;
     }
 
@@ -889,10 +889,10 @@ export class AutofillInlineMenuList extends AutofillInlineMenuPageElement {
    *
    * @param cipher - The cipher to build the list item for.
    */
-  private buildInlineMenuListActionsItem(cipher: InlineMenuCipherData) {
+  private buildInlineMenuListActionsItem(cipher: InlineMenuCipherData, index: number) {
     this.buildPasskeysHeadingElements(cipher);
 
-    const fillCipherElement = this.buildFillCipherElement(cipher);
+    const fillCipherElement = this.buildFillCipherElement(cipher, index);
     const viewCipherElement = this.buildViewCipherElement(cipher);
 
     const cipherContainerElement = globalThis.document.createElement("div");
@@ -942,14 +942,28 @@ export class AutofillInlineMenuList extends AutofillInlineMenuPageElement {
   }
 
   /**
+   * Builds the sequence number element for a cipher item.
+   *
+   * @param index - The 1-based index of the cipher in the list
+   */
+  private buildCipherIndexElement(index: number): HTMLSpanElement {
+    const indexElement = globalThis.document.createElement("span");
+    indexElement.classList.add("cipher-index");
+    indexElement.setAttribute("aria-hidden", "true");
+    indexElement.textContent = `${index}.`;
+    return indexElement;
+  }
+
+  /**
    * Builds the fill cipher button for a given cipher.
    * Wraps the cipher icon and details.
    *
    * @param cipher - The cipher to build the fill cipher button for.
    */
-  private buildFillCipherElement(cipher: InlineMenuCipherData) {
+  private buildFillCipherElement(cipher: InlineMenuCipherData, index: number) {
     const cipherIcon = this.buildCipherIconElement(cipher);
     const cipherDetailsElement = this.buildCipherDetailsElement(cipher);
+    const cipherIndexElement = this.buildCipherIndexElement(index);
 
     const fillCipherElement = globalThis.document.createElement("button");
     fillCipherElement.tabIndex = -1;
@@ -964,7 +978,7 @@ export class AutofillInlineMenuList extends AutofillInlineMenuPageElement {
     );
 
     this.addFillCipherElementAriaDescription(fillCipherElement, cipher);
-    fillCipherElement.append(cipherIcon, ...(cipherDetailsElement ? [cipherDetailsElement] : []));
+    fillCipherElement.append(cipherIndexElement, cipherIcon, ...(cipherDetailsElement ? [cipherDetailsElement] : []));
     fillCipherElement.addEventListener(EVENTS.CLICK, this.handleFillCipherClickEvent(cipher));
     fillCipherElement.addEventListener(EVENTS.KEYUP, this.handleFillCipherKeyUpEvent);
 
