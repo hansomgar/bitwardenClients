@@ -293,7 +293,20 @@ export class AutofillInlineMenuIframeService implements AutofillInlineMenuIframe
     );
 
     if (!elementHeightCompletelyInViewport) {
-      this.forceCloseInlineMenu();
+      const [viewportHeight] = this.getViewportSize();
+      const iframeRect = this.iframe.getBoundingClientRect();
+      const availableHeight = viewportHeight - iframeRect.top;
+
+      if (availableHeight <= 0) {
+        this.forceCloseInlineMenu();
+        return;
+      }
+
+      this.updateElementStyles(this.iframe, { height: `${availableHeight}px` });
+      this.postMessageToIFrame({
+        command: "adjustVaultListDisplayCount",
+        availableHeight: availableHeight,
+      });
       return;
     }
 

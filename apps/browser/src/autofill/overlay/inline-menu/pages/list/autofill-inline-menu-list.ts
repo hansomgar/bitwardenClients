@@ -73,6 +73,8 @@ export class AutofillInlineMenuList extends AutofillInlineMenuPageElement {
         this.handleUpdateAutofillInlineMenuGeneratedPassword(message),
       showSaveLoginInlineMenuList: () => this.handleShowSaveLoginInlineMenuList(),
       focusAutofillInlineMenuList: () => this.focusInlineMenuList(),
+      adjustVaultListDisplayCount: ({ message }) =>
+        this.handleAdjustVaultListDisplayCount(message),
     };
 
   constructor() {
@@ -1641,6 +1643,30 @@ export class AutofillInlineMenuList extends AutofillInlineMenuPageElement {
     }
 
     this.ciphersList.classList.remove(scrollbarClass);
+  };
+
+  /**
+   * Dynamically adjusts the vault list display count based on the available
+   * height in the viewport. When the iframe exceeds the viewport, the parent
+   * sends the available height, and this method recalculates how many items
+   * can fit without scrolling.
+   *
+   * @param message - The message containing the available height
+   */
+  private handleAdjustVaultListDisplayCount = (message: { availableHeight: number }) => {
+    if (!this.ciphersList) {
+      return;
+    }
+
+    const itemHeight = 64; // 6.4rem in px (html font-size is 10px)
+    const overhead = this.showInlineMenuAccountCreation ? 50 : 10;
+    const maxItems = Math.max(1, Math.floor((message.availableHeight - overhead) / itemHeight));
+
+    if (maxItems < this.showCiphersPerPage) {
+      this.showCiphersPerPage = maxItems;
+      this.ciphersList.style.maxHeight = `${this.showCiphersPerPage * 6.4}rem`;
+      this.toggleScrollClass();
+    }
   };
 
   /**

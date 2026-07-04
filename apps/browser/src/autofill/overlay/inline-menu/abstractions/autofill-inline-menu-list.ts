@@ -49,4 +49,9 @@ export type AutofillInlineMenuListWindowMessageHandlers = {
     message: UpdateAutofillInlineMenuGeneratedPasswordMessage;
   }) => void;
   focusAutofillInlineMenuList: () => void;
+  adjustVaultListDisplayCount: ({
+    message,
+  }: {
+    message: { availableHeight: number };
+  }) => void;
 };
