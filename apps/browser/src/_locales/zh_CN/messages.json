@@ -1665,6 +1665,9 @@
   "enableAutoTotpCopy": {
     "message": "自动复制 TOTP"
   },
+  "disableHttpWarning": {
+    "message": "禁用不安全页面警告"
+  },
   "disableAutoTotpCopyDesc": {
     "message": "如果登录包含验证器密钥，当自动填充此登录时，将 TOTP 验证码复制到剪贴板。"
   },

@@ -115,6 +115,15 @@ const CLIPBOARD_SETTING_UPDATED_NOTIFICATION_DISMISSED = new UserKeyDefinition(
   },
 );
 
+const DISABLE_HTTP_WARNING = new UserKeyDefinition(
+  AUTOFILL_SETTINGS_DISK,
+  "disableHttpWarning",
+  {
+    deserializer: (value: boolean) => value ?? false,
+    clearOn: [],
+  },
+);
+
 export abstract class AutofillSettingsServiceAbstraction {
   autofillOnPageLoad$: Observable<boolean>;
   setAutofillOnPageLoad: (newValue: boolean) => Promise<void>;
@@ -141,6 +150,8 @@ export abstract class AutofillSettingsServiceAbstraction {
   clipboardSettingUpdatedNotificationDismissed$: Observable<boolean>;
   setClipboardSettingUpdatedNotificationDismissed: (newValue: boolean) => Promise<void>;
   showClipboardSettingUpdateNotification$: Observable<boolean>;
+  disableHttpWarning$: Observable<boolean>;
+  setDisableHttpWarning: (newValue: boolean) => Promise<void>;
 }
 
 export class AutofillSettingsService implements AutofillSettingsServiceAbstraction {
@@ -181,6 +192,9 @@ export class AutofillSettingsService implements AutofillSettingsServiceAbstracti
 
   private clipboardSettingUpdatedNotificationDismissedState: ActiveUserState<boolean>;
   readonly clipboardSettingUpdatedNotificationDismissed$: Observable<boolean>;
+
+  private disableHttpWarningState: ActiveUserState<boolean>;
+  readonly disableHttpWarning$: Observable<boolean>;
 
   readonly showClipboardSettingUpdateNotification$: Observable<boolean>;
 
@@ -265,6 +279,9 @@ export class AutofillSettingsService implements AutofillSettingsServiceAbstracti
     this.clipboardSettingUpdatedNotificationDismissed$ =
       this.clipboardSettingUpdatedNotificationDismissedState.state$.pipe(map((x) => x ?? false));
 
+    this.disableHttpWarningState = this.stateProvider.getActive(DISABLE_HTTP_WARNING);
+    this.disableHttpWarning$ = this.disableHttpWarningState.state$.pipe(map((x) => x ?? false));
+
     // Observable that determines if notification should be shown
     // Shows notification if:
     // 1. User went through migration with null/Never value (hadPreMigrationValue is true)
@@ -321,5 +338,9 @@ export class AutofillSettingsService implements AutofillSettingsServiceAbstracti
 
   async setClipboardSettingUpdatedNotificationDismissed(newValue: boolean): Promise<void> {
     await this.clipboardSettingUpdatedNotificationDismissedState.update(() => newValue);
+  }
+
+  async setDisableHttpWarning(newValue: boolean): Promise<void> {
+    await this.disableHttpWarningState.update(() => newValue);
   }
 }

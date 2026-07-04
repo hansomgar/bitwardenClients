@@ -272,6 +272,15 @@
             <input formControlName="enableAutoTotpCopy" bitCheckbox id="totp" type="checkbox" />
             <bit-label for="totp">{{ "enableAutoTotpCopy" | i18n }}</bit-label>
           </bit-form-control>
+          <bit-form-control>
+            <input
+              formControlName="disableHttpWarning"
+              bitCheckbox
+              id="disableHttpWarning"
+              type="checkbox"
+            />
+            <bit-label for="disableHttpWarning">{{ "disableHttpWarning" | i18n }}</bit-label>
+          </bit-form-control>
           <bit-form-field
             id="clearClipboardField"
             [disableMargin]="isDefaultUriMatchDisabledByPolicy"

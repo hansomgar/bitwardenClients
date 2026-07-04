@@ -3137,6 +3137,7 @@ describe("AutofillService", () => {
         savedUrls: [],
         script: [],
         untrustedIframe: false,
+        disableHttpWarning: false,
       };
 
       it("returns an unmodified fill script when the field is a `span` field", async () => {

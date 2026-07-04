@@ -143,6 +143,7 @@ export class AutofillComponent implements OnInit {
     enableFillAssist: new FormControl(),
     enableContextMenuItem: new FormControl(),
     enableAutoTotpCopy: new FormControl(),
+    disableHttpWarning: new FormControl(),
     clearClipboard: new FormControl(),
     defaultUriMatch: new FormControl(),
   });
@@ -159,6 +160,7 @@ export class AutofillComponent implements OnInit {
   autofillOnPageLoadOptions: { name: string; value: boolean }[];
   enableContextMenuItem: boolean = false;
   enableAutoTotpCopy: boolean = false;
+  disableHttpWarning: boolean = false;
   /** Non-null asserted. */
   clearClipboard!: ClearClipboardDelaySetting;
   clearClipboardOptions: { name: string; value: ClearClipboardDelaySetting }[];
@@ -328,6 +330,14 @@ export class AutofillComponent implements OnInit {
       emitEvent: false,
     });
 
+    this.disableHttpWarning = await firstValueFrom(
+      this.autofillSettingsService.disableHttpWarning$,
+    );
+
+    this.additionalOptionsForm.controls.disableHttpWarning.patchValue(this.disableHttpWarning, {
+      emitEvent: false,
+    });
+
     this.clearClipboard = await firstValueFrom(this.autofillSettingsService.clearClipboardDelay$);
 
     this.additionalOptionsForm.controls.clearClipboard.patchValue(this.clearClipboard, {
@@ -356,6 +366,12 @@ export class AutofillComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((value) => {
         void this.autofillSettingsService.setAutoCopyTotp(value);
+      });
+
+    this.additionalOptionsForm.controls.disableHttpWarning.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) => {
+        void this.autofillSettingsService.setDisableHttpWarning(value);
       });
 
     this.additionalOptionsForm.controls.clearClipboard.valueChanges

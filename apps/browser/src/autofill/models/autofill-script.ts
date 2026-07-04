@@ -30,4 +30,5 @@ export default class AutofillScript {
   untrustedIframe!: boolean;
   /** Non-null asserted. */
   itemType!: string; // Appears to be unused, read but not written
+  disableHttpWarning: boolean = false;
 }

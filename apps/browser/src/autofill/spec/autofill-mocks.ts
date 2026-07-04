@@ -153,6 +153,7 @@ export function createAutofillScriptMock(
     script,
     itemType: "",
     untrustedIframe: false,
+    disableHttpWarning: false,
     ...customFields,
   };
 }

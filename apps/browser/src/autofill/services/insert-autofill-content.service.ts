@@ -47,7 +47,10 @@ class InsertAutofillContentService implements InsertAutofillContentServiceInterf
     if (
       !fillScript.script?.length ||
       currentlyInSandboxedIframe() ||
-      this.userCancelledInsecureUrlAutofill(fillScript.savedUrls) ||
+      this.userCancelledInsecureUrlAutofill(
+        fillScript.savedUrls,
+        fillScript.disableHttpWarning,
+      ) ||
       this.userCancelledUntrustedIframeAutofill(fillScript)
     ) {
       return;
@@ -65,7 +68,14 @@ class InsertAutofillContentService implements InsertAutofillContentServiceInterf
    * @returns {boolean}
    * @private
    */
-  private userCancelledInsecureUrlAutofill(savedUrls?: string[] | null): boolean {
+  private userCancelledInsecureUrlAutofill(
+    savedUrls?: string[] | null,
+    disableHttpWarning?: boolean,
+  ): boolean {
+    if (disableHttpWarning) {
+      return false;
+    }
+
     if (
       !savedUrls?.some((url) => url.startsWith(`https://${globalThis.location.hostname}`)) ||
       globalThis.location.protocol !== "http:" ||

@@ -105,6 +105,7 @@ describe("InsertAutofillContentService", () => {
       savedUrls: ["https://bitwarden.com"],
       untrustedIframe: false,
       itemType: "login",
+      disableHttpWarning: false,
     };
   });
 

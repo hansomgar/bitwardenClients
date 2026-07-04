@@ -892,6 +892,10 @@ export default class AutofillService implements AutofillServiceInterface {
         ?.filter((u) => u.match != UriMatchStrategy.Never && u.uri != null)
         .map((u) => u.uri!) ?? [];
 
+    fillScript.disableHttpWarning = await firstValueFrom(
+      this.autofillSettingsService.disableHttpWarning$,
+    );
+
     // Note; targeted fields intentionally skip the untrusted iframe check. The
     // presence of targeting rules represents explicit expectations of the target
 
@@ -1054,6 +1058,10 @@ export default class AutofillService implements AutofillServiceInterface {
     }, []);
 
     fillScript.untrustedIframe = await this.inUntrustedIframe(pageDetails.url, options);
+
+    fillScript.disableHttpWarning = await firstValueFrom(
+      this.autofillSettingsService.disableHttpWarning$,
+    );
 
     const passwordFields = AutofillService.loadPasswordFields(
       pageDetails,

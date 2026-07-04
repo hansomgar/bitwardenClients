@@ -1665,6 +1665,9 @@
   "enableAutoTotpCopy": {
     "message": "Copy TOTP automatically"
   },
+  "disableHttpWarning": {
+    "message": "Disable insecure page warning"
+  },
   "disableAutoTotpCopyDesc": {
     "message": "If a login has an authenticator key, copy the TOTP verification code to your clip-board when you autofill the login."
   },
