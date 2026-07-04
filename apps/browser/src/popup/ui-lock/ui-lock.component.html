@@ -1,0 +1,35 @@
+<div class="tw-flex tw-flex-col tw-h-full tw-p-4">
+  <p class="tw-mb-4 tw-text-muted" bitTypography="body1">
+    {{ "uiLockEnterPinOrPassword" | i18n }}
+  </p>
+
+  <div [formGroup]="form">
+    <bit-form-field>
+      <bit-label for="pinOrPassword">{{ "masterPassOrPIN" | i18n }}</bit-label>
+      <input
+        bitInput
+        type="password"
+        id="pinOrPassword"
+        formControlName="pinOrPassword"
+        (keyup.enter)="submit()"
+      />
+    </bit-form-field>
+
+    @if (errorMessage) {
+      <bit-callout [title]="'error' | i18n" type="danger" class="tw-mb-4">
+        {{ errorMessage }}
+      </bit-callout>
+    }
+
+    <button
+      bitButton
+      buttonType="primary"
+      block="true"
+      [disabled]="form.invalid || submitting"
+      (click)="submit()"
+      [loading]="submitting"
+    >
+      {{ "uiLockConfirmUnlock" | i18n }}
+    </button>
+  </div>
+</div>

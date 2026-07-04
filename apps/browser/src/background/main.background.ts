@@ -2082,6 +2082,7 @@ export default class MainBackground {
     const browserAction = BrowserApi.getBrowserAction();
 
     try {
+      await chrome.storage.local.set({ uiLockSkipCheck: true });
       // Set route of the popup before attempting to open it.
       // If the vault is locked, this won't have an effect as the auth guards will
       // redirect the user to the login page.
@@ -2114,6 +2115,7 @@ export default class MainBackground {
     const browserAction = BrowserApi.getBrowserAction();
 
     try {
+      await chrome.storage.local.set({ uiLockSkipCheck: true });
       // Set route of the popup before attempting to open it.
       // If the vault is locked, this won't have an effect as the auth guards will
       // redirect the user to the login page.

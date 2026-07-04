@@ -722,6 +722,39 @@
   "sessionTimeoutHeader": {
     "message": "会话超时"
   },
+  "uiLockHeader": {
+    "message": "界面上锁"
+  },
+  "uiLockTimeout": {
+    "message": "界面上锁时间"
+  },
+  "uiLockEnterPinOrPassword": {
+    "message": "请输入PIN或主密码解锁"
+  },
+  "uiLockConfirmUnlock": {
+    "message": "确认解锁"
+  },
+  "uiLockInvalidPinOrPassword": {
+    "message": "PIN或密码错误，还剩$REMAINING$次尝试",
+    "placeholders": {
+      "remaining": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "uiLockBackoffMessage": {
+    "message": "尝试次数过多，请等待$SECONDS$秒",
+    "placeholders": {
+      "seconds": {
+        "content": "$1",
+        "example": "300"
+      }
+    }
+  },
+  "masterPassOrPIN": {
+    "message": "主密码或PIN"
+  },
   "otherOptions": {
     "message": "其他选项"
   },

@@ -32,6 +32,7 @@ import { PhishingDetectionSettingsServiceAbstraction } from "@bitwarden/common/d
 import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import { PinServiceAbstraction } from "@bitwarden/common/key-management/pin/pin.service.abstraction";
 import { SharedUnlockSettingsService } from "@bitwarden/common/key-management/shared-unlock";
+import { UiLockServiceAbstraction } from "@bitwarden/common/key-management/ui-lock";
 import { VaultTimeoutSettingsService } from "@bitwarden/common/key-management/vault-timeout";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { EnvironmentService } from "@bitwarden/common/platform/abstractions/environment.service";
@@ -122,7 +123,22 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
     enableAutoBiometricsPrompt: true,
     enablePhishingDetection: true,
     allowSharingUnlockState: true,
+    uiLockTimeout: [5],
   });
+
+  protected uiLockTimeoutOptions = [
+    { label: "1 " + this.i18nService.t("minutes"), value: 1 },
+    { label: "5 " + this.i18nService.t("minutes"), value: 5 },
+    { label: "10 " + this.i18nService.t("minutes"), value: 10 },
+    { label: "30 " + this.i18nService.t("minutes"), value: 30 },
+    { label: "1 " + this.i18nService.t("hours"), value: 60 },
+    { label: "2 " + this.i18nService.t("hours"), value: 120 },
+    { label: "4 " + this.i18nService.t("hours"), value: 240 },
+    { label: "8 " + this.i18nService.t("hours"), value: 480 },
+    { label: "12 " + this.i18nService.t("hours"), value: 720 },
+    { label: "24 " + this.i18nService.t("hours"), value: 1440 },
+    { label: this.i18nService.t("never"), value: 0 },
+  ];
 
   protected showAccountSecurityNudge$: Observable<boolean> =
     this.accountService.activeAccount$.pipe(
@@ -164,6 +180,7 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
     private logService: LogService,
     private phishingDetectionSettingsService: PhishingDetectionSettingsServiceAbstraction,
     private sharedUnlockSettingsService: SharedUnlockSettingsService,
+    private uiLockService: UiLockServiceAbstraction,
   ) {
     this.multiClientPasswordManagement$ = this.configService.getFeatureFlag$(
       FeatureFlag.PM32413_MultiClientPasswordManagement,
@@ -217,6 +234,7 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
       allowSharingUnlockState: await firstValueFrom(
         this.sharedUnlockSettingsService.allowSharingUnlockState$(activeAccount.id),
       ),
+      uiLockTimeout: await firstValueFrom(this.uiLockService.getUiLockTimeout$(activeAccount.id)),
     };
     this.form.patchValue(initialValues, { emitEvent: false });
     this.loading.set(false);
@@ -334,6 +352,19 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
       .pipe(
         concatMap(async (enabled) => {
           await this.updateAllowSharingUnlockState(enabled);
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe();
+
+    this.form.controls.uiLockTimeout.valueChanges
+      .pipe(
+        concatMap(async (value) => {
+          const userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getUserId));
+          await this.uiLockService.setUiLockTimeout(userId, value);
+          if (value > 0) {
+            await this.uiLockService.setLastUnlockTime(userId);
+          }
         }),
         takeUntil(this.destroy$),
       )

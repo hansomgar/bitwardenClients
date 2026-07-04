@@ -99,6 +99,10 @@ import {
   DefaultSharedUnlockSettingsService,
 } from "@bitwarden/common/key-management/shared-unlock";
 import {
+  UiLockServiceAbstraction,
+  UiLockService,
+} from "@bitwarden/common/key-management/ui-lock";
+import {
   VaultTimeoutService,
   VaultTimeoutStringType,
 } from "@bitwarden/common/key-management/vault-timeout";
@@ -547,6 +551,11 @@ const safeProviders: SafeProvider[] = [
     provide: SharedUnlockSettingsService,
     useClass: DefaultSharedUnlockSettingsService,
     deps: [StateProvider],
+  }),
+  safeProvider({
+    provide: UiLockServiceAbstraction,
+    useClass: UiLockService,
+    deps: [StateProvider, PinServiceAbstraction, UserVerificationService, AccountService],
   }),
   safeProvider({
     provide: PhishingDetectionSettingsServiceAbstraction,

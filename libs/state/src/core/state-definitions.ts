@@ -259,3 +259,4 @@ export const CRYPTO_MEMORY = new StateDefinition("crypto", "memory");
 export const KDF_CONFIG_DISK = new StateDefinition("kdfConfig", "disk");
 export const KEY_CONNECTOR_DISK = new StateDefinition("keyConnector", "disk");
 export const SHARED_UNLOCK_SETTINGS_DISK = new StateDefinition("sharedUnlockSettings", "disk");
+export const UI_LOCK_SETTINGS_DISK = new StateDefinition("uiLockSettings", "disk");

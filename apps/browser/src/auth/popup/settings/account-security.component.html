@@ -115,6 +115,29 @@
 
       <bit-section>
         <bit-section-header>
+          <h2 bitTypography="h6">
+            {{ "uiLockHeader" | i18n }}
+          </h2>
+        </bit-section-header>
+        <bit-card>
+          <bit-form-field>
+            <bit-label for="uiLockTimeout">{{ "uiLockTimeout" | i18n }}</bit-label>
+            <bit-select
+              formControlName="uiLockTimeout"
+              id="uiLockTimeout"
+            >
+              <bit-option
+                *ngFor="let option of uiLockTimeoutOptions"
+                [label]="option.label"
+                [value]="option.value"
+              ></bit-option>
+            </bit-select>
+          </bit-form-field>
+        </bit-card>
+      </bit-section>
+
+      <bit-section>
+        <bit-section-header>
           <h2 bitTypography="h6">{{ "manageDevices" | i18n }}</h2>
         </bit-section-header>
         <bit-item>

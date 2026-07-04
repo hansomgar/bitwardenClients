@@ -1,0 +1,159 @@
+import { firstValueFrom, map, Observable } from "rxjs";
+
+import { AccountService } from "../../auth/abstractions/account.service";
+import { UserVerificationService } from "../../auth/abstractions/user-verification/user-verification.service.abstraction";
+import { VerificationType } from "../../auth/enums/verification-type";
+import { Verification } from "../../auth/types/verification";
+import { PinServiceAbstraction } from "../pin/pin.service.abstraction";
+import { StateProvider } from "../../platform/state";
+import { UserId } from "../../types/guid";
+
+import { UI_LOCK_TIMEOUT } from "./ui-lock.state";
+
+const UI_LOCK_LAST_UNLOCK_KEY = "uiLockLastUnlockTime";
+const UI_LOCK_FAILED_ATTEMPTS_KEY = "uiLockFailedAttempts";
+const UI_LOCK_BACKOFF_UNTIL_KEY = "uiLockBackoffUntil";
+const UI_LOCK_SKIP_CHECK_KEY = "uiLockSkipCheck";
+
+export abstract class UiLockServiceAbstraction {
+  abstract isUiLocked$(userId: UserId): Observable<boolean>;
+  abstract isUiLocked(userId: UserId): Promise<boolean>;
+  abstract unlock(userId: UserId, pinOrPassword: string): Promise<boolean>;
+  abstract setLastUnlockTime(userId: UserId): Promise<void>;
+  abstract getUiLockTimeout$(userId: UserId): Observable<number>;
+  abstract setUiLockTimeout(userId: UserId, timeoutMinutes: number): Promise<void>;
+  abstract getFailedAttempts(userId: UserId): Promise<number>;
+  abstract getBackoffUntil(userId: UserId): Promise<number | null>;
+  abstract setSkipCheck(skip: boolean): Promise<void>;
+  abstract getSkipCheck(): Promise<boolean>;
+}
+
+export class UiLockService implements UiLockServiceAbstraction {
+  private uiLockTimeoutState;
+
+  constructor(
+    private stateProvider: StateProvider,
+    private pinService: PinServiceAbstraction,
+    private userVerificationService: UserVerificationService,
+    private accountService: AccountService,
+  ) {
+    this.uiLockTimeoutState = this.stateProvider.getActive(UI_LOCK_TIMEOUT);
+  }
+
+  isUiLocked$(userId: UserId): Observable<boolean> {
+    return this.uiLockTimeoutState.state$.pipe(
+      map((timeoutMinutes) => {
+        if (timeoutMinutes == null || timeoutMinutes <= 0) {
+          return false;
+        }
+        return true;
+      }),
+    );
+  }
+
+  async isUiLocked(userId: UserId): Promise<boolean> {
+    const timeoutMinutes = await firstValueFrom(
+      this.uiLockTimeoutState.state$.pipe(map((x) => x ?? 5)),
+    );
+
+    if (timeoutMinutes <= 0) {
+      return false;
+    }
+
+    const result = await chrome.storage.local.get(UI_LOCK_LAST_UNLOCK_KEY);
+    const lastUnlockTime = result[UI_LOCK_LAST_UNLOCK_KEY] as number | undefined;
+
+    if (!lastUnlockTime) {
+      return true;
+    }
+
+    const elapsedMinutes = (Date.now() - lastUnlockTime) / 60000;
+    return elapsedMinutes >= timeoutMinutes;
+  }
+
+  async unlock(userId: UserId, pinOrPassword: string): Promise<boolean> {
+    const backoffUntil = await this.getBackoffUntil(userId);
+    if (backoffUntil && Date.now() < backoffUntil) {
+      return false;
+    }
+
+    let verified = false;
+
+    try {
+      verified = await this.pinService.validatePin(pinOrPassword, userId);
+    } catch {
+      // PIN validation failed, try master password
+    }
+
+    if (!verified) {
+      try {
+        const verification: Verification = {
+          type: VerificationType.MasterPassword,
+          secret: pinOrPassword,
+        };
+        verified = await this.userVerificationService.verifyUser(verification);
+      } catch {
+        verified = false;
+      }
+    }
+
+    if (verified) {
+      await this.resetFailedAttempts(userId);
+      await this.setLastUnlockTime(userId);
+      return true;
+    }
+
+    await this.recordFailedAttempt(userId);
+    return false;
+  }
+
+  async setLastUnlockTime(userId: UserId): Promise<void> {
+    await chrome.storage.local.set({ [UI_LOCK_LAST_UNLOCK_KEY]: Date.now() });
+  }
+
+  getUiLockTimeout$(userId: UserId): Observable<number> {
+    return this.uiLockTimeoutState.state$.pipe(map((x) => x ?? 5));
+  }
+
+  async setUiLockTimeout(userId: UserId, timeoutMinutes: number): Promise<void> {
+    await this.uiLockTimeoutState.update(() => timeoutMinutes);
+  }
+
+  async getFailedAttempts(userId: UserId): Promise<number> {
+    const result = await chrome.storage.local.get(UI_LOCK_FAILED_ATTEMPTS_KEY);
+    return (result[UI_LOCK_FAILED_ATTEMPTS_KEY] as number) ?? 0;
+  }
+
+  async getBackoffUntil(userId: UserId): Promise<number | null> {
+    const result = await chrome.storage.local.get(UI_LOCK_BACKOFF_UNTIL_KEY);
+    return (result[UI_LOCK_BACKOFF_UNTIL_KEY] as number) ?? null;
+  }
+
+  private async recordFailedAttempt(userId: UserId): Promise<void> {
+    const failedAttempts = (await this.getFailedAttempts(userId)) + 1;
+    await chrome.storage.local.set({ [UI_LOCK_FAILED_ATTEMPTS_KEY]: failedAttempts });
+
+    if (failedAttempts >= 5) {
+      const backoffMs = 5 * 60 * 1000;
+      await chrome.storage.local.set({
+        [UI_LOCK_BACKOFF_UNTIL_KEY]: Date.now() + backoffMs,
+      });
+    }
+  }
+
+  private async resetFailedAttempts(userId: UserId): Promise<void> {
+    await chrome.storage.local.set({
+      [UI_LOCK_FAILED_ATTEMPTS_KEY]: 0,
+      [UI_LOCK_BACKOFF_UNTIL_KEY]: null,
+    });
+  }
+
+  async setSkipCheck(skip: boolean): Promise<void> {
+    await chrome.storage.local.set({ [UI_LOCK_SKIP_CHECK_KEY]: skip });
+  }
+
+  async getSkipCheck(): Promise<boolean> {
+    const result = await chrome.storage.local.get(UI_LOCK_SKIP_CHECK_KEY);
+    return (result[UI_LOCK_SKIP_CHECK_KEY] as boolean) ?? false;
+  }
+}

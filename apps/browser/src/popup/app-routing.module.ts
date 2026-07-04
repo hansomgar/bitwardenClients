@@ -106,6 +106,8 @@ import { TrashComponent } from "../vault/popup/settings/trash.component";
 import { VaultSettingsComponent } from "../vault/popup/settings/vault-settings.component";
 
 import { RouteElevation } from "./app-routing.animations";
+import { UiLockComponent } from "./ui-lock/ui-lock.component";
+import { uiLockGuard } from "./ui-lock/ui-lock.guard";
 import {
   ExtensionAnonLayoutWrapperComponent,
   ExtensionAnonLayoutWrapperData,
@@ -137,6 +139,7 @@ const routes: Routes = [
     pathMatch: "full",
     children: [], // Children lets us have an empty component.
     canActivate: [
+      uiLockGuard(),
       popupRouterCacheGuard,
       redirectGuard({ loggedIn: "/tabs/current", loggedOut: "/login", locked: "/lock" }),
     ],
@@ -596,36 +599,56 @@ const routes: Routes = [
         children: [{ path: "", component: LoginDecryptionOptionsComponent }],
       },
       {
-        path: "lock",
-        canActivate: [lockGuard()],
-        data: {
-          pageIcon: LockIcon,
-          pageTitle: {
-            key: "yourVaultIsLockedV2",
-          },
-          showReadonlyHostname: true,
-          showAcctSwitcher: true,
-          contentVerticalPadding: "compact",
-          footerVerticalPadding: "compact",
-          elevation: 1,
-          /**
-           * This ensures that in a passkey flow the `/fido2?<queryParams>` URL does not get
-           * overwritten in the `BrowserRouterService` by the `/lock` route. This way, after
-           * unlocking, the user can be redirected back to the `/fido2?<queryParams>` URL.
-           *
-           * Also, this prevents a routing loop when using biometrics to unlock the vault in MV2 (Firefox),
-           * locking up the browser (https://bitwarden.atlassian.net/browse/PM-16116). This involves the
-           * `popup-router-cache.service` pushing the `lock` route to the history.
-           */
-          doNotSaveUrl: true,
-        } satisfies ExtensionAnonLayoutWrapperData & RouteDataProperties,
-        children: [
-          {
-            path: "",
-            component: LockComponent,
-          },
-        ],
+    path: "lock",
+    canActivate: [lockGuard()],
+    data: {
+      pageIcon: LockIcon,
+      pageTitle: {
+        key: "yourVaultIsLockedV2",
       },
+      showReadonlyHostname: true,
+      showAcctSwitcher: true,
+      contentVerticalPadding: "compact",
+      footerVerticalPadding: "compact",
+      elevation: 1,
+      /**
+       * This ensures that in a passkey flow the `/fido2?<queryParams>` URL does not get
+       * overwritten in the `BrowserRouterService` by the `/lock` route. This way, after
+       * unlocking, the user can be redirected back to the `/fido2?<queryParams>` URL.
+       *
+       * Also, this prevents a routing loop when using biometrics to unlock the vault in MV2 (Firefox),
+       * locking up the browser (https://bitwarden.atlassian.net/browse/PM-16116). This involves the
+       * `popup-router-cache.service` pushing the `lock` route to the history.
+       */
+      doNotSaveUrl: true,
+    } satisfies ExtensionAnonLayoutWrapperData & RouteDataProperties,
+    children: [
+      {
+        path: "",
+        component: LockComponent,
+      },
+    ],
+  },
+  {
+    path: "ui-lock",
+    canActivate: [authGuard],
+    data: {
+      pageIcon: LockIcon,
+      pageTitle: {
+        key: "uiLockHeader",
+      },
+      showReadonlyHostname: false,
+      showAcctSwitcher: false,
+      elevation: 1,
+      doNotSaveUrl: true,
+    } satisfies ExtensionAnonLayoutWrapperData & RouteDataProperties,
+    children: [
+      {
+        path: "",
+        component: UiLockComponent,
+      },
+    ],
+  },
       {
         path: AuthRoute.TwoFactor,
         canActivate: [unauthGuardFn(unauthRouteOverrides), TwoFactorAuthGuard],
@@ -724,6 +747,7 @@ const routes: Routes = [
   {
     path: "tabs",
     component: TabsV2Component,
+    canActivate: [uiLockGuard()],
     data: { elevation: 0 } satisfies RouteDataProperties,
     children: [
       {

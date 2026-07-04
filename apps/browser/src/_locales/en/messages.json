@@ -722,6 +722,39 @@
   "sessionTimeoutHeader": {
     "message": "Session timeout"
   },
+  "uiLockHeader": {
+    "message": "UI Lock"
+  },
+  "uiLockTimeout": {
+    "message": "UI Lock Timeout"
+  },
+  "uiLockEnterPinOrPassword": {
+    "message": "Enter your PIN or master password to unlock"
+  },
+  "uiLockConfirmUnlock": {
+    "message": "Confirm Unlock"
+  },
+  "uiLockInvalidPinOrPassword": {
+    "message": "Invalid PIN or password. $REMAINING$ attempts remaining.",
+    "placeholders": {
+      "remaining": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "uiLockBackoffMessage": {
+    "message": "Too many failed attempts. Please wait $SECONDS$ seconds.",
+    "placeholders": {
+      "seconds": {
+        "content": "$1",
+        "example": "300"
+      }
+    }
+  },
+  "masterPassOrPIN": {
+    "message": "Master Password or PIN"
+  },
   "otherOptions": {
     "message": "Other options"
   },
