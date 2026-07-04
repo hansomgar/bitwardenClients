@@ -281,6 +281,20 @@
             />
             <bit-label for="disableHttpWarning">{{ "disableHttpWarning" | i18n }}</bit-label>
           </bit-form-control>
+          <bit-form-field>
+            <bit-label for="vaultListDisplayCount">{{ "vaultListDisplayCount" | i18n }}</bit-label>
+            <bit-select
+              formControlName="vaultListDisplayCount"
+              bitInput
+              id="vaultListDisplayCount"
+            >
+              <bit-option
+                *ngFor="let option of vaultListDisplayCountOptions"
+                [label]="option.label"
+                [value]="option.value"
+              ></bit-option>
+            </bit-select>
+          </bit-form-field>
           <bit-form-field
             id="clearClipboardField"
             [disableMargin]="isDefaultUriMatchDisabledByPolicy"

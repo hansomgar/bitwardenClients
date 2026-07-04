@@ -1668,6 +1668,9 @@
   "disableHttpWarning": {
     "message": "Disable insecure page warning"
   },
+  "vaultListDisplayCount": {
+    "message": "Account list display count"
+  },
   "disableAutoTotpCopyDesc": {
     "message": "If a login has an authenticator key, copy the TOTP verification code to your clip-board when you autofill the login."
   },

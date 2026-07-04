@@ -124,6 +124,15 @@ const DISABLE_HTTP_WARNING = new UserKeyDefinition(
   },
 );
 
+const VAULT_LIST_DISPLAY_COUNT = new UserKeyDefinition(
+  AUTOFILL_SETTINGS_DISK,
+  "vaultListDisplayCount",
+  {
+    deserializer: (value: number) => value ?? 3,
+    clearOn: [],
+  },
+);
+
 export abstract class AutofillSettingsServiceAbstraction {
   autofillOnPageLoad$: Observable<boolean>;
   setAutofillOnPageLoad: (newValue: boolean) => Promise<void>;
@@ -152,6 +161,8 @@ export abstract class AutofillSettingsServiceAbstraction {
   showClipboardSettingUpdateNotification$: Observable<boolean>;
   disableHttpWarning$: Observable<boolean>;
   setDisableHttpWarning: (newValue: boolean) => Promise<void>;
+  vaultListDisplayCount$: Observable<number>;
+  setVaultListDisplayCount: (newValue: number) => Promise<void>;
 }
 
 export class AutofillSettingsService implements AutofillSettingsServiceAbstraction {
@@ -195,6 +206,9 @@ export class AutofillSettingsService implements AutofillSettingsServiceAbstracti
 
   private disableHttpWarningState: ActiveUserState<boolean>;
   readonly disableHttpWarning$: Observable<boolean>;
+
+  private vaultListDisplayCountState: ActiveUserState<number>;
+  readonly vaultListDisplayCount$: Observable<number>;
 
   readonly showClipboardSettingUpdateNotification$: Observable<boolean>;
 
@@ -282,6 +296,9 @@ export class AutofillSettingsService implements AutofillSettingsServiceAbstracti
     this.disableHttpWarningState = this.stateProvider.getActive(DISABLE_HTTP_WARNING);
     this.disableHttpWarning$ = this.disableHttpWarningState.state$.pipe(map((x) => x ?? false));
 
+    this.vaultListDisplayCountState = this.stateProvider.getActive(VAULT_LIST_DISPLAY_COUNT);
+    this.vaultListDisplayCount$ = this.vaultListDisplayCountState.state$.pipe(map((x) => x ?? 3));
+
     // Observable that determines if notification should be shown
     // Shows notification if:
     // 1. User went through migration with null/Never value (hadPreMigrationValue is true)
@@ -342,5 +359,9 @@ export class AutofillSettingsService implements AutofillSettingsServiceAbstracti
 
   async setDisableHttpWarning(newValue: boolean): Promise<void> {
     await this.disableHttpWarningState.update(() => newValue);
+  }
+
+  async setVaultListDisplayCount(newValue: number): Promise<void> {
+    await this.vaultListDisplayCountState.update(() => newValue);
   }
 }

@@ -62,7 +62,7 @@ export class AutofillInlineMenuList extends AutofillInlineMenuPageElement {
   private isPasskeyAuthInProgress = false;
   private authStatus: AuthenticationStatus = AuthenticationStatus.Locked;
   private isInitialized = false;
-  private readonly showCiphersPerPage = 6;
+  private showCiphersPerPage = 6;
   private readonly headingBorderClass = "inline-menu-list-heading--bordered";
   private readonly inlineMenuListWindowMessageHandlers: AutofillInlineMenuListWindowMessageHandlers =
     {
@@ -102,7 +102,12 @@ export class AutofillInlineMenuList extends AutofillInlineMenuPageElement {
       generatedPassword,
       showSaveLoginMenu,
       showAnimations = true,
+      vaultListDisplayCount,
     } = message;
+
+    if (vaultListDisplayCount != null) {
+      this.showCiphersPerPage = vaultListDisplayCount;
+    }
     const linkElement = await this.initAutofillInlineMenuPage(
       "list",
       styleSheetUrl,
@@ -557,6 +562,8 @@ export class AutofillInlineMenuList extends AutofillInlineMenuPageElement {
 
     this.loadPageOfCiphers();
 
+    this.ciphersList.style.maxHeight = `${this.showCiphersPerPage * 6.4}rem`;
+
     this.inlineMenuListContainer.appendChild(this.ciphersList);
     this.toggleScrollClass();
 
@@ -695,10 +702,7 @@ export class AutofillInlineMenuList extends AutofillInlineMenuPageElement {
    * Loads a page of ciphers into the inline menu list container.
    */
   private loadPageOfCiphers() {
-    const lastIndex = Math.min(
-      this.currentCipherIndex + this.showCiphersPerPage,
-      this.ciphers.length,
-    );
+    const lastIndex = this.ciphers.length;
     for (let cipherIndex = this.currentCipherIndex; cipherIndex < lastIndex; cipherIndex++) {
       this.ciphersList.appendChild(this.buildInlineMenuListActionsItem(this.ciphers[cipherIndex]));
       this.currentCipherIndex++;
@@ -1631,13 +1635,7 @@ export class AutofillInlineMenuList extends AutofillInlineMenuPageElement {
     }
     const scrollbarClass = "inline-menu-list-actions--scrollbar";
 
-    let containerHeight = height;
-    if (!containerHeight) {
-      const inlineMenuListContainerRects = this.inlineMenuListContainer.getBoundingClientRect();
-      containerHeight = inlineMenuListContainerRects.height;
-    }
-
-    if (containerHeight >= 170) {
+    if (this.ciphersList.scrollHeight > this.ciphersList.clientHeight) {
       this.ciphersList.classList.add(scrollbarClass);
       return;
     }

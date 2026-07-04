@@ -3449,6 +3449,9 @@ export class OverlayBackground implements OverlayBackgroundInterface {
       showInlineMenuAccountCreation,
       authStatus,
       extensionOrigin,
+      vaultListDisplayCount: await firstValueFrom(
+        this.autofillSettingsService.vaultListDisplayCount$,
+      ),
     });
     if (port.sender) {
       this.updateInlineMenuPosition(

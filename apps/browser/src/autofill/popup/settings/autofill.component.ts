@@ -144,6 +144,7 @@ export class AutofillComponent implements OnInit {
     enableContextMenuItem: new FormControl(),
     enableAutoTotpCopy: new FormControl(),
     disableHttpWarning: new FormControl(),
+    vaultListDisplayCount: new FormControl(),
     clearClipboard: new FormControl(),
     defaultUriMatch: new FormControl(),
   });
@@ -161,6 +162,8 @@ export class AutofillComponent implements OnInit {
   enableContextMenuItem: boolean = false;
   enableAutoTotpCopy: boolean = false;
   disableHttpWarning: boolean = false;
+  vaultListDisplayCount: number = 3;
+  vaultListDisplayCountOptions: { label: string; value: number }[];
   /** Non-null asserted. */
   clearClipboard!: ClearClipboardDelaySetting;
   clearClipboardOptions: { name: string; value: ClearClipboardDelaySetting }[];
@@ -337,6 +340,26 @@ export class AutofillComponent implements OnInit {
     this.additionalOptionsForm.controls.disableHttpWarning.patchValue(this.disableHttpWarning, {
       emitEvent: false,
     });
+
+    this.vaultListDisplayCount = await firstValueFrom(
+      this.autofillSettingsService.vaultListDisplayCount$,
+    );
+
+    this.vaultListDisplayCountOptions = Array.from({ length: 10 }, (_, i) => i + 1).map((n) => ({
+      label: n.toString(),
+      value: n,
+    }));
+
+    this.additionalOptionsForm.controls.vaultListDisplayCount.patchValue(
+      this.vaultListDisplayCount,
+      { emitEvent: false },
+    );
+
+    this.additionalOptionsForm.controls.vaultListDisplayCount.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) => {
+        void this.autofillSettingsService.setVaultListDisplayCount(value);
+      });
 
     this.clearClipboard = await firstValueFrom(this.autofillSettingsService.clearClipboardDelay$);
 

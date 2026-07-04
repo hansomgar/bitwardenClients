@@ -1668,6 +1668,9 @@
   "disableHttpWarning": {
     "message": "禁用不安全页面警告"
   },
+  "vaultListDisplayCount": {
+    "message": "填充账号列表界面长度"
+  },
   "disableAutoTotpCopyDesc": {
     "message": "如果登录包含验证器密钥，当自动填充此登录时，将 TOTP 验证码复制到剪贴板。"
   },
