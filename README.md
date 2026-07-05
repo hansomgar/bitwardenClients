@@ -133,6 +133,7 @@ getBackoffUntil(userId)       → Promise<number|null> // 获取退让截止时�
 setSkipCheck(skip)            → Promise<void>        // 跳过本次检查
 getSkipCheck()                → Promise<boolean>     // 读取跳过标志
 lockNow(userId)               → Promise<void>        // 立即上锁
+clearManualLock(userId)       → Promise<void>        // 清除手动上锁标记
 ```
 
 **存储架构：**
@@ -145,10 +146,15 @@ lockNow(userId)               → Promise<void>        // 立即上锁
 | 运行时 | `chrome.storage.local` | `uiLockBackoffUntil` | 退让截止时间戳（ms） |
 | 运行时 | `chrome.storage.local` | `uiLockSkipCheck` | 跳过本次 UI 锁检查 |
 | 运行时 | `chrome.storage.local` | `uiLockAutoCheckThreshold` | 自动检测最小字符数阈值，初始 4，失败递增，成功解锁后重置为 4 |
+| 运行时 | `chrome.storage.local` | `uiLockManuallyLocked` | 手动上锁标记，超时设为"从不"时区分首次加载和手动上锁 |
 
-**`lockNow` 实现：** 清除 `uiLockLastUnlockTime`，使 `isUiLocked` 立即判定为 `true`。
+**`lockNow` 实现：** 设置 `uiLockManuallyLocked = true`，同时清除 `uiLockLastUnlockTime`。
 
-**`isUiLocked` 实现：** 读取 `uiLockLastUnlockTime`，计算 `(Date.now() - lastUnlockTime) / 60000`，与 `timeoutMinutes` 比较。若 `lastUnlockTime` 不存在，直接返回 `true`。
+**`isUiLocked` 实现：**
+- 当 `timeoutMinutes <= 0`（从不）时：检查 `uiLockManuallyLocked` 标记。若为 `true` 表示用户手动上锁，返回已锁定；否则返回未锁定。
+- 当 `timeoutMinutes > 0` 时：读取 `uiLockLastUnlockTime`，计算 `(Date.now() - lastUnlockTime) / 60000`，与 `timeoutMinutes` 比较。若 `lastUnlockTime` 不存在，直接返回 `true`。
+
+**`unlock` 成功时：** 调用 `clearManualLock()` 清除 `uiLockManuallyLocked` 标记，确保解锁后不再被锁定。
 
 **私有方法 `recordFailedAttempt`：** 失败计数 +1 后写入 `chrome.storage.local`；每 5 次失败触发退让，使用递增序列计算等待时间。
 
@@ -355,6 +361,7 @@ private async tryAutoCheck(value: string) {
 | 自动解锁成功后计数未清零 | `tryAutoCheck` 成功时未重置 `failedAttempts` 和 `backoffUntil` | 成功时同时调用 `resetFailedAttempts` |
 | Nx 缓存导致旧代码编译 | Nx 增量编译缓存了旧版本文件 | 重启 dev server 或修改文件触发重编译 |
 | UI 锁计时从解锁开始算，而非从操作结束开始 | `setLastUnlockTime` 仅在解锁时调用 | 守卫检查通过时也调用 `setLastUnlockTime`，每次打开弹窗重置计时器 |
+| 超时设为"从不"时手动上锁无效 | `isUiLocked` 在 `timeoutMinutes<=0` 时直接返回 `false` | 新增 `uiLockManuallyLocked` 标记，`lockNow` 设置标记，`isUiLocked` 检查标记 |
 | 密码页面顶部 callout 占用空间且信息重复 | 模板中 `missingWebsite` 和 `changeAtRiskPassword` 两个 callout | 删除两个 callout，风险提示保留在密码输入框下方 |
 
 ---
@@ -410,13 +417,13 @@ private async tryAutoCheck(value: string) {
 - 创建 UI_LOCK_TIMEOUT 的 UserKeyDefinition<number>，使用 UI_LOCK_SETTINGS_DISK，默认值 5，deserializer: (value) => value ?? 5
 
 **libs/common/src/key-management/ui-lock/ui-lock.service.ts:**
-- 创建抽象类 UiLockServiceAbstraction，定义接口：isUiLocked$, isUiLocked, unlock, setLastUnlockTime, getUiLockTimeout$, setUiLockTimeout, getFailedAttempts, getBackoffUntil, setSkipCheck, getSkipCheck, lockNow
+- 创建抽象类 UiLockServiceAbstraction，定义接口：isUiLocked$, isUiLocked, unlock, setLastUnlockTime, getUiLockTimeout$, setUiLockTimeout, getFailedAttempts, getBackoffUntil, setSkipCheck, getSkipCheck, lockNow, clearManualLock
 - 创建实现类 UiLockService，构造函数注入 StateProvider, PinServiceAbstraction, UserVerificationService, AccountService
-- 使用 chrome.storage.local 存储运行时状态，键名：uiLockLastUnlockTime, uiLockFailedAttempts, uiLockBackoffUntil, uiLockSkipCheck
-- isUiLocked: 读取 lastUnlockTime，计算 (Date.now() - lastUnlockTime) / 60000 >= timeoutMinutes，若不存在则返回 true
-- unlock: 区分 PIN（<12字符）和主密码（>=12字符），PIN 先验证 pinService.validatePin，主密码先验证 userVerificationService.verifyUser(VerificationType.MasterPassword)，失败后尝试 PIN
+- 使用 chrome.storage.local 存储运行时状态，键名：uiLockLastUnlockTime, uiLockFailedAttempts, uiLockBackoffUntil, uiLockSkipCheck, uiLockManuallyLocked
+- isUiLocked: 当 timeoutMinutes<=0 时检查 uiLockManuallyLocked 标记；否则读取 lastUnlockTime 计算时间差
+- unlock: 区分 PIN（<12字符）和主密码（>=12字符），PIN 先验证 pinService.validatePin，主密码先验证 userVerificationService.verifyUser(VerificationType.MasterPassword)，失败后尝试 PIN；成功时调用 clearManualLock()
 - recordFailedAttempt: 仅 `<12` 字符计入，每 5 次触发退让，使用递增序列 [10,30,60,300,900,1800,3600,7200]，第9次起 ×2
-- lockNow: 删除 chrome.storage.local 中的 uiLockLastUnlockTime
+- lockNow: 设置 uiLockManuallyLocked=true，删除 uiLockLastUnlockTime
 
 **libs/common/src/key-management/ui-lock/index.ts:**
 - 导出 UiLockServiceAbstraction, UiLockService, UI_LOCK_TIMEOUT
