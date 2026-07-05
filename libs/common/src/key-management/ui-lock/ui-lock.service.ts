@@ -73,20 +73,28 @@ export class UiLockService implements UiLockServiceAbstraction {
   }
 
   async unlock(userId: UserId, pinOrPassword: string): Promise<boolean> {
-    const backoffUntil = await this.getBackoffUntil(userId);
-    if (backoffUntil && Date.now() < backoffUntil) {
-      return false;
+    // Short inputs (< 12 chars) are treated as PIN for backoff purposes
+    const isShortPin = pinOrPassword.length < 12;
+
+    // Only short PINs are subject to backoff; long PINs and master passwords bypass
+    if (isShortPin) {
+      const backoffUntil = await this.getBackoffUntil(userId);
+      if (backoffUntil && Date.now() < backoffUntil) {
+        return false;
+      }
     }
 
     let verified = false;
 
-    try {
-      verified = await this.pinService.validatePin(pinOrPassword, userId);
-    } catch {
-      // PIN validation failed, try master password
-    }
-
-    if (!verified) {
+    if (isShortPin) {
+      // Short inputs can only be PINs
+      try {
+        verified = await this.pinService.validatePin(pinOrPassword, userId);
+      } catch {
+        // PIN validation failed
+      }
+    } else {
+      // Long inputs: try master password first, then PIN
       try {
         const verification: Verification = {
           type: VerificationType.MasterPassword,
@@ -94,7 +102,15 @@ export class UiLockService implements UiLockServiceAbstraction {
         };
         verified = await this.userVerificationService.verifyUser(verification);
       } catch {
-        verified = false;
+        // Master password verification failed
+      }
+
+      if (!verified) {
+        try {
+          verified = await this.pinService.validatePin(pinOrPassword, userId);
+        } catch {
+          // PIN validation failed
+        }
       }
     }
 
@@ -104,7 +120,10 @@ export class UiLockService implements UiLockServiceAbstraction {
       return true;
     }
 
-    await this.recordFailedAttempt(userId);
+    // Only short PIN attempts count towards backoff
+    if (isShortPin) {
+      await this.recordFailedAttempt(userId);
+    }
     return false;
   }
 
@@ -134,7 +153,7 @@ export class UiLockService implements UiLockServiceAbstraction {
     const failedAttempts = (await this.getFailedAttempts(userId)) + 1;
     await chrome.storage.local.set({ [UI_LOCK_FAILED_ATTEMPTS_KEY]: failedAttempts });
 
-    if (failedAttempts >= 5) {
+    if (failedAttempts % 5 === 0) {
       const backoffMs = 5 * 60 * 1000;
       await chrome.storage.local.set({
         [UI_LOCK_BACKOFF_UNTIL_KEY]: Date.now() + backoffMs,

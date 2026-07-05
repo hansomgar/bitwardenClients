@@ -723,7 +723,7 @@
     "message": "Session timeout"
   },
   "uiLockHeader": {
-    "message": "UI Lock"
+    "message": "UI is locked"
   },
   "uiLockTimeout": {
     "message": "UI Lock Timeout"
@@ -745,6 +745,9 @@
         "example": "3"
       }
     }
+  },
+  "uiLockInvalidMasterPassword": {
+    "message": "Invalid password."
   },
   "uiLockBackoffMessage": {
     "message": "Too many failed attempts. Please wait $SECONDS$ seconds.",

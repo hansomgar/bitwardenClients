@@ -723,7 +723,7 @@
     "message": "会话超时"
   },
   "uiLockHeader": {
-    "message": "界面上锁"
+    "message": "界面已上锁"
   },
   "uiLockTimeout": {
     "message": "界面上锁时间"
@@ -745,6 +745,9 @@
         "example": "3"
       }
     }
+  },
+  "uiLockInvalidMasterPassword": {
+    "message": "密码错误"
   },
   "uiLockBackoffMessage": {
     "message": "尝试次数过多，请等待$SECONDS$秒",

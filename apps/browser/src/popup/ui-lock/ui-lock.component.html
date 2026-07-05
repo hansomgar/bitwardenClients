@@ -1,11 +1,7 @@
 <div class="tw-flex tw-flex-col tw-h-full tw-p-4">
-  <p class="tw-mb-4 tw-text-muted" bitTypography="body1">
-    {{ "uiLockEnterPinOrPassword" | i18n }}
-  </p>
-
   <div [formGroup]="form">
     <bit-form-field>
-      <bit-label for="pinOrPassword">{{ "masterPassOrPIN" | i18n }}</bit-label>
+      <bit-label for="pinOrPassword">{{ "uiLockEnterPinOrPassword" | i18n }}</bit-label>
       <input
         bitInput
         type="password"
