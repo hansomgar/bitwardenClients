@@ -723,13 +723,16 @@
     "message": "Session timeout"
   },
   "uiLockHeader": {
-    "message": "UI is locked"
+    "message": "UI lock"
   },
   "uiLockTimeout": {
     "message": "UI Lock Timeout"
   },
   "uiLockNow": {
     "message": "Lock Now"
+  },
+  "uiIsLocked": {
+    "message": "UI is locked"
   },
   "uiLockEnterPinOrPassword": {
     "message": "Enter your PIN or master password to unlock"

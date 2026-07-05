@@ -635,7 +635,7 @@ const routes: Routes = [
     data: {
       pageIcon: LockIcon,
       pageTitle: {
-        key: "uiLockHeader",
+        key: "uiIsLocked",
       },
       showReadonlyHostname: false,
       showAcctSwitcher: false,
