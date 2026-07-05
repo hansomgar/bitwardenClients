@@ -14,6 +14,7 @@ const UI_LOCK_LAST_UNLOCK_KEY = "uiLockLastUnlockTime";
 const UI_LOCK_FAILED_ATTEMPTS_KEY = "uiLockFailedAttempts";
 const UI_LOCK_BACKOFF_UNTIL_KEY = "uiLockBackoffUntil";
 const UI_LOCK_SKIP_CHECK_KEY = "uiLockSkipCheck";
+const UI_LOCK_MANUAL_LOCK_KEY = "uiLockManuallyLocked";
 
 export abstract class UiLockServiceAbstraction {
   abstract isUiLocked$(userId: UserId): Observable<boolean>;
@@ -27,6 +28,7 @@ export abstract class UiLockServiceAbstraction {
   abstract setSkipCheck(skip: boolean): Promise<void>;
   abstract getSkipCheck(): Promise<boolean>;
   abstract lockNow(userId: UserId): Promise<void>;
+  abstract clearManualLock(userId: UserId): Promise<void>;
 }
 
 export class UiLockService implements UiLockServiceAbstraction {
@@ -57,8 +59,10 @@ export class UiLockService implements UiLockServiceAbstraction {
       this.uiLockTimeoutState.state$.pipe(map((x) => x ?? 0)),
     );
 
+    // When timeout is "Never", check if the user manually locked
     if (timeoutMinutes <= 0) {
-      return false;
+      const manualResult = await chrome.storage.local.get(UI_LOCK_MANUAL_LOCK_KEY);
+      return (manualResult[UI_LOCK_MANUAL_LOCK_KEY] as boolean) === true;
     }
 
     const result = await chrome.storage.local.get(UI_LOCK_LAST_UNLOCK_KEY);
@@ -116,6 +120,7 @@ export class UiLockService implements UiLockServiceAbstraction {
 
     if (verified) {
       await this.resetFailedAttempts(userId);
+      await this.clearManualLock(userId);
       await this.setLastUnlockTime(userId);
       return true;
     }
@@ -184,6 +189,11 @@ export class UiLockService implements UiLockServiceAbstraction {
   }
 
   async lockNow(userId: UserId): Promise<void> {
+    await chrome.storage.local.set({ [UI_LOCK_MANUAL_LOCK_KEY]: true });
     await chrome.storage.local.remove(UI_LOCK_LAST_UNLOCK_KEY);
+  }
+
+  async clearManualLock(userId: UserId): Promise<void> {
+    await chrome.storage.local.remove(UI_LOCK_MANUAL_LOCK_KEY);
   }
 }

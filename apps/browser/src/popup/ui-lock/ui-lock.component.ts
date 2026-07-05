@@ -165,6 +165,7 @@ export class UiLockComponent implements OnInit, OnDestroy {
             [UI_LOCK_BACKOFF_UNTIL_KEY]: null,
           });
           this.autoCheckThreshold = 4;
+          await this.uiLockService.clearManualLock(userId);
           await this.uiLockService.setLastUnlockTime(userId);
           await this.router.navigate(["/tabs/vault"]);
           return;
