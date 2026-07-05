@@ -3,7 +3,7 @@ import { CanActivateFn, Router, UrlTree } from "@angular/router";
 import { firstValueFrom } from "rxjs";
 
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
-import { getUserId } from "@bitwarden/common/auth/services/account.service";
+import { getOptionalUserId } from "@bitwarden/common/auth/services/account.service";
 import { UiLockServiceAbstraction } from "@bitwarden/common/key-management/ui-lock";
 
 export function uiLockGuard(): CanActivateFn {
@@ -18,7 +18,8 @@ export function uiLockGuard(): CanActivateFn {
       return true;
     }
 
-    const userId = await firstValueFrom(accountService.activeAccount$.pipe(getUserId));
+    // getOptionalUserId returns null when no account is active, instead of throwing
+    const userId = await firstValueFrom(accountService.activeAccount$.pipe(getOptionalUserId));
     if (!userId) {
       return true;
     }

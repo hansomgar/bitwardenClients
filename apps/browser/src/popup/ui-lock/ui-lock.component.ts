@@ -6,7 +6,7 @@ import { firstValueFrom, Subject, takeUntil } from "rxjs";
 
 import { JslibModule } from "@bitwarden/angular/jslib.module";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
-import { getUserId } from "@bitwarden/common/auth/services/account.service";
+import { getOptionalUserId } from "@bitwarden/common/auth/services/account.service";
 import { PinServiceAbstraction } from "@bitwarden/common/key-management/pin/pin.service.abstraction";
 import { UiLockServiceAbstraction } from "@bitwarden/common/key-management/ui-lock";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
@@ -56,7 +56,12 @@ export class UiLockComponent implements OnInit, OnDestroy {
   ) {}
 
   async ngOnInit() {
-    const userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getUserId));
+    const userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getOptionalUserId));
+    if (!userId) {
+      await this.router.navigate(["/login"]);
+      return;
+    }
+
     const isLocked = await this.uiLockService.isUiLocked(userId);
 
     if (!isLocked) {
@@ -93,7 +98,12 @@ export class UiLockComponent implements OnInit, OnDestroy {
     this.submitting = true;
     this.errorMessage = null;
 
-    const userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getUserId));
+    const userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getOptionalUserId));
+    if (!userId) {
+      this.submitting = false;
+      return;
+    }
+
     const pinOrPassword = this.form.value.pinOrPassword;
     const isPin = pinOrPassword.length < 12;
 
@@ -142,7 +152,11 @@ export class UiLockComponent implements OnInit, OnDestroy {
     while (value.length >= this.autoCheckThreshold && !this.isAutoChecking) {
       this.isAutoChecking = true;
       try {
-        const userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getUserId));
+        const userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getOptionalUserId));
+        if (!userId) {
+          return;
+        }
+
         const isValid = await this.pinService.validatePin(value, userId);
         if (isValid) {
           await chrome.storage.local.set({
