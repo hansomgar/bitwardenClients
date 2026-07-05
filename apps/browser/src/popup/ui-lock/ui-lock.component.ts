@@ -50,7 +50,11 @@ export class UiLockComponent implements OnInit {
     const isLocked = await this.uiLockService.isUiLocked(userId);
 
     if (!isLocked) {
-      await this.router.navigate(["/tabs/vault"]);
+      const result = await chrome.storage.local.get("uiLockLastUnlockTime");
+      if (result["uiLockLastUnlockTime"]) {
+        await this.router.navigate(["/tabs/vault"]);
+        return;
+      }
     }
   }
 

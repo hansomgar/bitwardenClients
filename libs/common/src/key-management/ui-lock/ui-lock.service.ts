@@ -26,6 +26,7 @@ export abstract class UiLockServiceAbstraction {
   abstract getBackoffUntil(userId: UserId): Promise<number | null>;
   abstract setSkipCheck(skip: boolean): Promise<void>;
   abstract getSkipCheck(): Promise<boolean>;
+  abstract lockNow(userId: UserId): Promise<void>;
 }
 
 export class UiLockService implements UiLockServiceAbstraction {
@@ -155,5 +156,9 @@ export class UiLockService implements UiLockServiceAbstraction {
   async getSkipCheck(): Promise<boolean> {
     const result = await chrome.storage.local.get(UI_LOCK_SKIP_CHECK_KEY);
     return (result[UI_LOCK_SKIP_CHECK_KEY] as boolean) ?? false;
+  }
+
+  async lockNow(userId: UserId): Promise<void> {
+    await chrome.storage.local.remove(UI_LOCK_LAST_UNLOCK_KEY);
   }
 }

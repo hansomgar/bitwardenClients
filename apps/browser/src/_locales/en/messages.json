@@ -728,6 +728,9 @@
   "uiLockTimeout": {
     "message": "UI Lock Timeout"
   },
+  "uiLockNow": {
+    "message": "Lock Now"
+  },
   "uiLockEnterPinOrPassword": {
     "message": "Enter your PIN or master password to unlock"
   },

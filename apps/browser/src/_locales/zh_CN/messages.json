@@ -728,6 +728,9 @@
   "uiLockTimeout": {
     "message": "界面上锁时间"
   },
+  "uiLockNow": {
+    "message": "立即上锁"
+  },
   "uiLockEnterPinOrPassword": {
     "message": "请输入PIN或主密码解锁"
   },

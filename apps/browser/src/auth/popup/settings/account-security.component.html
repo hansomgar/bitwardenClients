@@ -120,19 +120,29 @@
           </h2>
         </bit-section-header>
         <bit-card>
-          <bit-form-field>
-            <bit-label for="uiLockTimeout">{{ "uiLockTimeout" | i18n }}</bit-label>
-            <bit-select
-              formControlName="uiLockTimeout"
-              id="uiLockTimeout"
+          <label for="uiLockTimeout" class="tw-block tw-mb-1">{{ "uiLockTimeout" | i18n }}</label>
+          <div class="tw-flex tw-items-center tw-gap-3">
+            <bit-form-field class="tw-flex-1">
+              <bit-select
+                formControlName="uiLockTimeout"
+                id="uiLockTimeout"
+              >
+                <bit-option
+                  *ngFor="let option of uiLockTimeoutOptions"
+                  [label]="option.label"
+                  [value]="option.value"
+                ></bit-option>
+              </bit-select>
+            </bit-form-field>
+            <button
+              bitButton
+              type="button"
+              buttonType="secondary"
+              (click)="lockNow()"
             >
-              <bit-option
-                *ngFor="let option of uiLockTimeoutOptions"
-                [label]="option.label"
-                [value]="option.value"
-              ></bit-option>
-            </bit-select>
-          </bit-form-field>
+              {{ "uiLockNow" | i18n }}
+            </button>
+          </div>
         </bit-card>
       </bit-section>
 

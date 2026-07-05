@@ -59,6 +59,7 @@ import {
   SwitchComponent,
   CalloutModule,
   SpinnerComponent,
+  ButtonModule,
 } from "@bitwarden/components";
 import {
   KeyService,
@@ -107,6 +108,7 @@ import { AwaitDesktopDialogComponent } from "./await-desktop-dialog.component";
     SwitchComponent,
     CalloutModule,
     SpinnerComponent,
+    ButtonModule,
   ],
 })
 export class AccountSecurityComponent implements OnInit, OnDestroy {
@@ -635,6 +637,13 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
   async lock() {
     const activeUserId = await firstValueFrom(getUserId(this.accountService.activeAccount$));
     await this.lockService.lock(activeUserId);
+  }
+
+  async lockNow() {
+    const userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getUserId));
+    await this.uiLockService.lockNow(userId);
+    await this.router.navigate(["/ui-lock"]);
+    setTimeout(() => window.close(), 500);
   }
 
   async logOut() {
