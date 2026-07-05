@@ -72,6 +72,9 @@ export class LoginCredentialsViewComponent implements OnChanges {
   @Input() showChangePasswordLink: boolean;
   readonly changePasswordLink = input<string | undefined>();
   // FIXME(https://bitwarden.atlassian.net/browse/CL-903): Migrate to Signals
+  // eslint-disable-next-line @angular-eslint/prefer-signals
+  @Input() passwordRiskType: string | null = null;
+  // FIXME(https://bitwarden.atlassian.net/browse/CL-903): Migrate to Signals
   // eslint-disable-next-line @angular-eslint/prefer-output-emitter-ref
   @Output() handleChangePassword = new EventEmitter<void>();
   // FIXME(https://bitwarden.atlassian.net/browse/CL-903): Migrate to Signals
@@ -150,5 +153,33 @@ export class LoginCredentialsViewComponent implements OnChanges {
 
   launchChangePasswordEvent(): void {
     this.handleChangePassword.emit();
+  }
+
+  /** Returns the i18n-translated risk type message based on passwordRiskType. */
+  get riskTypeMessage(): string {
+    switch (this.passwordRiskType) {
+      case "exposed":
+        return this.i18nService.t("atRiskPasswordExposed");
+      case "weak":
+        return this.i18nService.t("atRiskPasswordWeak");
+      case "reused":
+        return this.i18nService.t("atRiskPasswordReused");
+      default:
+        return this.i18nService.t("atRiskPassword");
+    }
+  }
+
+  /** Returns the Tailwind color class for the risk icon based on priority. */
+  get riskIconColor(): string {
+    switch (this.passwordRiskType) {
+      case "exposed":
+        return "tw-text-danger";
+      case "weak":
+        return "tw-text-warning";
+      case "reused":
+        return "tw-text-[#b8960a]";
+      default:
+        return "tw-text-warning";
+    }
   }
 }

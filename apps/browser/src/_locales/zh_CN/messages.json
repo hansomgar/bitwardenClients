@@ -3109,6 +3109,15 @@
   "atRiskPassword": {
     "message": "存在风险的密码"
   },
+  "atRiskPasswordExposed": {
+    "message": "存在风险的密码（已泄露密码）"
+  },
+  "atRiskPasswordWeak": {
+    "message": "存在风险的密码（弱密码）"
+  },
+  "atRiskPasswordReused": {
+    "message": "存在风险的密码（重复使用密码）"
+  },
   "atRiskPasswords": {
     "message": "存在风险的密码"
   },

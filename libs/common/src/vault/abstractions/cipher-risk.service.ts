@@ -67,3 +67,28 @@ export function isPasswordAtRisk(risk: CipherRiskResult): boolean {
     risk.password_strength < 3
   );
 }
+
+/** Risk type classification for at-risk passwords, ordered by priority (highest first). */
+export type PasswordRiskType = "exposed" | "weak" | "reused";
+
+/**
+ * Determines the specific risk type of a password from its CipherRiskResult.
+ * Returns the highest-priority risk type if multiple risks exist.
+ *
+ * Priority order: exposed > weak > reused
+ *
+ * @param risk - The CipherRiskResult to evaluate
+ * @returns The risk type, or null if the password is not at risk
+ */
+export function getPasswordRiskType(risk: CipherRiskResult): PasswordRiskType | null {
+  if (risk.exposed_result.type === "Found" && risk.exposed_result.value > 0) {
+    return "exposed";
+  }
+  if (risk.password_strength < 3) {
+    return "weak";
+  }
+  if ((risk.reuse_count ?? 1) > 1) {
+    return "reused";
+  }
+  return null;
+}

@@ -3121,6 +3121,15 @@
   "atRiskPassword": {
     "message": "At-risk password"
   },
+  "atRiskPasswordExposed": {
+    "message": "At-risk password (exposed)"
+  },
+  "atRiskPasswordWeak": {
+    "message": "At-risk password (weak)"
+  },
+  "atRiskPasswordReused": {
+    "message": "At-risk password (reused)"
+  },
   "atRiskPasswords": {
     "message": "At-risk passwords"
   },

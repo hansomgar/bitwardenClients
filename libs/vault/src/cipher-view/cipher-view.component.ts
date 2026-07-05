@@ -1,3 +1,5 @@
+import type { CipherRiskResult } from "@bitwarden/sdk-internal";
+
 import { CommonModule } from "@angular/common";
 import { Component, computed, input, resource } from "@angular/core";
 import { toObservable, toSignal } from "@angular/core/rxjs-interop";
@@ -13,8 +15,6 @@ import { AccountService } from "@bitwarden/common/auth/abstractions/account.serv
 import { getUserId } from "@bitwarden/common/auth/services/account.service";
 import { isCardExpired } from "@bitwarden/common/autofill/utils";
 import { BillingAccountProfileStateService } from "@bitwarden/common/billing/abstractions";
-import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
-import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import { getByIds } from "@bitwarden/common/platform/misc";
@@ -22,7 +22,9 @@ import { CipherId, EmergencyAccessId, UserId } from "@bitwarden/common/types/gui
 import { ChangeLoginPasswordService } from "@bitwarden/common/vault/abstractions/change-login-password.service";
 import {
   CipherRiskService,
+  getPasswordRiskType,
   isPasswordAtRisk,
+  PasswordRiskType,
 } from "@bitwarden/common/vault/abstractions/cipher-risk.service";
 import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.service";
 import { FolderService } from "@bitwarden/common/vault/abstractions/folder/folder.service.abstraction";
@@ -34,7 +36,6 @@ import {
   CalloutModule,
   SearchModule,
   TypographyModule,
-  LinkComponent,
 } from "@bitwarden/components";
 
 import { AdditionalOptionsComponent } from "./additional-options/additional-options.component";
@@ -74,7 +75,6 @@ import { ViewIdentitySectionsComponent } from "./view-identity-sections/view-ide
     ViewIdentitySectionsComponent,
     LoginCredentialsViewComponent,
     AutofillOptionsViewComponent,
-    LinkComponent,
     TypographyModule,
   ],
 })
@@ -120,7 +120,6 @@ export class CipherViewComponent {
     private cipherRiskService: CipherRiskService,
     private billingAccountService: BillingAccountProfileStateService,
     private vaultSettingsService: VaultSettingsService,
-    private configService: ConfigService,
   ) {}
 
   readonly resolvedCollections = toSignal<CollectionView[] | undefined>(
@@ -277,27 +276,44 @@ export class CipherViewComponent {
   });
 
   /**
-   * Whether the login password for the cipher is considered at risk.
-   * The password is only evaluated when the user is premium and has edit access to the cipher.
+   * The CipherRiskResult for the current cipher's password, or null if not at risk / not available.
    */
-  readonly passwordIsAtRisk = toSignal(
+  readonly passwordRiskResult = toSignal(
     combineLatest([this.activeUserId$, this.cipher$]).pipe(
       switchMap(([userId, cipher]) => {
         if (!cipher.hasLoginPassword || !cipher.edit || cipher.organizationId || cipher.isDeleted) {
-          return of(false);
+          return of(null);
         }
         return this.switchPremium$(
           userId,
           () =>
-            from(this.checkIfPasswordIsAtRisk(cipher.id as CipherId, userId as UserId)).pipe(
-              startWith(false),
+            from(this.fetchCipherRisk(cipher.id as CipherId, userId as UserId)).pipe(
+              startWith(null),
             ),
-          () => of(false),
+          () => of(null),
         );
       }),
     ),
-    { initialValue: false },
+    { initialValue: null },
   );
+
+  /**
+   * Whether the login password for the cipher is considered at risk.
+   * Derived from passwordRiskResult.
+   */
+  readonly passwordIsAtRisk = computed(() => {
+    const risk = this.passwordRiskResult();
+    return risk != null && isPasswordAtRisk(risk);
+  });
+
+  /**
+   * The specific risk type of the password, or null if not at risk.
+   * Derived from passwordRiskResult.
+   */
+  readonly passwordRiskType = computed((): PasswordRiskType | null => {
+    const risk = this.passwordRiskResult();
+    return risk != null ? getPasswordRiskType(risk) : null;
+  });
 
   readonly showChangePasswordLink = computed(() => {
     return (
@@ -312,11 +328,6 @@ export class CipherViewComponent {
 
   readonly showAtRiskPasswordNotifications = toSignal(
     this.vaultSettingsService.showAtRiskPasswordNotifications$,
-  );
-
-  readonly removeAtRiskCallout = toSignal(
-    this.configService.getFeatureFlag$(FeatureFlag.PM32016RemoveAtRiskCallout),
-    { initialValue: false },
   );
 
   protected readonly changePasswordUrl = resource({
@@ -365,13 +376,12 @@ export class CipherViewComponent {
       .pipe(switchMap((isPremium) => (isPremium ? ifPremium$() : ifNonPremium$())));
   }
 
-  private async checkIfPasswordIsAtRisk(cipherId: CipherId, userId: UserId): Promise<boolean> {
+  private async fetchCipherRisk(cipherId: CipherId, userId: UserId): Promise<CipherRiskResult | null> {
     try {
-      const risk = await this.cipherRiskService.computeCipherRiskForUser(cipherId, userId, true);
-      return isPasswordAtRisk(risk);
+      return await this.cipherRiskService.computeCipherRiskForUser(cipherId, userId, true);
     } catch (error: unknown) {
       this.logService.error("Failed to check if password is at risk", error);
-      return false;
+      return null;
     }
   }
 }
