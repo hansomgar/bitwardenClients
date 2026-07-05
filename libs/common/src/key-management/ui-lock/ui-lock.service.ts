@@ -154,9 +154,15 @@ export class UiLockService implements UiLockServiceAbstraction {
     await chrome.storage.local.set({ [UI_LOCK_FAILED_ATTEMPTS_KEY]: failedAttempts });
 
     if (failedAttempts % 5 === 0) {
-      const backoffMs = 5 * 60 * 1000;
+      const blockNumber = failedAttempts / 5;
+      // Escalating backoff: 10s, 30s, 1min, 5min, 15min, 30min, 60min, 120min, then *2
+      const baseSequence = [10, 30, 60, 300, 900, 1800, 3600, 7200];
+      const backoffSeconds =
+        blockNumber <= baseSequence.length
+          ? baseSequence[blockNumber - 1]
+          : 7200 * Math.pow(2, blockNumber - 8);
       await chrome.storage.local.set({
-        [UI_LOCK_BACKOFF_UNTIL_KEY]: Date.now() + backoffMs,
+        [UI_LOCK_BACKOFF_UNTIL_KEY]: Date.now() + backoffSeconds * 1000,
       });
     }
   }

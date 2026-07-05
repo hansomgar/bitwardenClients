@@ -6,9 +6,6 @@ import { firstValueFrom, Subject, takeUntil } from "rxjs";
 
 import { JslibModule } from "@bitwarden/angular/jslib.module";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
-import { UserVerificationService } from "@bitwarden/common/auth/abstractions/user-verification/user-verification.service.abstraction";
-import { VerificationType } from "@bitwarden/common/auth/enums/verification-type";
-import { Verification } from "@bitwarden/common/auth/types/verification";
 import { getUserId } from "@bitwarden/common/auth/services/account.service";
 import { PinServiceAbstraction } from "@bitwarden/common/key-management/pin/pin.service.abstraction";
 import { UiLockServiceAbstraction } from "@bitwarden/common/key-management/ui-lock";
@@ -21,6 +18,8 @@ import {
 } from "@bitwarden/components";
 
 const UI_LOCK_AUTO_CHECK_THRESHOLD_KEY = "uiLockAutoCheckThreshold";
+const UI_LOCK_FAILED_ATTEMPTS_KEY = "uiLockFailedAttempts";
+const UI_LOCK_BACKOFF_UNTIL_KEY = "uiLockBackoffUntil";
 
 @Component({
   templateUrl: "ui-lock.component.html",
@@ -51,7 +50,6 @@ export class UiLockComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private uiLockService: UiLockServiceAbstraction,
     private pinService: PinServiceAbstraction,
-    private userVerificationService: UserVerificationService,
     private accountService: AccountService,
     private i18nService: I18nService,
     private router: Router,
@@ -118,10 +116,12 @@ export class UiLockComponent implements OnInit, OnDestroy {
       await this.router.navigate(["/tabs/vault"]);
     } else {
       if (isPin) {
-        const failedAttempts = await this.uiLockService.getFailedAttempts(userId);
-        if (failedAttempts % 5 === 0) {
-          this.errorMessage = this.i18nService.t("uiLockBackoffMessage", "5");
+        const backoffUntil = await this.uiLockService.getBackoffUntil(userId);
+        if (backoffUntil && Date.now() < backoffUntil) {
+          const remainingSeconds = Math.ceil((backoffUntil - Date.now()) / 1000);
+          this.errorMessage = this.i18nService.t("uiLockBackoffMessage", remainingSeconds.toString());
         } else {
+          const failedAttempts = await this.uiLockService.getFailedAttempts(userId);
           const remainingInBlock = 5 - (failedAttempts % 5);
           this.errorMessage = this.i18nService.t(
             "uiLockInvalidPinOrPassword",
@@ -143,40 +143,20 @@ export class UiLockComponent implements OnInit, OnDestroy {
       this.isAutoChecking = true;
       try {
         const userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getUserId));
-        let isValid = false;
-
-        if (value.length >= 12) {
-          // Long inputs: try master password first, then PIN
-          try {
-            const verification: Verification = {
-              type: VerificationType.MasterPassword,
-              secret: value,
-            };
-            isValid = await this.userVerificationService.verifyUser(verification);
-          } catch {
-            // Master password verification failed
-          }
-          if (!isValid) {
-            try {
-              isValid = await this.pinService.validatePin(value, userId);
-            } catch {
-              // PIN validation failed
-            }
-          }
-        } else {
-          // Short inputs: only PIN
-          isValid = await this.pinService.validatePin(value, userId);
-        }
-
+        const isValid = await this.pinService.validatePin(value, userId);
         if (isValid) {
-          await chrome.storage.local.set({ [UI_LOCK_AUTO_CHECK_THRESHOLD_KEY]: 4 });
+          await chrome.storage.local.set({
+            [UI_LOCK_AUTO_CHECK_THRESHOLD_KEY]: 4,
+            [UI_LOCK_FAILED_ATTEMPTS_KEY]: 0,
+            [UI_LOCK_BACKOFF_UNTIL_KEY]: null,
+          });
           this.autoCheckThreshold = 4;
           await this.uiLockService.setLastUnlockTime(userId);
           await this.router.navigate(["/tabs/vault"]);
           return;
         }
       } catch {
-        // Validation failed silently
+        // PIN validation failed silently
       }
       this.autoCheckThreshold++;
       await chrome.storage.local.set({ [UI_LOCK_AUTO_CHECK_THRESHOLD_KEY]: this.autoCheckThreshold });
