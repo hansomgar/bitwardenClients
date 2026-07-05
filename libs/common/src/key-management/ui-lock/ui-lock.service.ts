@@ -54,7 +54,7 @@ export class UiLockService implements UiLockServiceAbstraction {
 
   async isUiLocked(userId: UserId): Promise<boolean> {
     const timeoutMinutes = await firstValueFrom(
-      this.uiLockTimeoutState.state$.pipe(map((x) => x ?? 5)),
+      this.uiLockTimeoutState.state$.pipe(map((x) => x ?? 0)),
     );
 
     if (timeoutMinutes <= 0) {
@@ -132,7 +132,7 @@ export class UiLockService implements UiLockServiceAbstraction {
   }
 
   getUiLockTimeout$(userId: UserId): Observable<number> {
-    return this.uiLockTimeoutState.state$.pipe(map((x) => x ?? 5));
+    return this.uiLockTimeoutState.state$.pipe(map((x) => x ?? 0));
   }
 
   async setUiLockTimeout(userId: UserId, timeoutMinutes: number): Promise<void> {

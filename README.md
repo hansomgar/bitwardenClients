@@ -98,7 +98,7 @@ Security audits and feedback are welcome. Please open an issue or email us priva
 
 | 文件 | 说明 |
 |------|------|
-| `libs/common/src/key-management/ui-lock/ui-lock.state.ts` | `UI_LOCK_TIMEOUT` 的 `UserKeyDefinition`（`UI_LOCK_SETTINGS_DISK`，默认 5 分钟） |
+| `libs/common/src/key-management/ui-lock/ui-lock.state.ts` | `UI_LOCK_TIMEOUT` 的 `UserKeyDefinition`（`UI_LOCK_SETTINGS_DISK`，默认 0 = 从不） |
 | `libs/common/src/key-management/ui-lock/ui-lock.service.ts` | 核心服务：抽象类 `UiLockServiceAbstraction` + 实现类 `UiLockService` |
 | `libs/common/src/key-management/ui-lock/index.ts` | Barrel export：导出 `UiLockServiceAbstraction`、`UiLockService`、`UI_LOCK_TIMEOUT` |
 | `apps/browser/src/popup/ui-lock/ui-lock.guard.ts` | 路由守卫：`uiLockGuard()` — `CanActivateFn` |
@@ -139,7 +139,7 @@ lockNow(userId)               → Promise<void>        // 立即上锁
 
 | 层级 | 存储介质 | 键 | 说明 |
 |------|---------|-----|------|
-| 设置层 | `StateProvider` (disk) | `uiLockTimeout` | 用户配置的超时分钟数，默认 5 |
+| 设置层 | `StateProvider` (disk) | `uiLockTimeout` | 用户配置的超时分钟数，默认 0（从不） |
 | 运行时 | `chrome.storage.local` | `uiLockLastUnlockTime` | 最后解锁时间戳（ms） |
 | 运行时 | `chrome.storage.local` | `uiLockFailedAttempts` | 累计失败次数 |
 | 运行时 | `chrome.storage.local` | `uiLockBackoffUntil` | 退让截止时间戳（ms） |

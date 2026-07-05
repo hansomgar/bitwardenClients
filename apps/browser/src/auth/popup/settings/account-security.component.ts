@@ -125,7 +125,7 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
     enableAutoBiometricsPrompt: true,
     enablePhishingDetection: true,
     allowSharingUnlockState: true,
-    uiLockTimeout: [5],
+    uiLockTimeout: [0],
   });
 
   protected uiLockTimeoutOptions = [
