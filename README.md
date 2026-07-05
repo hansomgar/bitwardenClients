@@ -331,6 +331,14 @@ private async tryAutoCheck(value: string) {
 | `uiLockInvalidMasterPassword` | Invalid master password | 主密码错误 |
 | `uiLockBackoffMessage` | Too many failed attempts. Please wait $SECONDS$ seconds. | 失败次数过多，请等待 $SECONDS$ 秒后再试 |
 
+### 风险密码提示
+
+| Key | 英文 | 中文 |
+|-----|------|------|
+| `atRiskPasswordExposed` | At-risk password (exposed) | 存在风险的密码（已泄露密码） |
+| `atRiskPasswordWeak` | At-risk password (weak) | 存在风险的密码（弱密码） |
+| `atRiskPasswordReused` | At-risk password (reused) | 存在风险的密码（重复使用密码） |
+
 > **注意：** 带 `$VARIABLE$` 的消息必须声明 `placeholders` 定义，否则扩展加载失败。
 
 ---
@@ -346,6 +354,8 @@ private async tryAutoCheck(value: string) {
 | 退让时间显示"等待 5 秒"但实际是 300 秒 | `submit` 中硬编码 `"5"` 秒 | 改为从 `backoffUntil` 计算实际剩余秒数 |
 | 自动解锁成功后计数未清零 | `tryAutoCheck` 成功时未重置 `failedAttempts` 和 `backoffUntil` | 成功时同时调用 `resetFailedAttempts` |
 | Nx 缓存导致旧代码编译 | Nx 增量编译缓存了旧版本文件 | 重启 dev server 或修改文件触发重编译 |
+| UI 锁计时从解锁开始算，而非从操作结束开始 | `setLastUnlockTime` 仅在解锁时调用 | 守卫检查通过时也调用 `setLastUnlockTime`，每次打开弹窗重置计时器 |
+| 密码页面顶部 callout 占用空间且信息重复 | 模板中 `missingWebsite` 和 `changeAtRiskPassword` 两个 callout | 删除两个 callout，风险提示保留在密码输入框下方 |
 
 ---
 
@@ -461,4 +471,99 @@ private async tryAutoCheck(value: string) {
 - 确保 TypeScript 使用枚举值（VerificationType.MasterPassword）而非字符串字面量
 - 确保所有 i18n 占位符已定义
 - 注意 Nx 缓存可能导致旧代码编译，必要时重启 dev server
+```
+
+---
+
+## 七、风险密码提示优化
+
+### 7.1 功能概述
+将密码库详情页中密码输入框下方的"存在风险的密码"提示，改为按风险类型分类显示，并使用不同颜色的图标区分优先级。
+
+### 7.2 风险类型及优先级（从高到低）
+
+| 优先级 | 类型 | 判断条件 | 图标颜色 |
+|--------|------|---------|---------|
+| 1 | 已泄露密码 (exposed) | `exposed_result.type === "Found" && exposed_result.value > 0` | 红色 (`tw-text-danger`) |
+| 2 | 弱密码 (weak) | `password_strength < 3` | 橙色 (`tw-text-warning`) |
+| 3 | 重复使用密码 (reused) | `reuse_count > 1` | 黄色 (`tw-text-[#b8960a]`) |
+
+- 如果密码同时存在多种风险，只显示优先级最高的那个类型
+- 显示格式：`存在风险的密码（已泄露密码）` / `At-risk password (exposed)`
+
+### 7.3 修改文件清单
+
+| 文件 | 改动 |
+|------|------|
+| `libs/common/src/vault/abstractions/cipher-risk.service.ts` | 新增 `PasswordRiskType` 类型和 `getPasswordRiskType()` 函数，按优先级返回风险类型 |
+| `libs/vault/src/cipher-view/cipher-view.component.ts` | 新增 `passwordRiskResult` 和 `passwordRiskType` 信号，传递给子组件；删除 `removeAtRiskCallout` 及相关 `FeatureFlag`/`ConfigService` 依赖 |
+| `libs/vault/src/cipher-view/cipher-view.component.html` | 删除顶部 `missingWebsite` 和 `changeAtRiskPassword` 两个 callout；向子组件传递 `passwordRiskType` |
+| `libs/vault/src/cipher-view/login-credentials/login-credentials-view.component.ts` | 新增 `@Input() passwordRiskType`、`riskTypeMessage` getter 和 `riskIconColor` getter |
+| `libs/vault/src/cipher-view/login-credentials/login-credentials-view.component.html` | 风险提示从固定 `atRiskPassword` 改为 `riskTypeMessage` 动态显示；图标颜色从固定 `tw-text-warning` 改为 `[ngClass]="riskIconColor"` |
+| `apps/browser/src/_locales/en/messages.json` | 新增 3 个翻译键 |
+| `apps/browser/src/_locales/zh_CN/messages.json` | 新增 3 个翻译键 |
+
+### 7.4 核心实现
+
+**`getPasswordRiskType()` 函数：**
+```typescript
+export type PasswordRiskType = "exposed" | "weak" | "reused";
+
+export function getPasswordRiskType(risk: CipherRiskResult): PasswordRiskType | null {
+  if (risk.exposed_result.type === "Found" && risk.exposed_result.value > 0) {
+    return "exposed";
+  }
+  if (risk.password_strength < 3) {
+    return "weak";
+  }
+  if ((risk.reuse_count ?? 1) > 1) {
+    return "reused";
+  }
+  return null;
+}
+```
+
+**`riskIconColor` getter（图标颜色映射）：**
+```typescript
+get riskIconColor(): string {
+  switch (this.passwordRiskType) {
+    case "exposed": return "tw-text-danger";      // 红色
+    case "weak":    return "tw-text-warning";      // 橙色
+    case "reused":  return "tw-text-[#b8960a]";    // 黄色
+    default:        return "tw-text-warning";
+  }
+}
+```
+
+### 7.5 新增翻译键
+
+| Key | 英文 | 中文 |
+|-----|------|------|
+| `atRiskPasswordExposed` | At-risk password (exposed) | 存在风险的密码（已泄露密码） |
+| `atRiskPasswordWeak` | At-risk password (weak) | 存在风险的密码（弱密码） |
+| `atRiskPasswordReused` | At-risk password (reused) | 存在风险的密码（重复使用密码） |
+
+### 7.6 删除的功能
+- 密码详情页顶部的"更改存在风险的密码" callout 提示框（`changeAtRiskPassword`）
+- 密码详情页顶部的"缺失网站" callout 提示框（`missingWebsite`）
+- `removeAtRiskCallout` 信号及相关的 `FeatureFlag.PM32016RemoveAtRiskCallout` 和 `ConfigService` 依赖
+
+---
+
+## 八、UI 锁计时策略优化
+
+### 8.1 功能概述
+将 UI 锁的计时起点从"解锁那一刻"改为"用户最后一次在弹窗中操作"，每次用户打开弹窗或切换标签页时自动重置计时器。
+
+### 8.2 修改文件
+
+| 文件 | 改动 |
+|------|------|
+| `apps/browser/src/popup/ui-lock/ui-lock.guard.ts` | 守卫检查通过后调用 `setLastUnlockTime(userId)` 重置计时器 |
+
+### 8.3 计时逻辑
+```
+用户解锁 → 操作弹窗 → 每次打开/切换标签页时计时器自动重置
+用户关闭弹窗 → 计时器从最后一次操作开始倒计时
+用户在超时前再次打开弹窗 → 计时器重新归零
 ```
