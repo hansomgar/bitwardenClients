@@ -28,6 +28,10 @@ export function uiLockGuard(): CanActivateFn {
       return router.createUrlTree(["/ui-lock"]) as UrlTree;
     }
 
+    // Reset the lock timer on every successful guard check,
+    // so the timeout counts from the last popup interaction, not from unlock.
+    await uiLockService.setLastUnlockTime(userId);
+
     return true;
   };
 }
