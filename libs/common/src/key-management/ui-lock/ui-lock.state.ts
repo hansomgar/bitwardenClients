@@ -1,10 +1,17 @@
 import { UserKeyDefinition, UI_LOCK_SETTINGS_DISK } from "../../platform/state";
 
-export const UI_LOCK_TIMEOUT = new UserKeyDefinition<number>(
+import { UiLockTimeout, UiLockTimeoutStringType } from "./ui-lock.types";
+
+export const UI_LOCK_TIMEOUT = new UserKeyDefinition<UiLockTimeout>(
   UI_LOCK_SETTINGS_DISK,
   "uiLockTimeout",
   {
-    deserializer: (value: number) => value ?? 0,
+    deserializer: (value: UiLockTimeout) => {
+      if (value === undefined || value === null) {
+        return UiLockTimeoutStringType.Never;
+      }
+      return value;
+    },
     clearOn: [],
   },
 );

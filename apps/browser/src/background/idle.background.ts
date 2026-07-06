@@ -3,6 +3,10 @@ import { firstValueFrom } from "rxjs";
 import { LockService, LogoutService } from "@bitwarden/auth/common";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import {
+  UiLockServiceAbstraction,
+  UiLockTimeoutStringType,
+} from "@bitwarden/common/key-management/ui-lock";
+import {
   VaultTimeoutAction,
   VaultTimeoutService,
   VaultTimeoutSettingsService,
@@ -25,6 +29,7 @@ export default class IdleBackground {
     private vaultTimeoutSettingsService: VaultTimeoutSettingsService,
     private lockService: LockService,
     private logoutService: LogoutService,
+    private uiLockService: UiLockServiceAbstraction,
   ) {
     this.idle = chrome.idle || (browser != null ? browser.idle : null);
   }
@@ -76,6 +81,14 @@ export default class IdleBackground {
                 } else {
                   await this.lockService.lock(userId as UserId);
                 }
+              }
+
+              // Also lock the UI when the UI lock timeout is set to onLocked
+              const uiLockTimeout = await firstValueFrom(
+                this.uiLockService.getUiLockTimeout$(userId as UserId),
+              );
+              if (uiLockTimeout === UiLockTimeoutStringType.OnLocked) {
+                await this.uiLockService.lockNow(userId as UserId);
               }
             }
           }

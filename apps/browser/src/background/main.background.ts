@@ -147,6 +147,10 @@ import { DefaultSharedUnlockLeaderService } from "@bitwarden/common/key-manageme
 import { V2UpgradeTokenStateService } from "@bitwarden/common/key-management/upgrade-token/abstractions/v2-upgrade-token-state.service.abstraction";
 import { DefaultV2UpgradeTokenStateService } from "@bitwarden/common/key-management/upgrade-token/services/default-v2-upgrade-token-state.service";
 import {
+  UiLockService,
+  UiLockServiceAbstraction,
+} from "@bitwarden/common/key-management/ui-lock";
+import {
   DefaultVaultTimeoutSettingsService,
   VaultTimeoutSettingsService,
   VaultTimeoutStringType,
@@ -468,6 +472,7 @@ export default class MainBackground {
   processReloadService: ProcessReloadServiceAbstraction;
   eventCollectionService: EventCollectionServiceAbstraction;
   eventUploadService: EventUploadServiceAbstraction;
+  uiLockService: UiLockServiceAbstraction;
   policyService: InternalPolicyServiceAbstraction;
   newPolicyService: InternalNewPolicyService;
   sendService: InternalSendServiceAbstraction;
@@ -976,6 +981,13 @@ export default class MainBackground {
     );
 
     this.pinService = new PinService(this.sdkService);
+
+    this.uiLockService = new UiLockService(
+      this.stateProvider,
+      this.pinService,
+      this.userVerificationService,
+      this.accountService,
+    );
 
     this.ipcContentScriptManagerService = new IpcContentScriptManagerService(this.configService);
     const ipcSessionRepository = new IpcSessionRepository(this.stateProvider);
@@ -1634,6 +1646,7 @@ export default class MainBackground {
       this.vaultTimeoutSettingsService,
       this.lockService,
       logoutService,
+      this.uiLockService,
     );
 
     this.usernameGenerationService = legacyUsernameGenerationServiceFactory(

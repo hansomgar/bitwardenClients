@@ -13,6 +13,7 @@ import { LogService } from "@bitwarden/common/platform/abstractions/log.service"
 import { MessagingService } from "@bitwarden/common/platform/abstractions/messaging.service";
 import { MessageListener, isExternalMessage } from "@bitwarden/common/platform/messaging";
 import { Utils } from "@bitwarden/common/platform/misc/utils";
+import { UserId } from "@bitwarden/common/types/guid";
 import { CipherType } from "@bitwarden/common/vault/enums";
 import { VaultMessages } from "@bitwarden/common/vault/enums/vault-messages.enum";
 import { BiometricsCommands } from "@bitwarden/key-management";
@@ -74,6 +75,7 @@ export default class RuntimeBackground {
     }
 
     await this.checkOnInstalled();
+    await this.lockUiOnRestartIfNeeded();
 
     const backgroundMessageListener = (
       msg: any,
@@ -516,6 +518,18 @@ export default class RuntimeBackground {
         this.onInstalledReason = null;
       }
     }, 100);
+  }
+
+  private async lockUiOnRestartIfNeeded() {
+    const allUsers = await firstValueFrom(this.accountService.accounts$);
+    for (const userId in allUsers) {
+      const timeout = await firstValueFrom(
+        this.main.uiLockService.getUiLockTimeout$(userId as UserId),
+      );
+      if (timeout === "onRestart") {
+        await this.main.uiLockService.lockNow(userId as UserId);
+      }
+    }
   }
 
   /** Returns the browser tabs that have the web vault open */

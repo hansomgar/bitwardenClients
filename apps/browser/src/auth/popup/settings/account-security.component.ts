@@ -32,7 +32,12 @@ import { PhishingDetectionSettingsServiceAbstraction } from "@bitwarden/common/d
 import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import { PinServiceAbstraction } from "@bitwarden/common/key-management/pin/pin.service.abstraction";
 import { SharedUnlockSettingsService } from "@bitwarden/common/key-management/shared-unlock";
-import { UiLockServiceAbstraction } from "@bitwarden/common/key-management/ui-lock";
+import {
+  isUiLockTimeoutNumeric,
+  UiLockServiceAbstraction,
+  UiLockTimeout,
+  UiLockTimeoutStringType,
+} from "@bitwarden/common/key-management/ui-lock";
 import { VaultTimeoutSettingsService } from "@bitwarden/common/key-management/vault-timeout";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { EnvironmentService } from "@bitwarden/common/platform/abstractions/environment.service";
@@ -125,10 +130,10 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
     enableAutoBiometricsPrompt: true,
     enablePhishingDetection: true,
     allowSharingUnlockState: true,
-    uiLockTimeout: [0],
+    uiLockTimeout: [UiLockTimeoutStringType.Never as UiLockTimeout],
   });
 
-  protected uiLockTimeoutOptions = [
+  protected uiLockTimeoutOptions: { label: string; value: UiLockTimeout }[] = [
     { label: "1 " + this.i18nService.t("minutes"), value: 1 },
     { label: "5 " + this.i18nService.t("minutes"), value: 5 },
     { label: "10 " + this.i18nService.t("minutes"), value: 10 },
@@ -139,7 +144,9 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
     { label: "8 " + this.i18nService.t("hours"), value: 480 },
     { label: "12 " + this.i18nService.t("hours"), value: 720 },
     { label: "24 " + this.i18nService.t("hours"), value: 1440 },
-    { label: this.i18nService.t("never"), value: 0 },
+    { label: this.i18nService.t("onLocked"), value: UiLockTimeoutStringType.OnLocked },
+    { label: this.i18nService.t("onRestart"), value: UiLockTimeoutStringType.OnRestart },
+    { label: this.i18nService.t("never"), value: UiLockTimeoutStringType.Never },
   ];
 
   protected showAccountSecurityNudge$: Observable<boolean> =
@@ -364,7 +371,7 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
         concatMap(async (value) => {
           const userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getUserId));
           await this.uiLockService.setUiLockTimeout(userId, value);
-          if (value > 0) {
+          if (isUiLockTimeoutNumeric(value) && (value as number) > 0) {
             await this.uiLockService.setLastUnlockTime(userId);
           }
         }),

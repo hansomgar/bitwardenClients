@@ -9,6 +9,7 @@ import { StateProvider } from "../../platform/state";
 import { UserId } from "../../types/guid";
 
 import { UI_LOCK_TIMEOUT } from "./ui-lock.state";
+import { isUiLockTimeoutNumeric, UiLockTimeout, UiLockTimeoutStringType } from "./ui-lock.types";
 
 const UI_LOCK_LAST_UNLOCK_KEY = "uiLockLastUnlockTime";
 const UI_LOCK_FAILED_ATTEMPTS_KEY = "uiLockFailedAttempts";
@@ -21,8 +22,8 @@ export abstract class UiLockServiceAbstraction {
   abstract isUiLocked(userId: UserId): Promise<boolean>;
   abstract unlock(userId: UserId, pinOrPassword: string): Promise<boolean>;
   abstract setLastUnlockTime(userId: UserId): Promise<void>;
-  abstract getUiLockTimeout$(userId: UserId): Observable<number>;
-  abstract setUiLockTimeout(userId: UserId, timeoutMinutes: number): Promise<void>;
+  abstract getUiLockTimeout$(userId: UserId): Observable<UiLockTimeout>;
+  abstract setUiLockTimeout(userId: UserId, timeout: UiLockTimeout): Promise<void>;
   abstract getFailedAttempts(userId: UserId): Promise<number>;
   abstract getBackoffUntil(userId: UserId): Promise<number | null>;
   abstract setSkipCheck(skip: boolean): Promise<void>;
@@ -45,8 +46,12 @@ export class UiLockService implements UiLockServiceAbstraction {
 
   isUiLocked$(userId: UserId): Observable<boolean> {
     return this.uiLockTimeoutState.state$.pipe(
-      map((timeoutMinutes) => {
-        if (timeoutMinutes == null || timeoutMinutes <= 0) {
+      map((timeout) => {
+        if (timeout == null || timeout === UiLockTimeoutStringType.Never) {
+          return false;
+        }
+        if (!isUiLockTimeoutNumeric(timeout)) {
+          // onLocked / onRestart are handled by the background or on restart.
           return false;
         }
         return true;
@@ -55,14 +60,24 @@ export class UiLockService implements UiLockServiceAbstraction {
   }
 
   async isUiLocked(userId: UserId): Promise<boolean> {
-    const timeoutMinutes = await firstValueFrom(
-      this.uiLockTimeoutState.state$.pipe(map((x) => x ?? 0)),
+    const timeout = await firstValueFrom(
+      this.uiLockTimeoutState.state$.pipe(map((x) => x ?? UiLockTimeoutStringType.Never)),
     );
 
     // When timeout is "Never", check if the user manually locked
-    if (timeoutMinutes <= 0) {
+    if (timeout === UiLockTimeoutStringType.Never) {
       const manualResult = await chrome.storage.local.get(UI_LOCK_MANUAL_LOCK_KEY);
       return (manualResult[UI_LOCK_MANUAL_LOCK_KEY] as boolean) === true;
+    }
+
+    // String-based timeouts are handled outside of the regular timer check.
+    if (!isUiLockTimeoutNumeric(timeout)) {
+      return false;
+    }
+
+    const timeoutMinutes = timeout as number;
+    if (timeoutMinutes <= 0) {
+      return false;
     }
 
     const result = await chrome.storage.local.get(UI_LOCK_LAST_UNLOCK_KEY);
@@ -136,12 +151,12 @@ export class UiLockService implements UiLockServiceAbstraction {
     await chrome.storage.local.set({ [UI_LOCK_LAST_UNLOCK_KEY]: Date.now() });
   }
 
-  getUiLockTimeout$(userId: UserId): Observable<number> {
-    return this.uiLockTimeoutState.state$.pipe(map((x) => x ?? 0));
+  getUiLockTimeout$(userId: UserId): Observable<UiLockTimeout> {
+    return this.uiLockTimeoutState.state$.pipe(map((x) => x ?? UiLockTimeoutStringType.Never));
   }
 
-  async setUiLockTimeout(userId: UserId, timeoutMinutes: number): Promise<void> {
-    await this.uiLockTimeoutState.update(() => timeoutMinutes);
+  async setUiLockTimeout(userId: UserId, timeout: UiLockTimeout): Promise<void> {
+    await this.uiLockTimeoutState.update(() => timeout);
   }
 
   async getFailedAttempts(userId: UserId): Promise<number> {
