@@ -5,7 +5,7 @@
   "version": "2026.6.1",
   "description": "__MSG_extDesc__",
   "default_locale": "en",
-  "author": "Vaultwarden",
+  "author": "HandsomgGuy",
   "homepage_url": "https://bitwarden.com",
   "icons": {
     "16": "images/icon16.png",
