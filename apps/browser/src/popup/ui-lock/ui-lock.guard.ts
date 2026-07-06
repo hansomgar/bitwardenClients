@@ -29,10 +29,10 @@ export function uiLockGuard(): CanActivateFn {
 
     const timeout = await firstValueFrom(uiLockService.getUiLockTimeout$(userId));
 
-    // For "every time" option, lock on each fresh popup open.
+    // For "on popup open" option, lock on each fresh popup open.
     // The flag is set in AppComponent's constructor and is per-popup-instance memory only.
     if (
-      timeout === UiLockTimeoutStringType.OnPopupClose &&
+      timeout === UiLockTimeoutStringType.OnPopupOpen &&
       uiLockService.consumePopupOpenedForLockCheck()
     ) {
       await uiLockService.lockNow(userId);

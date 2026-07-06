@@ -889,7 +889,7 @@
   "fourHours": {
     "message": "4 hours"
   },
-  "onPopupClose": {
+  "onPopupOpen": {
     "message": "Every time"
   },
   "onLocked": {

@@ -118,7 +118,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private authRequestAnsweringService: AuthRequestAnsweringService,
   ) {
     // Mark that this popup instance was just opened. The uiLockGuard consumes this
-    // in-memory flag to decide whether to lock when the "every time" option is selected.
+    // in-memory flag to decide whether to lock when the "on popup open" option is selected.
     this.uiLockService.setPopupOpenedForLockCheck();
 
     this.deviceTrustToastService.setupListeners$.pipe(takeUntilDestroyed()).subscribe();

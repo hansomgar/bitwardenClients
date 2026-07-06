@@ -1,5 +1,5 @@
 export const UiLockTimeoutStringType = {
-  OnPopupClose: "onPopupClose",
+  OnPopupOpen: "onPopupOpen",
   OnLocked: "onLocked",
   OnRestart: "onRestart",
   Never: "never",

@@ -134,7 +134,7 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
   });
 
   protected uiLockTimeoutOptions: { label: string; value: UiLockTimeout }[] = [
-    { label: this.i18nService.t("onPopupClose"), value: UiLockTimeoutStringType.OnPopupClose },
+    { label: this.i18nService.t("onPopupOpen"), value: UiLockTimeoutStringType.OnPopupOpen },
     { label: "1 " + this.i18nService.t("minutes"), value: 1 },
     { label: "5 " + this.i18nService.t("minutes"), value: 5 },
     { label: "10 " + this.i18nService.t("minutes"), value: 10 },

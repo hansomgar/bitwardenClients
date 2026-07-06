@@ -889,7 +889,7 @@
   "fourHours": {
     "message": "4 小时"
   },
-  "onPopupClose": {
+  "onPopupOpen": {
     "message": "每次"
   },
   "onLocked": {
