@@ -129,14 +129,16 @@ isUiLocked$(userId)  → Observable<boolean>   // 响应式检查
 isUiLocked(userId)    → Promise<boolean>      // 一次性检查（计算实际时间差）
 unlock(userId, pinOrPassword) → Promise<boolean>  // 验证并解锁
 setLastUnlockTime(userId)     → Promise<void>      // 记录解锁时间
-getUiLockTimeout$(userId)     → Observable<number>  // 获取超时设置
-setUiLockTimeout(userId, timeoutMinutes) → Promise<void>  // 设置超时
+getUiLockTimeout$(userId)     → Observable<UiLockTimeout>  // 获取超时设置
+setUiLockTimeout(userId, timeout) → Promise<void>  // 设置超时
 getFailedAttempts(userId)     → Promise<number>      // 获取失败次数
 getBackoffUntil(userId)       → Promise<number|null> // 获取退让截止时间
 setSkipCheck(skip)            → Promise<void>        // 跳过本次检查
 getSkipCheck()                → Promise<boolean>     // 读取跳过标志
 lockNow(userId)               → Promise<void>        // 立即上锁
 clearManualLock(userId)       → Promise<void>        // 清除手动上锁标记
+setPopupOpenedForLockCheck()  → void                 // 设置弹窗打开内存标记（用于 onPopupOpen 选项）
+consumePopupOpenedForLockCheck() → boolean           // 消费弹窗打开内存标记
 ```
 
 **存储架构：**
@@ -164,7 +166,133 @@ clearManualLock(userId)       → Promise<void>        // 清除手动上锁标�
 
 **私有方法 `resetFailedAttempts`：** 同时将 `failedAttempts` 设为 0、`backoffUntil` 设为 null，由 `unlock()` 成功时调用。
 
-### 2.4 DI 注册
+### 2.4 上锁/解锁完整流程
+
+#### 上锁流程
+
+UI 锁可以通过以下四种方式触发上锁，最终都调用 `lockNow()`：
+
+```
+触发源                          调用链
+─────────────────────────────────────────────────────────────
+用户点击"立即上锁"按钮           account-security.component.ts
+或 Vault 顶部"上锁界面"按钮       vault.component.ts
+                                ↓
+                            uiLockService.lockNow(userId)
+                                ↓
+                chrome.storage.local.uiLockManuallyLocked = true
+                chrome.storage.local.uiLockLastUnlockTime 删除
+                                ↓
+                          导航到 /ui-lock
+─────────────────────────────────────────────────────────────
+系统锁屏/屏保                    idle.background.ts
+                                ↓
+                            uiLockService.lockNow(userId)
+                                ↓
+                chrome.storage.local.uiLockManuallyLocked = true
+─────────────────────────────────────────────────────────────
+浏览器重启（非"从不"选项）        runtime.background.ts
+                                ↓
+                            uiLockService.lockNow(userId)
+                                ↓
+                chrome.storage.local.uiLockManuallyLocked = true
+─────────────────────────────────────────────────────────────
+"弹窗出现时"选项                 AppComponent 构造函数设置内存标记
+                                ↓
+                            uiLockGuard 检查标记
+                                ↓
+                            uiLockService.lockNow(userId)
+                                ↓
+                chrome.storage.local.uiLockManuallyLocked = true
+```
+
+上锁后的状态：
+- `uiLockManuallyLocked = true`：表示当前处于锁定状态。
+- `uiLockLastUnlockTime` 被删除：确保数字超时选项也会判定为锁定。
+- 用户再次访问 popup 路由时，`uiLockGuard` 检测到锁定，重定向到 `/ui-lock`。
+
+#### 解锁流程
+
+用户在 `/ui-lock` 页面输入 PIN 或主密码后触发 `submit()`：
+
+```
+ui-lock.component.ts submit()
+    ↓
+检查退让期（backoffUntil）
+    ↓
+判断输入长度
+    ↓
+├── 输入长度 < 12 字符
+│       ↓
+│   只验证 PIN（pinService.validatePin）
+│       ↓
+│   若失败：failedAttempts +1，可能触发退让
+│   若成功：调用 uiLockService.unlock()
+│
+└── 输入长度 >= 12 字符
+        ↓
+    先验证主密码（userVerificationService.verifyUser）
+        ↓
+    若失败，再尝试验证 PIN
+        ↓
+    若成功：调用 uiLockService.unlock()
+        ↓
+uiLockService.unlock() 成功
+    ↓
+resetFailedAttempts()      // failedAttempts=0, backoffUntil=null
+clearManualLock()          // uiLockManuallyLocked = false
+setLastUnlockTime()        // uiLockLastUnlockTime = Date.now()
+    ↓
+导航到 /tabs/vault
+```
+
+#### 自动检测流程
+
+`ui-lock.component.ts` 订阅输入框 `valueChanges`：
+
+```
+输入长度 >= autoCheckThreshold（初始 4）
+    ↓
+tryAutoCheck(value)
+    ↓
+while 循环中调用 pinService.validatePin(value)
+    ↓
+成功：
+  - autoCheckThreshold = 4
+  - failedAttempts = 0
+  - backoffUntil = null
+  - clearManualLock()
+  - setLastUnlockTime()
+  - 导航到 /tabs/vault
+失败：
+  - autoCheckThreshold +1
+  - 持久化到 chrome.storage.local
+  - 不显示错误，不计入 failedAttempts
+```
+
+#### 守卫放行流程
+
+当用户打开 popup 且未锁定时，守卫会：
+
+```
+uiLockGuard 执行
+    ↓
+检查 skipCheck，若为 true 则重置并放行
+    ↓
+获取当前用户
+    ↓
+对 "onPopupOpen" 选项检查内存标记
+    ↓
+调用 isUiLocked(userId)
+    ↓
+未锁定：
+  - 调用 setLastUnlockTime(userId)  // 重置计时器
+  - 放行，用户可继续操作
+已锁定：
+  - 重定向到 /ui-lock
+```
+
+### 2.5 DI 注册
 
 **文件：** `apps/browser/src/popup/services/services.module.ts`
 
@@ -179,7 +307,7 @@ safeProvider({
 }),
 ```
 
-### 2.5 路由守卫
+### 2.6 路由守卫
 
 **文件：** `apps/browser/src/popup/ui-lock/ui-lock.guard.ts`
 
@@ -198,7 +326,7 @@ safeProvider({
 - `/tabs` 路由也添加 `uiLockGuard()`
 - 注册 `/ui-lock` 路由指向 `UiLockComponent`
 
-### 2.6 设置页面
+### 2.7 设置页面
 
 **文件：** `apps/browser/src/auth/popup/settings/account-security.component.html`
 
@@ -221,7 +349,7 @@ safeProvider({
 - 设置超时后立即调用 `setLastUnlockTime()` 初始化计时器
 - `lockNow()` 方法：调用 `uiLockService.lockNow()` → `setSkipCheck(true)` → 导航到 `/ui-lock` → `setTimeout(() => window.close(), 500)`
 
-### 2.7 解锁页面
+### 2.8 解锁页面
 
 **文件：** `apps/browser/src/popup/ui-lock/ui-lock.component.html`
 
@@ -239,7 +367,7 @@ safeProvider({
 - `tryAutoCheck()`：自动检测，见下方
 - `ngOnDestroy`：取消 `valueChanges` 订阅
 
-### 2.8 PIN 自动检测
+### 2.9 PIN 自动检测
 
 从输入达到 4 位开始，通过 `valueChanges` 订阅自动实时检测 PIN 是否正确。**注意：自动检测仅验证 PIN 码（`pinService.validatePin`），不检查主密码。**
 
@@ -268,7 +396,7 @@ private async tryAutoCheck(value: string) {
 | 阈值规则 | 只增不减，关闭弹窗再打开不重置，唯一回归方法是成功解锁 |
 | 并发保护 | `isAutoChecking` 标志 + `while` 循环确保阈值递增后立即重检 |
 
-### 2.9 PIN 与主密码区分
+### 2.10 PIN 与主密码区分
 
 | 输入长度 | 验证顺序 | 退让策略 | 失败计数 |
 |---------|---------|---------|---------|
@@ -281,7 +409,7 @@ private async tryAutoCheck(value: string) {
 3. 第二次优化：<12 字符仅验证 PIN（主密码不可能低于 12 位），>=12 字符优先验证主密码再验证 PIN
 4. 最终版本：<12 字符仅 PIN 且计入失败计数，>=12 字符主密码→PIN 且不计入失败计数
 
-### 2.10 退让策略 (Backoff)
+### 2.11 退让策略 (Backoff)
 
 仅对短 PIN（< 12 字符）生效，主密码不受退让约束。
 
@@ -317,9 +445,9 @@ private async tryAutoCheck(value: string) {
 | 退让外，PIN 错误 | "PIN 或密码错误，还剩 X 次尝试机会" |
 | 主密码错误 | "主密码错误"（不显示剩余次数） |
 
-### 2.11 UI 锁选项与行为说明
+### 2.12 UI 锁选项与行为说明
 
-当前 UI 锁超时设置支持下拉选项，默认选中**"从不"**。
+当前 UI 锁超时设置支持下拉选项，默认选中**"从不"。**
 
 | 选项 | 触发条件 | 效果说明 |
 |------|---------|---------|
@@ -508,7 +636,91 @@ UI 锁仅限制手动打开的扩展弹窗（popup），不影响浏览器自动
 **apps/browser/src/_locales/en/messages.json 和 zh_CN/messages.json:**
 - 添加所有翻译键（见翻译键列表），带 $VARIABLE$ 的键必须添加 placeholders 定义
 
-### 2.3 后台事件处理
+### 2.3 上锁/解锁逻辑
+
+#### 上锁流程
+
+所有上锁最终都调用 `uiLockService.lockNow(userId)`，执行以下原子操作：
+
+```
+lockNow(userId)
+  → chrome.storage.local.uiLockManuallyLocked = true
+  → chrome.storage.local.uiLockLastUnlockTime 删除
+```
+
+触发 `lockNow()` 的四种场景：
+
+1. **手动上锁**：用户点击设置页"立即上锁"按钮或 Vault 顶部"上锁界面"按钮。
+2. **系统锁定时**：`idle.background.ts` 监听到 `chrome.idle.onStateChanged === "locked"` 且用户选项为 `"onLocked"`。
+3. **浏览器重启时**：`runtime.background.ts` 的 `init()` 中对所有 `uiLockTimeout !== "never"` 的用户调用。
+4. **弹窗出现时**：`AppComponent` 构造函数设置内存标记 `popupOpenedForLockCheck`，`uiLockGuard` 对 `"onPopupOpen"` 选项检查到标记后调用。
+
+上锁后用户访问任何 popup 路由都会先进入 `uiLockGuard`，守卫检测到锁定后重定向到 `/ui-lock`。
+
+#### 守卫流程
+
+```
+uiLockGuard 执行
+  → 检查 uiLockSkipCheck，若为 true 则重置并放行（用于 lockNow 后导航）
+  → 获取当前活跃用户 userId
+  → 若 uiLockTimeout === "onPopupOpen" 且 consumePopupOpenedForLockCheck() 返回 true
+       → 调用 lockNow(userId)
+       → 重定向到 /ui-lock
+  → 调用 isUiLocked(userId)
+       → true：重定向到 /ui-lock
+       → false：调用 setLastUnlockTime(userId) 重置计时器，放行
+```
+
+#### 解锁流程
+
+在 `/ui-lock` 页面，用户输入 PIN 或主密码后触发 `submit()`：
+
+```
+submit(value)
+  → 检查 backoffUntil：若仍在退让期内，直接显示剩余秒数错误
+  → 判断输入长度
+       ├── < 12 字符：只验证 PIN（pinService.validatePin）
+       │             失败：failedAttempts +1，可能触发退让
+       │             成功：进入 unlock 成功处理
+       └── >= 12 字符：先验证主密码（userVerificationService.verifyUser）
+                      主密码失败：再尝试 PIN
+                      任一成功：进入 unlock 成功处理
+                       都失败：显示主密码错误（不计入失败次数、不退让）
+
+unlock 成功处理
+  → resetFailedAttempts()    // failedAttempts=0, backoffUntil=null
+  → clearManualLock()        // uiLockManuallyLocked=false
+  → setLastUnlockTime()      // lastUnlockTime=Date.now()
+  → 导航到 /tabs/vault
+```
+
+#### 自动检测流程
+
+`ui-lock.component.ts` 订阅输入框 `valueChanges`：
+
+```
+输入长度 >= autoCheckThreshold（初始 4，存储键 uiLockAutoCheckThreshold）
+  → tryAutoCheck(value)
+       → while 循环调用 pinService.validatePin(value)
+            成功：
+              - autoCheckThreshold = 4
+              - failedAttempts = 0
+              - backoffUntil = null
+              - clearManualLock()
+              - setLastUnlockTime()
+              - 导航到 /tabs/vault
+            失败：
+              - autoCheckThreshold +1
+              - 持久化到 chrome.storage.local
+              - 不显示错误，不计入 failedAttempts
+```
+
+#### 浏览器重启与系统锁定
+
+- **浏览器重启**：扩展启动时遍历所有用户，只要 `uiLockTimeout !== "never"` 就调用 `lockNow()`。因此选择数字超时、`onLocked`、`onRestart` 中的任意一项，重启后打开弹窗都需要解锁；选择 `"从不"` 则保持重启前状态。
+- **系统锁定**：操作系统进入锁屏时，对所有 `"onLocked"` 用户调用 `lockNow()`。
+
+### 2.4 后台事件处理
 
 **浏览器重启时上锁：**
 - 在 runtime.background.ts 的 init() 中，扩展启动后遍历所有用户
@@ -524,12 +736,12 @@ UI 锁仅限制手动打开的扩展弹窗（popup），不影响浏览器自动
 - uiLockGuard 检查到 "onPopupOpen" 且标记存在时调用 lockNow() 并重定向到 /ui-lock
 - 不同浏览器窗口的弹窗各自独立触发
 
-### 2.4 影响范围
+### 2.5 影响范围
 
 - UI 锁只限制手动打开的扩展弹窗（popup）
 - 不影响自动填充内联菜单、保存/更新密码通知栏、右键菜单自动填充、后台自动填充、FIDO2/WebAuthn 等服务
 
-### 2.5 编译验证
+### 2.6 编译验证
 - 运行 npx nx serve browser --configuration=edge-dev
 - 确保 TypeScript 使用枚举值（VerificationType.MasterPassword）而非字符串字面量
 - 确保所有 i18n 占位符已定义
