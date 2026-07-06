@@ -138,7 +138,7 @@ describe("BrowserExtensionInstallComponent", () => {
       const link = fixture.debugElement.query(By.css("a")).nativeElement;
 
       expect(link.getAttribute("href")).toBe(
-        "https://microsoftedge.microsoft.com/addons/detail/jbkfoedolllekgbhcbcoahefnbanhhlh",
+        "https://microsoftedge.microsoft.com/addons/detail/cjdgpclnagfkbpbplgaikfbgjdoohmle", //更改bitwarden的edge扩展地址为vaultwarden地址
       );
     });
   });

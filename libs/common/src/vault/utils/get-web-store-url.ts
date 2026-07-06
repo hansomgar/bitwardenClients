@@ -15,7 +15,7 @@ export const getWebStoreUrl = (deviceType: DeviceType): string => {
     case DeviceType.OperaBrowser:
       return "https://addons.opera.com/extensions/details/bitwarden-free-password-manager/";
     case DeviceType.EdgeBrowser:
-      return "https://microsoftedge.microsoft.com/addons/detail/jbkfoedolllekgbhcbcoahefnbanhhlh";
+      return "https://microsoftedge.microsoft.com/addons/detail/cjdgpclnagfkbpbplgaikfbgjdoohmle"; //更改bitwarden的edge扩展地址为vaultwarden地址
     default:
       return "https://bitwarden.com/download/#downloads-web-browser";
   }

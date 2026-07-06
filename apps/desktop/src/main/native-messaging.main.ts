@@ -436,7 +436,7 @@ export class NativeMessagingMain {
       // Chrome beta extension
       "chrome-extension://hccnnhgbibccigepcmlgppchkpfdophk/",
       // Edge extension
-      "chrome-extension://jbkfoedolllekgbhcbcoahefnbanhhlh/",
+      "chrome-extension://cjdgpclnagfkbpbplgaikfbgjdoohmle/", //更改bitwarden的edge扩展地址为vaultwarden地址
       // Opera extension
       "chrome-extension://ccnckbpmaceehanjmeomladnmlffdjgn/",
     ]);

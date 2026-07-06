@@ -22,7 +22,7 @@ const WebStoreUrls: Partial<Record<DeviceType, string>> = {
   [DeviceType.OperaBrowser]:
     "https://addons.opera.com/extensions/details/bitwarden-free-password-manager/",
   [DeviceType.EdgeBrowser]:
-    "https://microsoftedge.microsoft.com/addons/detail/jbkfoedolllekgbhcbcoahefnbanhhlh",
+    "https://microsoftedge.microsoft.com/addons/detail/cjdgpclnagfkbpbplgaikfbgjdoohmle", //更改bitwarden的edge扩展地址为vaultwarden地址
 };
 
 // FIXME(https://bitwarden.atlassian.net/browse/CL-764): Migrate to OnPush

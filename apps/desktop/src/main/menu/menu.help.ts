@@ -219,7 +219,7 @@ export class HelpMenu implements IMenubarMenu {
         click: () =>
           this.shell.openExternal(
             "https://microsoftedge.microsoft.com/addons/" +
-              "detail/jbkfoedolllekgbhcbcoahefnbanhhlh",
+              "detail/cjdgpclnagfkbpbplgaikfbgjdoohmle", //更改bitwarden的edge扩展地址为vaultwarden地址
             UrlType.WebUrl,
           ),
       },

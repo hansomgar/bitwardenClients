@@ -178,7 +178,7 @@ export class VaultOnboardingComponent implements OnInit, OnDestroy {
       );
     } else if (this.platformUtilsService.isEdge()) {
       this.extensionUrl.set(
-        "https://microsoftedge.microsoft.com/addons/detail/jbkfoedolllekgbhcbcoahefnbanhhlh",
+        "https://microsoftedge.microsoft.com/addons/detail/cjdgpclnagfkbpbplgaikfbgjdoohmle", //更改bitwarden的edge扩展地址为vaultwarden地址
       );
     } else {
       this.extensionUrl.set("https://bitwarden.com/download/#downloads-web-browser");
