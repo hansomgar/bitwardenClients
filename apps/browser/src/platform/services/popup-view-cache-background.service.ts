@@ -15,7 +15,7 @@ import {
 import { BrowserApi } from "../browser/browser-api";
 import { fromChromeEvent } from "../browser/from-chrome-event";
 
-const popupClosedPortName = "new_popup";
+export const popupClosedPortName = "new_popup";
 
 export type ViewCacheOptions = {
   /**

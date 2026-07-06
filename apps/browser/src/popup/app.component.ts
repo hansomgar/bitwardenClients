@@ -79,7 +79,6 @@ export class AppComponent implements OnInit, OnDestroy {
   private routerAnimations = false;
   private processingPendingAuthRequests = false;
   private shouldRerunAuthRequestProcessing = false;
-  private uiLockPopupPort: chrome.runtime.Port | null = null;
 
   private destroy$ = new Subject<void>();
 
@@ -124,11 +123,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     initPopupClosedListener();
-
-    // Open a long-lived connection so the background can detect when this popup closes.
-    if (chrome.runtime?.connect) {
-      this.uiLockPopupPort = chrome.runtime.connect({ name: "uiLockPopup" });
-    }
 
     this.compactModeService.init();
     await this.popupSizeService.setHeight();

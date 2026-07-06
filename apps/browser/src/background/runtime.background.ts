@@ -31,6 +31,7 @@ import { AutofillService } from "../autofill/services/abstractions/autofill.serv
 import { FORCE_TARGETING_RULES_UPDATE_COMMAND } from "../autofill/services/targeting-rules-data.service";
 import { BrowserApi } from "../platform/browser/browser-api";
 import { BrowserEnvironmentService } from "../platform/services/browser-environment.service";
+import { popupClosedPortName } from "../platform/services/popup-view-cache-background.service";
 import BrowserInitialInstallService from "../platform/services/browser-initial-install.service";
 import { BrowserPlatformUtilsService } from "../platform/services/platform-utils/browser-platform-utils.service";
 
@@ -127,9 +128,10 @@ export default class RuntimeBackground {
 
     // Listen for popup lifetime so we can lock the UI when the popup closes
     // if the user has selected the "every time" UI lock option.
+    // This reuses the existing popup-closed port opened by initPopupClosedListener().
     if (chrome.runtime?.onConnect) {
       chrome.runtime.onConnect.addListener((port) => {
-        if (port.name === "uiLockPopup") {
+        if (port.name === popupClosedPortName) {
           port.onDisconnect.addListener(() => {
             void this.lockUiOnPopupCloseIfNeeded();
           });
