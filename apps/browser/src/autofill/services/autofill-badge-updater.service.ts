@@ -62,6 +62,6 @@ export class AutofillBadgeUpdaterService {
       return undefined;
     }
 
-    return cipherCount > 9 ? "9+" : cipherCount.toString();
+    return cipherCount > 99 ? "99+" : cipherCount.toString();
   }
 }
