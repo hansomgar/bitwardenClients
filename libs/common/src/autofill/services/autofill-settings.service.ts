@@ -128,7 +128,7 @@ const VAULT_LIST_DISPLAY_COUNT = new UserKeyDefinition(
   AUTOFILL_SETTINGS_DISK,
   "vaultListDisplayCount",
   {
-    deserializer: (value: number) => value ?? 3,
+    deserializer: (value: number) => value ?? 5,
     clearOn: [],
   },
 );
@@ -297,7 +297,7 @@ export class AutofillSettingsService implements AutofillSettingsServiceAbstracti
     this.disableHttpWarning$ = this.disableHttpWarningState.state$.pipe(map((x) => x ?? false));
 
     this.vaultListDisplayCountState = this.stateProvider.getActive(VAULT_LIST_DISPLAY_COUNT);
-    this.vaultListDisplayCount$ = this.vaultListDisplayCountState.state$.pipe(map((x) => x ?? 3));
+    this.vaultListDisplayCount$ = this.vaultListDisplayCountState.state$.pipe(map((x) => x ?? 5));
 
     // Observable that determines if notification should be shown
     // Shows notification if:
