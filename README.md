@@ -478,6 +478,42 @@ private async tryAutoCheck(value: string) {
 - 确保 TypeScript 使用枚举值（VerificationType.MasterPassword）而非字符串字面量
 - 确保所有 i18n 占位符已定义
 - 注意 Nx 缓存可能导致旧代码编译，必要时重启 dev server
+
+## 3. 密码库顶部菜单添加锁定按钮
+
+### 3.1 在 vault.component.html 中添加按钮
+- 在密码库顶部导航栏中，密码库标题右侧添加两个 bitIconButton 按钮
+- 第一个按钮：icon="bwi-lock"，title 使用 i18n key "lockSession"，click 触发 lockSession()
+- 第二个按钮：icon="bwi-eye-slash"，title 使用 i18n key "lockUi"，click 触发 lockUi()
+
+### 3.2 在 vault.component.ts 中添加方法
+- 注入 LockService, AccountService, UiLockServiceAbstraction
+- 新增 lockSession() 方法：获取 activeAccount userId，调用 lockService.lock(userId)
+- 新增 lockUi() 方法：调用 uiLockService.lockNow()，设置 skipCheck(true)，导航到 /ui-lock，500ms 后关闭弹窗
+
+### 3.3 添加翻译键
+- 在 messages.json（en 和 zh_CN）中添加 lockSession 和 lockUi 的翻译
+
+## 4. UI 锁界面添加会话锁定按钮
+
+### 4.1 修改 extension-anon-layout-wrapper.component.html
+- 在 VaultwardenLogo 右侧添加 bitIconButton 按钮
+- 使用 *ngIf="showLockSessionButton" 控制显示
+- icon="bwi-lock"，title 使用 i18n key "lockSession"，click 触发 lockSession()
+
+### 4.2 修改 extension-anon-layout-wrapper.component.ts
+- 注入 LockService, AccountService
+- 新增 showLockSessionButton 字段（默认 false）
+- 新增 lockSession() 方法：获取 activeAccount userId，调用 lockService.lock(userId)
+- 在 ExtensionAnonLayoutWrapperData 接口中添加 showLockSessionButton 可选属性
+- 在 setAnonLayoutWrapperDataFromRouteData 和 handleExtensionAnonLayoutWrapperDataServiceUpdate 中读取该字段
+
+### 4.3 修改 extension-anon-layout-defaults.ts
+- 在 EXTENSION_ANON_LAYOUT_DEFAULTS 中添加 showLockSessionButton: false
+
+### 4.4 修改 app-routing.module.ts
+- 在 /ui-lock 路由的 data 中设置 showLockSessionButton: true
+
 ```
 
 ---
@@ -557,20 +593,31 @@ get riskIconColor(): string {
 
 ---
 
-## 八、UI 锁计时策略优化
+## 八、密码库顶部菜单添加锁定按钮
 
-### 8.1 功能概述
+在浏览器插件主界面（密码库）的顶部导航栏中添加了两个锁定按钮：
+
+- **上锁会话**：立即锁定整个用户会话，需要重新输入主密码
+- **上锁界面**：立即锁定当前界面，用户在设置的时间内打开弹窗只需验证指纹/面容或PIN码
+
+## 九、UI 锁计时策略优化
+
+### 9.1 功能概述
 将 UI 锁的计时起点从"解锁那一刻"改为"用户最后一次在弹窗中操作"，每次用户打开弹窗或切换标签页时自动重置计时器。
 
-### 8.2 修改文件
+### 9.2 修改文件
 
 | 文件 | 改动 |
 |------|------|
 | `apps/browser/src/popup/ui-lock/ui-lock.guard.ts` | 守卫检查通过后调用 `setLastUnlockTime(userId)` 重置计时器 |
 
-### 8.3 计时逻辑
+### 9.3 计时逻辑
 ```
 用户解锁 → 操作弹窗 → 每次打开/切换标签页时计时器自动重置
 用户关闭弹窗 → 计时器从最后一次操作开始倒计时
 用户在超时前再次打开弹窗 → 计时器重新归零
 ```
+
+## 十、UI 锁界面添加会话锁定按钮
+
+在界面锁定（UI Lock）页面的顶部导航栏中添加了"上锁会话"按钮，用户在界面锁定状态下可以直接点击该按钮立即锁定整个会话。
