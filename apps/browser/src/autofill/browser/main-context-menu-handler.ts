@@ -45,7 +45,7 @@ export class MainContextMenuHandler {
     return [
       {
         id: ROOT_ID,
-        title: "Bitwarden",
+        title: "Vaultwarden",
       },
       {
         id: AUTOFILL_ID,

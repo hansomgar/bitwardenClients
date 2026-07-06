@@ -24,7 +24,7 @@ const RateUrls = {
   [DeviceType.OperaExtension]:
     "https://addons.opera.com/en/extensions/details/bitwarden-free-password-manager/#feedback-container",
   [DeviceType.EdgeExtension]:
-    "https://microsoftedge.microsoft.com/addons/detail/jbkfoedolllekgbhcbcoahefnbanhhlh",
+    "https://microsoftedge.microsoft.com/addons/detail/cjdgpclnagfkbpbplgaikfbgjdoohmle",
   [DeviceType.VivaldiExtension]:
     "https://chromewebstore.google.com/detail/bitwarden-free-password-m/nngceckbapebfimnlniiiahkandclblb/reviews",
   [DeviceType.SafariExtension]: "https://apps.apple.com/app/bitwarden/id1352778147",

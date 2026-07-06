@@ -1,16 +1,16 @@
-{
+﻿{
   "appName": {
-    "message": "Bitwarden"
+    "message": "Vaultwarden"
   },
   "appLogoLabel": {
-    "message": "Bitwarden logo"
+    "message": "Vaultwarden logo"
   },
   "extName": {
-    "message": "Bitwarden Password Manager",
+    "message": "Vaultwarden Password Manager",
     "description": "Extension name, MUST be less than 40 characters (Safari restriction)"
   },
   "extDesc": {
-    "message": "无论是在家中、工作中还是在旅途中，Bitwarden 都可以轻松地保护您的所有密码、通行密钥和敏感信息。",
+    "message": "无论是在家中、工作中还是在旅途中，Vaultwarden 都可以轻松地保护您的所有密码、通行密钥和敏感信息。",
     "description": "Extension description, MUST be less than 112 characters (Safari restriction)"
   },
   "loginOrCreateNewAccount": {
@@ -23,7 +23,7 @@
     "message": "创建账户"
   },
   "newToBitwarden": {
-    "message": "Bitwarden 新手吗？"
+    "message": "Vaultwarden 新手吗？"
   },
   "logInWithPasskey": {
     "message": "使用通行密钥登录"

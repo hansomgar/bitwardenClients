@@ -2,11 +2,11 @@
   "manifest_version": 3,
   "minimum_chrome_version": "102.0",
   "name": "__MSG_extName__",
-  "short_name": "Bitwarden",
+  "short_name": "Vaultwarden",
   "version": "2026.6.1",
   "description": "__MSG_extDesc__",
   "default_locale": "en",
-  "author": "Bitwarden Inc.",
+  "author": "Vaultwarden",
   "homepage_url": "https://bitwarden.com",
   "icons": {
     "16": "images/icon16.png",
@@ -43,7 +43,7 @@
       "19": "images/icon19.png",
       "38": "images/icon38.png"
     },
-    "default_title": "Bitwarden",
+    "default_title": "Vaultwarden",
     "default_popup": "popup/index.html"
   },
   "permissions": [
@@ -179,7 +179,7 @@
     }
   },
   "__firefox__sidebar_action": {
-    "default_title": "Bitwarden",
+    "default_title": "Vaultwarden",
     "default_panel": "popup/index.html?uilocation=sidebar",
     "default_icon": "images/icon19.png",
     "open_at_install": false
@@ -189,7 +189,7 @@
   },
   "__firefox__storage": null,
   "__opera__sidebar_action": {
-    "default_title": "Bitwarden",
+    "default_title": "Vaultwarden",
     "default_panel": "popup/index.html?uilocation=sidebar",
     "default_icon": "images/icon19.png",
     "open_at_install": false,

@@ -102,7 +102,7 @@ export const mockTasks = [
 ];
 
 export const mockI18n = {
-  appName: "Bitwarden",
+  appName: "Vaultwarden",
   atRiskPassword: "At-risk password",
   atRiskNavigatePromptV2:
     "Your password for this site is at-risk. $ORGANIZATION$ has requested that you navigate to your account settings and change it.",

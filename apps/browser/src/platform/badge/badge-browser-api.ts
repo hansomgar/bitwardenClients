@@ -231,7 +231,7 @@ export class DefaultBadgeBrowserApi implements BadgeBrowserApi {
       this.sidebarAction.setBadgeText({ text, tabId });
     } else if (this.sidebarAction) {
       // Firefox
-      const title = `Bitwarden${Utils.isNullOrEmpty(text) ? "" : ` [${text}]`}`;
+      const title = `Vaultwarden${Utils.isNullOrEmpty(text) ? "" : ` [${text}]`}`;
       await this.sidebarAction.setTitle({ title, tabId });
     }
   }
