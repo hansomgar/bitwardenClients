@@ -29,7 +29,7 @@ const VaultwardenLogo = svg`
    <!-- ault 改为真实文本显示 -->
   <text x="132" y="48" fill="#08a647" font-size="56" font-weight="bold" font-style="italic" style="font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;">ault</text>
    <!-- warden 改为真实文本显示 -->
-  <text x="240" y="48" fill="#08a647" font-size="56" style="font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;">warden</text>
+  <text x="236" y="48" fill="#08a647" font-size="52" style="font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;">warden</text>
 </svg>`;
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import {
