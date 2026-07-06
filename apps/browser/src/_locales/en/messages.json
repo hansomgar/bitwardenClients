@@ -317,13 +317,13 @@
     "message": "Continue to web app?"
   },
   "continueToWebAppDesc": {
-    "message": "Explore more features of your Bitwarden account on the web app."
+    "message": "Explore more features of your Vaultwarden account on the web app."
   },
   "continueToHelpCenter": {
     "message": "Continue to Help Center?"
   },
   "continueToHelpCenterDesc": {
-    "message": "Learn more about how to use Bitwarden on the Help Center."
+    "message": "Learn more about how to use Vaultwarden on the Help Center."
   },
   "continueToBrowserExtensionStore": {
     "message": "Continue to browser extension store?"
@@ -349,7 +349,7 @@
     "message": "Log out"
   },
   "aboutBitwarden": {
-    "message": "About Bitwarden"
+    "message": "About Vaultwarden"
   },
   "about": {
     "message": "About"
@@ -448,7 +448,7 @@
     "message": "Help & feedback"
   },
   "helpCenter": {
-    "message": "Bitwarden Help center"
+    "message": "Vaultwarden Help center"
   },
   "communityForums": {
     "message": "Explore Bitwarden community forums"
@@ -476,7 +476,7 @@
     "message": "Automatically generate strong, unique passwords for your logins."
   },
   "bitWebVaultApp": {
-    "message": "Bitwarden web app"
+    "message": "Vaultwarden web app"
   },
   "select": {
     "message": "Select"

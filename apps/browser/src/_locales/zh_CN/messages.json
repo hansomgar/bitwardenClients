@@ -1,4 +1,4 @@
-﻿{
+{
   "appName": {
     "message": "Vaultwarden"
   },
@@ -317,13 +317,13 @@
     "message": "前往网页 App 吗？"
   },
   "continueToWebAppDesc": {
-    "message": "在网页 App 上探索 Bitwarden 账户的更多功能。"
+    "message": "在网页 App 上探索 Vaultwarden 账户的更多功能。"
   },
   "continueToHelpCenter": {
     "message": "前往帮助中心吗？"
   },
   "continueToHelpCenterDesc": {
-    "message": "访问帮助中心进一步了解如何使用 Bitwarden。"
+    "message": "访问帮助中心进一步了解如何使用 Vaultwarden。"
   },
   "continueToBrowserExtensionStore": {
     "message": "前往浏览器扩展商店吗？"
@@ -349,7 +349,7 @@
     "message": "注销"
   },
   "aboutBitwarden": {
-    "message": "关于 Bitwarden"
+    "message": "关于 Vaultwarden"
   },
   "about": {
     "message": "关于"
@@ -448,7 +448,7 @@
     "message": "帮助与反馈"
   },
   "helpCenter": {
-    "message": "Bitwarden 帮助中心"
+    "message": "Vaultwarden 帮助中心"
   },
   "communityForums": {
     "message": "探索 Bitwarden 社区论坛"
@@ -476,7 +476,7 @@
     "message": "自动为您的登录生成强大且唯一的密码。"
   },
   "bitWebVaultApp": {
-    "message": "Bitwarden 网页 App"
+    "message": "Vaultwarden 网页 App"
   },
   "select": {
     "message": "选择"
