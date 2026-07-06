@@ -329,10 +329,10 @@
     "message": "Continue to browser extension store?"
   },
   "continueToBrowserExtensionStoreDesc": {
-    "message": "Help others find out if Bitwarden is right for them. Visit your browser's extension store and leave a rating now."
+    "message": "Help others find out if Vaultwarden is right for them. Visit your browser's extension store and leave a rating now."
   },
   "changeMasterPasswordOnWebConfirmation": {
-    "message": "You can change your master password on the Bitwarden web app."
+    "message": "You can change your master password on the Vaultwarden web app."
   },
   "fingerprintPhrase": {
     "message": "Fingerprint phrase",
@@ -1084,7 +1084,7 @@
     "message": "Two-step login makes your account more secure by requiring you to verify your login with another device such as a security key, authenticator app, SMS, phone call, or email. Two-step login can be set up on the bitwarden.com web vault. Do you want to visit the website now?"
   },
   "twoStepLoginConfirmationContent": {
-    "message": "Make your account more secure by setting up two-step login in the Bitwarden web app."
+    "message": "Make your account more secure by setting up two-step login in the Vaultwarden web app."
   },
   "twoStepLoginConfirmationTitle": {
     "message": "Continue to web app?"
@@ -1236,7 +1236,7 @@
     "message": "Jump to setting"
   },
   "notificationAddDesc": {
-    "message": "Should Bitwarden remember this password for you?"
+    "message": "Should Vaultwarden remember this password for you?"
   },
   "notificationAddSave": {
     "message": "Save"
@@ -1272,11 +1272,11 @@
     }
   },
   "notificationLoginSaveConfirmation": {
-    "message": "saved to Bitwarden.",
+    "message": "saved to Vaultwarden.",
     "description": "Shown to user after item is saved."
   },
   "notificationLoginUpdatedConfirmation": {
-    "message": "updated in Bitwarden.",
+    "message": "updated in Vaultwarden.",
     "description": "Shown to user after item is updated."
   },
   "selectItemAriaLabel": {
@@ -1374,13 +1374,13 @@
     "message": "Ask to save new passkeys or log in with passkeys stored in your vault. Applies to all logged in accounts."
   },
   "notificationChangeDesc": {
-    "message": "Do you want to update this password in Bitwarden?"
+    "message": "Do you want to update this password in Vaultwarden?"
   },
   "notificationChangeSave": {
     "message": "Update"
   },
   "notificationUnlockDesc": {
-    "message": "Unlock your Bitwarden vault to complete the autofill request."
+    "message": "Unlock your Vaultwarden vault to complete the autofill request."
   },
   "notificationUnlock": {
     "message": "Unlock"
@@ -1823,7 +1823,7 @@
     "message": "Self-hosted environment"
   },
   "selfHostedBaseUrlHint": {
-    "message": "Specify the base URL of your on-premises hosted Bitwarden installation. Example: https://bitwarden.company.com"
+    "message": "Specify the base URL of your on-premises hosted Vaultwarden installation. Example: https://bitwarden.company.com"
   },
   "selfHostedCustomEnvHeader": {
     "message": "For advanced configuration, you can specify the base URL of each service independently."
@@ -5001,7 +5001,7 @@
     "description": "Label indicating the most common import formats"
   },
   "uriMatchDefaultStrategyHint": {
-    "message": "URI match detection is how Bitwarden identifies autofill suggestions.",
+    "message": "URI match detection is how Vaultwarden identifies autofill suggestions.",
     "description": "Explains to the user that URI match detection determines how Bitwarden suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
   },
   "regExAdvancedOptionWarning": {
@@ -5045,23 +5045,23 @@
     "description": "Body content for dialog which asks if the user wants to proceed to the browser's keyboard shortcut settings page"
   },
   "overrideDefaultBrowserAutofillTitle": {
-    "message": "Make Bitwarden your default password manager?",
+    "message": "Make Vaultwarden your default password manager?",
     "description": "Dialog title facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutofillDescription": {
-    "message": "Ignoring this option may cause conflicts between Bitwarden autofill suggestions and your browser's.",
+    "message": "Ignoring this option may cause conflicts between Vaultwarden autofill suggestions and your browser's.",
     "description": "Dialog message facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutoFillSettings": {
-    "message": "Make Bitwarden your default password manager",
+    "message": "Make Vaultwarden your default password manager",
     "description": "Label for the setting that allows overriding the default browser autofill settings"
   },
   "privacyPermissionAdditionNotGrantedTitle": {
-    "message": "Unable to set Bitwarden as the default password manager",
+    "message": "Unable to set Vaultwarden as the default password manager",
     "description": "Title for the dialog that appears when the user has not granted the extension permission to set privacy settings"
   },
   "privacyPermissionAdditionNotGrantedDescription": {
-    "message": "You must grant browser privacy permissions to Bitwarden to set it as the default password manager.",
+    "message": "You must grant browser privacy permissions to Vaultwarden to set it as the default password manager.",
     "description": "Description for the dialog that appears when the user has not granted the extension permission to set privacy settings"
   },
   "makeDefault": {
@@ -6305,7 +6305,7 @@
     "message": "About this setting"
   },
   "permitCipherDetailsDescription": {
-    "message": "Bitwarden will use saved login URIs to identify which icon or change password URL should be used to improve your experience. No information is collected or saved when you use this service."
+    "message": "Vaultwarden will use saved login URIs to identify which icon or change password URL should be used to improve your experience. No information is collected or saved when you use this service."
   },
   "noPermissionsViewPage": {
     "message": "You do not have permissions to view this page. Try logging in with a different account."
@@ -6578,7 +6578,7 @@
     "message": "user@bitwarden.com, user@acme.com"
   },
   "downloadBitwardenApps": {
-    "message": "Download Bitwarden apps"
+    "message": "Download Vaultwarden/Bitwarden apps"
   },
   "emailProtected": {
     "message": "Email protected"

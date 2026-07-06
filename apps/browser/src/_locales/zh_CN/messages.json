@@ -329,10 +329,10 @@
     "message": "前往浏览器扩展商店吗？"
   },
   "continueToBrowserExtensionStoreDesc": {
-    "message": "帮助他人了解 Bitwarden 是否适合他们。立即访问浏览器扩展商店并留下评分。"
+    "message": "帮助他人了解 Vaultwarden 是否适合他们。立即访问浏览器扩展商店并留下评分。"
   },
   "changeMasterPasswordOnWebConfirmation": {
-    "message": "您可以在 Bitwarden 网页 App 上更改您的主密码。"
+    "message": "您可以在 Vaultwarden 网页 App 上更改您的主密码。"
   },
   "fingerprintPhrase": {
     "message": "指纹短语",
@@ -1084,7 +1084,7 @@
     "message": "两步登录要求您从其他设备（例如安全密钥、验证器 App、短信、电话或者电子邮件）来验证您的登录，这能使您的账户更加安全。两步登录需要在 bitwarden.com 网页密码库中设置。现在要访问此网站吗？"
   },
   "twoStepLoginConfirmationContent": {
-    "message": "在 Bitwarden 网页 App 中设置两步登录，让您的账户更加安全。"
+    "message": "在 Vaultwarden 网页 App 中设置两步登录，让您的账户更加安全。"
   },
   "twoStepLoginConfirmationTitle": {
     "message": "前往网页 App 吗？"
@@ -1236,7 +1236,7 @@
     "message": "跳转到设置"
   },
   "notificationAddDesc": {
-    "message": "希望 Bitwarden 为您保存这个密码吗？"
+    "message": "希望 Vaultwarden 为您保存这个密码吗？"
   },
   "notificationAddSave": {
     "message": "保存"
@@ -1272,11 +1272,11 @@
     }
   },
   "notificationLoginSaveConfirmation": {
-    "message": "已保存到 Bitwarden。",
+    "message": "已保存到 Vaultwarden。",
     "description": "Shown to user after item is saved."
   },
   "notificationLoginUpdatedConfirmation": {
-    "message": "已在 Bitwarden 中更新。",
+    "message": "已在 Vaultwarden 中更新。",
     "description": "Shown to user after item is updated."
   },
   "selectItemAriaLabel": {
@@ -1374,13 +1374,13 @@
     "message": "询问保存新的通行密钥或使用存储在密码库中的通行密钥登录。适用于所有已登录的账户。"
   },
   "notificationChangeDesc": {
-    "message": "要在 Bitwarden 中更新此密码吗？"
+    "message": "要在 Vaultwarden 中更新此密码吗？"
   },
   "notificationChangeSave": {
     "message": "更新"
   },
   "notificationUnlockDesc": {
-    "message": "解锁 Bitwarden 密码库以完成自动填充请求。"
+    "message": "解锁 Vaultwarden 密码库以完成自动填充请求。"
   },
   "notificationUnlock": {
     "message": "解锁​​​​"
@@ -1823,7 +1823,7 @@
     "message": "自托管环境"
   },
   "selfHostedBaseUrlHint": {
-    "message": "指定您的本地托管 Bitwarden 安装的基础 URL。例如：https://bitwarden.company.com"
+    "message": "指定您的本地托管 Vaultwarden 安装的基础 URL。例如：https://bitwarden.company.com"
   },
   "selfHostedCustomEnvHeader": {
     "message": "对于高级配置，您可以单独指定每个服务的基础 URL。"
@@ -4992,7 +4992,7 @@
     "description": "Label indicating the most common import formats"
   },
   "uriMatchDefaultStrategyHint": {
-    "message": "Bitwarden 根据 URI 匹配检测来识别自动填充建议。",
+    "message": "Vaultwarden 根据 URI 匹配检测来识别自动填充建议。",
     "description": "Explains to the user that URI match detection determines how Bitwarden suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
   },
   "regExAdvancedOptionWarning": {
@@ -5036,23 +5036,23 @@
     "description": "Body content for dialog which asks if the user wants to proceed to the browser's keyboard shortcut settings page"
   },
   "overrideDefaultBrowserAutofillTitle": {
-    "message": "将 Bitwarden 设置为默认密码管理器吗？",
+    "message": "将 Vaultwarden 设置为默认密码管理器吗？",
     "description": "Dialog title facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutofillDescription": {
-    "message": "忽略此选项可能会导致 Bitwarden 自动填充建议与浏览器产生冲突。",
+    "message": "忽略此选项可能会导致 Vaultwarden 自动填充建议与浏览器产生冲突。",
     "description": "Dialog message facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutoFillSettings": {
-    "message": "将 Bitwarden 设置为默认密码管理器",
+    "message": "将 Vaultwarden 设置为默认密码管理器",
     "description": "Label for the setting that allows overriding the default browser autofill settings"
   },
   "privacyPermissionAdditionNotGrantedTitle": {
-    "message": "无法将 Bitwarden 设置为默认密码管理器",
+    "message": "无法将 Vaultwarden 设置为默认密码管理器",
     "description": "Title for the dialog that appears when the user has not granted the extension permission to set privacy settings"
   },
   "privacyPermissionAdditionNotGrantedDescription": {
-    "message": "您必须授予 Bitwarden 浏览器隐私权限才能将其设置为默认密码管理器。",
+    "message": "您必须授予 Vaultwarden 浏览器隐私权限才能将其设置为默认密码管理器。",
     "description": "Description for the dialog that appears when the user has not granted the extension permission to set privacy settings"
   },
   "makeDefault": {
@@ -6296,7 +6296,7 @@
     "message": "关于此设置"
   },
   "permitCipherDetailsDescription": {
-    "message": "Bitwarden 将使用已保存的登录 URI 来确定应使用的图标或更改密码的 URL，以提升您的使用体验。使用此服务时不会收集或保存任何信息。"
+    "message": "Vaultwarden 将使用已保存的登录 URI 来确定应使用的图标或更改密码的 URL，以提升您的使用体验。使用此服务时不会收集或保存任何信息。"
   },
   "noPermissionsViewPage": {
     "message": "您没有查看此页面的权限。请尝试使用其他账户登录。"
@@ -6569,7 +6569,7 @@
     "message": "user@bitwarden.com, user@acme.com"
   },
   "downloadBitwardenApps": {
-    "message": "下载 Bitwarden App"
+    "message": "下载 Vaultwarden/Bitwarden App"
   },
   "emailProtected": {
     "message": "电子邮箱保护"
