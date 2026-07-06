@@ -20,5 +20,6 @@ export const EXTENSION_ANON_LAYOUT_DEFAULTS: Required<
   showAcctSwitcher: false,
   showBackButton: false,
   showLogo: true,
+  showLockSessionButton: false,
   hideFooter: false,
 };
