@@ -54,14 +54,14 @@ Security audits and feedback are welcome. Please open an issue or email us priva
 | `apps/browser/src/_locales/zh_CN/messages.json` | 添加中文翻译 |
 
 ### 1.2 自动填充列表显示数量配置
-在自动填充设置页添加了下拉框，允许用户选择自动填充列表显示数量（1-10，默认 3）。
+在自动填充设置页添加了下拉框，允许用户选择自动填充列表显示数量（1-10，默认 5）。
 
 **修改文件：**
 | 文件 | 改动 |
 |------|------|
 | `apps/browser/src/autofill/popup/settings/autofill.component.html` | 添加下拉框 UI |
 | `apps/browser/src/autofill/popup/settings/autofill.component.ts` | 绑定选择值 |
-| `libs/common/src/autofill/services/autofill-settings.service.ts` | 新增 `vaultListDisplayCount` 的 `UserKeyDefinition`（number，默认 3，范围 1-10） |
+| `libs/common/src/autofill/services/autofill-settings.service.ts` | 新增 `vaultListDisplayCount` 的 `UserKeyDefinition`（number，默认 5，范围 1-10） |
 | `apps/browser/src/autofill/background/overlay.background.ts` | 从后台传递到 iframe |
 | `apps/browser/src/autofill/overlay/inline-menu/iframe-content/autofill-inline-menu-list-iframe.ts` | 调整 iframe maxHeight 为 650px，接收并传递到列表组件 |
 | `apps/browser/src/autofill/overlay/inline-menu/pages/list/autofill-inline-menu-list.ts` | 替换硬编码 `showCiphersPerPage`，一次性加载全部 cipher |
@@ -88,9 +88,12 @@ Security audits and feedback are welcome. Please open an issue or email us priva
 ## 二、界面上锁 (UI Lock) 功能
 
 ### 2.1 功能概述
+
 类似于手机锁屏，在用户设定时间内未操作扩展弹窗后，自动锁定 UI 界面，需要输入 PIN 码或主密码才能解锁。仅影响弹窗 UI，不影响后台自动填充、密码保存、FIDO2/WebAuthn 等服务。
 
 **计时策略：** 锁定倒计时从用户最后一次在弹窗中操作开始计算（每次打开弹窗或切换标签页时自动重置计时器），而非从解锁那一刻开始。只要用户持续使用弹窗，就不会被锁定。
+
+**默认行为：** 默认选择"从不"，即不会自动上锁，只有用户手动点击"立即上锁"按钮才会锁定。
 
 ### 2.2 完整文件清单
 
@@ -98,7 +101,7 @@ Security audits and feedback are welcome. Please open an issue or email us priva
 
 | 文件 | 说明 |
 |------|------|
-| `libs/common/src/key-management/ui-lock/ui-lock.state.ts` | `UI_LOCK_TIMEOUT` 的 `UserKeyDefinition`（`UI_LOCK_SETTINGS_DISK`，默认 0 = 从不） |
+| `libs/common/src/key-management/ui-lock/ui-lock.state.ts` | `UI_LOCK_TIMEOUT` 的 `UserKeyDefinition<UiLockTimeout>`（`UI_LOCK_SETTINGS_DISK`，默认 "never" = 从不） |
 | `libs/common/src/key-management/ui-lock/ui-lock.service.ts` | 核心服务：抽象类 `UiLockServiceAbstraction` + 实现类 `UiLockService` |
 | `libs/common/src/key-management/ui-lock/index.ts` | Barrel export：导出 `UiLockServiceAbstraction`、`UiLockService`、`UI_LOCK_TIMEOUT` |
 | `apps/browser/src/popup/ui-lock/ui-lock.guard.ts` | 路由守卫：`uiLockGuard()` — `CanActivateFn` |
@@ -140,19 +143,20 @@ clearManualLock(userId)       → Promise<void>        // 清除手动上锁标�
 
 | 层级 | 存储介质 | 键 | 说明 |
 |------|---------|-----|------|
-| 设置层 | `StateProvider` (disk) | `uiLockTimeout` | 用户配置的超时分钟数，默认 0（从不） |
+| 设置层 | `StateProvider` (disk) | `uiLockTimeout` | 用户配置的超时选项，默认 "never"（从不） |
 | 运行时 | `chrome.storage.local` | `uiLockLastUnlockTime` | 最后解锁时间戳（ms） |
 | 运行时 | `chrome.storage.local` | `uiLockFailedAttempts` | 累计失败次数 |
 | 运行时 | `chrome.storage.local` | `uiLockBackoffUntil` | 退让截止时间戳（ms） |
 | 运行时 | `chrome.storage.local` | `uiLockSkipCheck` | 跳过本次 UI 锁检查 |
 | 运行时 | `chrome.storage.local` | `uiLockAutoCheckThreshold` | 自动检测最小字符数阈值，初始 4，失败递增，成功解锁后重置为 4 |
-| 运行时 | `chrome.storage.local` | `uiLockManuallyLocked` | 手动上锁标记，超时设为"从不"时区分首次加载和手动上锁 |
+| 运行时 | `chrome.storage.local` | `uiLockManuallyLocked` | 手动/事件上锁标记，任何超时选项下触发 lockNow() 都会设置 |
 
 **`lockNow` 实现：** 设置 `uiLockManuallyLocked = true`，同时清除 `uiLockLastUnlockTime`。
 
 **`isUiLocked` 实现：**
-- 当 `timeoutMinutes <= 0`（从不）时：检查 `uiLockManuallyLocked` 标记。若为 `true` 表示用户手动上锁，返回已锁定；否则返回未锁定。
-- 当 `timeoutMinutes > 0` 时：读取 `uiLockLastUnlockTime`，计算 `(Date.now() - lastUnlockTime) / 60000`，与 `timeoutMinutes` 比较。若 `lastUnlockTime` 不存在，直接返回 `true`。
+- 首先检查 `uiLockManuallyLocked` 标记。若为 `true` 表示手动/事件上锁，返回已锁定。
+- 当超时选项为数字时：读取 `uiLockLastUnlockTime`，计算 `(Date.now() - lastUnlockTime) / 60000`，与 `timeoutMinutes` 比较。若 `lastUnlockTime` 不存在，直接返回 `true`。
+- 当超时选项为字符串（`onPopupOpen`/`onLocked`/`onRestart`）时：由对应事件触发上锁，此处不基于时间判定，返回未锁定。
 
 **`unlock` 成功时：** 调用 `clearManualLock()` 清除 `uiLockManuallyLocked` 标记，确保解锁后不再被锁定。
 
@@ -211,9 +215,9 @@ safeProvider({
 **文件：** `apps/browser/src/auth/popup/settings/account-security.component.ts`
 
 - 注入 `UiLockServiceAbstraction`
-- 表单新增 `uiLockTimeout` 控件（默认 5）
+- 表单新增 `uiLockTimeout` 控件（默认"从不"）
 - `uiLockTimeoutOptions` 使用 `this.i18nService.t("minutes")` 和 `this.i18nService.t("hours")` 显示单位
-- 选项：1/5/10/30 分钟，1/2/4/8/12/24 小时，永不（值 0）
+- 选项：弹窗出现时、1/5/10/30 分钟、1/2/4/8/12/24 小时、系统锁定时、浏览器重启时、从不
 - 设置超时后立即调用 `setLastUnlockTime()` 初始化计时器
 - `lockNow()` 方法：调用 `uiLockService.lockNow()` → `setSkipCheck(true)` → 导航到 `/ui-lock` → `setTimeout(() => window.close(), 500)`
 
@@ -313,6 +317,25 @@ private async tryAutoCheck(value: string) {
 | 退让外，PIN 错误 | "PIN 或密码错误，还剩 X 次尝试机会" |
 | 主密码错误 | "主密码错误"（不显示剩余次数） |
 
+### 2.11 UI 锁选项与行为说明
+
+当前 UI 锁超时设置支持下拉选项，默认选中**"从不"**。
+
+| 选项 | 触发条件 | 效果说明 |
+|------|---------|---------|
+| **弹窗出现时** | 每次新的扩展弹窗被打开 | 新弹窗打开时立即锁定，解锁后当前弹窗内可继续操作；不同浏览器窗口的弹窗各自独立，都需要解锁 |
+| **1 分钟 ~ 24 小时** | 距离最后一次通过守卫检查超过设定时间 | 持续使用弹窗时不会锁定；关闭弹窗后超过设定时间再打开会锁定 |
+| **系统锁定时** | 操作系统进入锁屏/屏保 | 系统锁屏后立即锁定 UI |
+| **浏览器重启时** | 扩展初始化/浏览器重启 | 只要选择非"从不"，重启后首次打开弹窗都会锁定，不论之前是否已超时 |
+| **从不** | 不自动触发 | 不会自动锁定；但如果用户手动点了"立即上锁"，锁定状态会持久化，重启后依然锁定 |
+
+**浏览器重启行为：**
+- 选择非"从不"时，扩展启动会自动锁定 UI，因此重启后打开弹窗一定需要解锁。
+- 选择"从不"时，重启后保持重启前的锁定状态：如果之前手动上锁了，重启后仍锁定；否则保持解锁。
+
+**影响范围：**
+UI 锁仅限制手动打开的扩展弹窗（popup），不影响浏览器自动调出的流程，例如自动填充内联菜单、保存/更新密码通知栏、右键菜单自动填充、后台自动填充服务等。
+
 ---
 
 ## 三、翻译键完整列表
@@ -336,6 +359,10 @@ private async tryAutoCheck(value: string) {
 | `uiLockInvalidPinOrPassword` | Invalid PIN or password. $REMAINING$ attempts remaining. | PIN 或密码错误，还剩 $REMAINING$ 次尝试机会 |
 | `uiLockInvalidMasterPassword` | Invalid master password | 主密码错误 |
 | `uiLockBackoffMessage` | Too many failed attempts. Please wait $SECONDS$ seconds. | 失败次数过多，请等待 $SECONDS$ 秒后再试 |
+| `onPopupOpen` | On popup open | 弹窗出现时 |
+| `onLocked` | On system lock | 系统锁定时 |
+| `onRestart` | On browser restart | 浏览器重启时 |
+| `never` | Never | 从不 |
 
 ### 风险密码提示
 
@@ -361,7 +388,7 @@ private async tryAutoCheck(value: string) {
 | 自动解锁成功后计数未清零 | `tryAutoCheck` 成功时未重置 `failedAttempts` 和 `backoffUntil` | 成功时同时调用 `resetFailedAttempts` |
 | Nx 缓存导致旧代码编译 | Nx 增量编译缓存了旧版本文件 | 重启 dev server 或修改文件触发重编译 |
 | UI 锁计时从解锁开始算，而非从操作结束开始 | `setLastUnlockTime` 仅在解锁时调用 | 守卫检查通过时也调用 `setLastUnlockTime`，每次打开弹窗重置计时器 |
-| 超时设为"从不"时手动上锁无效 | `isUiLocked` 在 `timeoutMinutes<=0` 时直接返回 `false` | 新增 `uiLockManuallyLocked` 标记，`lockNow` 设置标记，`isUiLocked` 检查标记 |
+| 手动/事件上锁在某些超时选项下不生效 | `isUiLocked` 对字符串类型直接返回 `false` | 将 `uiLockManuallyLocked` 检查提前到最前面，任何超时选项下都优先判断 |
 | 密码页面顶部 callout 占用空间且信息重复 | 模板中 `missingWebsite` 和 `changeAtRiskPassword` 两个 callout | 删除两个 callout，风险提示保留在密码输入框下方 |
 
 ---
@@ -394,8 +421,8 @@ private async tryAutoCheck(value: string) {
 - 在 messages.json（en 和 zh_CN）中添加翻译
 
 ### 1.2 自动填充列表显示数量
-- 在 autofill.component.html 的"Additional Options"区域添加一个下拉框，标签用 i18n key "vaultListDisplayCount"，可选值 1-10，默认 3
-- 在 AutofillSettingsService 中新增 vaultListDisplayCount 的 UserKeyDefinition（number 类型，默认 3，范围 1-10）
+- 在 autofill.component.html 的"Additional Options"区域添加一个下拉框，标签用 i18n key "vaultListDisplayCount"，可选值 1-10，默认 5
+- 在 AutofillSettingsService 中新增 vaultListDisplayCount 的 UserKeyDefinition（number 类型，默认 5，范围 1-10）
 - 数据流：overlay.background.ts → autofill-inline-menu-list-iframe.ts → autofill-inline-menu-list.ts
 - 替换 autofill-inline-menu-list.ts 中的硬编码 showCiphersPerPage，一次性加载全部 cipher
 - 动态计算列表高度：每项 6.4rem，iframe 最大高度 650px（在 autofill-inline-menu-list-iframe.ts 中修改）
@@ -413,25 +440,33 @@ private async tryAutoCheck(value: string) {
 
 ### 2.1 新建文件
 
+**libs/common/src/key-management/ui-lock/ui-lock.types.ts:**
+- 定义 UiLockTimeout 联合类型：number | "onPopupOpen" | "onLocked" | "onRestart" | "never"
+- 定义 UiLockTimeoutStringType 常量对象
+- 实现 isUiLockTimeoutNumeric 类型守卫函数
+
 **libs/common/src/key-management/ui-lock/ui-lock.state.ts:**
-- 创建 UI_LOCK_TIMEOUT 的 UserKeyDefinition<number>，使用 UI_LOCK_SETTINGS_DISK，默认值 5，deserializer: (value) => value ?? 5
+- 创建 UI_LOCK_TIMEOUT 的 UserKeyDefinition<UiLockTimeout>，使用 UI_LOCK_SETTINGS_DISK，默认值为 "never"，deserializer: (value) => value ?? "never"
 
 **libs/common/src/key-management/ui-lock/ui-lock.service.ts:**
 - 创建抽象类 UiLockServiceAbstraction，定义接口：isUiLocked$, isUiLocked, unlock, setLastUnlockTime, getUiLockTimeout$, setUiLockTimeout, getFailedAttempts, getBackoffUntil, setSkipCheck, getSkipCheck, lockNow, clearManualLock
 - 创建实现类 UiLockService，构造函数注入 StateProvider, PinServiceAbstraction, UserVerificationService, AccountService
 - 使用 chrome.storage.local 存储运行时状态，键名：uiLockLastUnlockTime, uiLockFailedAttempts, uiLockBackoffUntil, uiLockSkipCheck, uiLockManuallyLocked
-- isUiLocked: 当 timeoutMinutes<=0 时检查 uiLockManuallyLocked 标记；否则读取 lastUnlockTime 计算时间差
+- isUiLocked: 首先检查 uiLockManuallyLocked 标记；对数字超时读取 lastUnlockTime 计算时间差；字符串类型（onPopupOpen/onLocked/onRestart）由事件/守卫触发
 - unlock: 区分 PIN（<12字符）和主密码（>=12字符），PIN 先验证 pinService.validatePin，主密码先验证 userVerificationService.verifyUser(VerificationType.MasterPassword)，失败后尝试 PIN；成功时调用 clearManualLock()
 - recordFailedAttempt: 仅 `<12` 字符计入，每 5 次触发退让，使用递增序列 [10,30,60,300,900,1800,3600,7200]，第9次起 ×2
 - lockNow: 设置 uiLockManuallyLocked=true，删除 uiLockLastUnlockTime
+- clearManualLock: 清除 uiLockManuallyLocked 标记
 
 **libs/common/src/key-management/ui-lock/index.ts:**
-- 导出 UiLockServiceAbstraction, UiLockService, UI_LOCK_TIMEOUT
+- 导出 UiLockServiceAbstraction, UiLockService, UI_LOCK_TIMEOUT, UiLockTimeout, UiLockTimeoutStringType, isUiLockTimeoutNumeric
 
 **apps/browser/src/popup/ui-lock/ui-lock.guard.ts:**
 - 实现 uiLockGuard() 返回 CanActivateFn
 - 检查 skipCheck，如果 true 则重置并放行
+- 对 "onPopupOpen" 选项检查内存标记 popupOpenedForLockCheck，若存在则调用 lockNow() 并重定向到 /ui-lock
 - 获取当前用户，调用 isUiLocked，如果锁定则重定向到 /ui-lock
+- 检查通过后调用 setLastUnlockTime() 重置计时器
 
 **apps/browser/src/popup/ui-lock/ui-lock.component.html:**
 - 纯内容布局，无 <popup-page> 和 <popup-header>
@@ -464,16 +499,37 @@ private async tryAutoCheck(value: string) {
 
 **apps/browser/src/auth/popup/settings/account-security.component.ts:**
 - 注入 UiLockServiceAbstraction
-- 表单新增 uiLockTimeout 控件（默认 5）
+- 表单新增 uiLockTimeout 控件（默认 "never"）
 - uiLockTimeoutOptions 使用 i18nService.t("minutes")/i18nService.t("hours") 显示单位
-- 选项值：1,5,10,30,60,120,240,480,720,1440,0
-- 设置超时后立即调用 setLastUnlockTime()
+- 选项值："onPopupOpen", 1,5,10,30,60,120,240,480,720,1440, "onLocked", "onRestart", "never"
+- 设置数字超时后立即调用 setLastUnlockTime()
 - lockNow(): lockNow() → setSkipCheck(true) → router.navigate(['/ui-lock']) → setTimeout(() => window.close(), 500)
 
 **apps/browser/src/_locales/en/messages.json 和 zh_CN/messages.json:**
 - 添加所有翻译键（见翻译键列表），带 $VARIABLE$ 的键必须添加 placeholders 定义
 
-### 2.3 编译验证
+### 2.3 后台事件处理
+
+**浏览器重启时上锁：**
+- 在 runtime.background.ts 的 init() 中，扩展启动后遍历所有用户
+- 对任何 uiLockTimeout !== "never" 的用户调用 lockNow()
+- 因此选择非"从不"时，浏览器重启后打开弹窗一定需要解锁
+
+**系统锁定时上锁：**
+- 在 idle.background.ts 中监听 chrome.idle.onStateChanged
+- 当 newState === "locked" 且用户 uiLockTimeout === "onLocked" 时调用 lockNow()
+
+**弹窗出现时上锁：**
+- 在 AppComponent 构造函数中设置内存标记 popupOpenedForLockCheck（每个弹窗实例独立）
+- uiLockGuard 检查到 "onPopupOpen" 且标记存在时调用 lockNow() 并重定向到 /ui-lock
+- 不同浏览器窗口的弹窗各自独立触发
+
+### 2.4 影响范围
+
+- UI 锁只限制手动打开的扩展弹窗（popup）
+- 不影响自动填充内联菜单、保存/更新密码通知栏、右键菜单自动填充、后台自动填充、FIDO2/WebAuthn 等服务
+
+### 2.5 编译验证
 - 运行 npx nx serve browser --configuration=edge-dev
 - 确保 TypeScript 使用枚举值（VerificationType.MasterPassword）而非字符串字面量
 - 确保所有 i18n 占位符已定义
@@ -598,7 +654,7 @@ get riskIconColor(): string {
 在浏览器插件主界面（密码库）的顶部导航栏中添加了两个锁定按钮：
 
 - **上锁会话**：立即锁定整个用户会话，需要重新输入主密码
-- **上锁界面**：立即锁定当前界面，用户在设置的时间内打开弹窗只需验证指纹/面容或PIN码
+- **上锁界面**：立即锁定当前弹窗界面，并根据 UI 锁超时设置决定下次打开弹窗时是否需要解锁
 
 ## 九、UI 锁计时策略优化
 
@@ -621,3 +677,28 @@ get riskIconColor(): string {
 ## 十、UI 锁界面添加会话锁定按钮
 
 在界面锁定（UI Lock）页面的顶部导航栏中添加了"上锁会话"按钮，用户在界面锁定状态下可以直接点击该按钮立即锁定整个会话。
+
+---
+
+## 十一、UI 锁选项扩展（最新）
+
+### 11.1 新增选项
+
+在原有的数字超时和"从不"基础上，界面上锁下拉框新增了以下选项：
+
+- **弹窗出现时**：每次打开新的扩展弹窗时立即上锁，解锁后当前弹窗内可继续操作；不同浏览器窗口的弹窗各自独立触发。
+- **系统锁定时**：操作系统进入锁屏或屏保时立即上锁。
+- **浏览器重启时**：扩展初始化时上锁；并且只要选择非"从不"，浏览器重启后都会自动上锁。
+
+### 11.2 默认选项
+
+界面上锁默认选择 **"从不"**，不会自动锁定，只有用户手动触发"立即上锁"才会锁定。
+
+### 11.3 浏览器重启行为
+
+- **非"从不"**：扩展启动时自动对所有相关用户上锁，因此重启后打开弹窗一定需要解锁，不依赖之前是否已超时。
+- **"从不"**：重启后保持重启前的状态。如果之前手动上锁了，重启后仍锁定；否则保持解锁。
+
+### 11.4 影响范围
+
+UI 锁仅限制手动打开的扩展弹窗（popup），不影响浏览器自动调出的流程，例如自动填充内联菜单、保存/更新密码通知栏、右键菜单自动填充、后台自动填充、FIDO2/WebAuthn 等服务。
