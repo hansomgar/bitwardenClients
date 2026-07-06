@@ -4,7 +4,10 @@ import { firstValueFrom } from "rxjs";
 
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { getOptionalUserId } from "@bitwarden/common/auth/services/account.service";
-import { UiLockServiceAbstraction } from "@bitwarden/common/key-management/ui-lock";
+import {
+  UiLockServiceAbstraction,
+  UiLockTimeoutStringType,
+} from "@bitwarden/common/key-management/ui-lock";
 
 export function uiLockGuard(): CanActivateFn {
   return async () => {
@@ -22,6 +25,18 @@ export function uiLockGuard(): CanActivateFn {
     const userId = await firstValueFrom(accountService.activeAccount$.pipe(getOptionalUserId));
     if (!userId) {
       return true;
+    }
+
+    const timeout = await firstValueFrom(uiLockService.getUiLockTimeout$(userId));
+
+    // For "every time" option, lock on each fresh popup open.
+    // The flag is set in AppComponent's constructor and is per-popup-instance memory only.
+    if (
+      timeout === UiLockTimeoutStringType.OnPopupClose &&
+      uiLockService.consumePopupOpenedForLockCheck()
+    ) {
+      await uiLockService.lockNow(userId);
+      return router.createUrlTree(["/ui-lock"]) as UrlTree;
     }
 
     const isLocked = await uiLockService.isUiLocked(userId);

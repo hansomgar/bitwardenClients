@@ -43,6 +43,7 @@ import { LogService } from "@bitwarden/common/platform/abstractions/log.service"
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import { SdkService } from "@bitwarden/common/platform/abstractions/sdk/sdk.service";
 import { MessageListener } from "@bitwarden/common/platform/messaging";
+import { UiLockServiceAbstraction } from "@bitwarden/common/key-management/ui-lock";
 import { UserId } from "@bitwarden/common/types/guid";
 import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.service";
 import {
@@ -73,6 +74,7 @@ import { DesktopSyncVerificationDialogComponent } from "./components/desktop-syn
 export class AppComponent implements OnInit, OnDestroy {
   private compactModeService = inject(PopupCompactModeService);
   private sdkService = inject(SdkService);
+  private uiLockService = inject(UiLockServiceAbstraction);
 
   private lastActivity: Date;
   private activeUserId: UserId;
@@ -115,6 +117,10 @@ export class AppComponent implements OnInit, OnDestroy {
     private pendingAuthRequestsState: PendingAuthRequestsStateService,
     private authRequestAnsweringService: AuthRequestAnsweringService,
   ) {
+    // Mark that this popup instance was just opened. The uiLockGuard consumes this
+    // in-memory flag to decide whether to lock when the "every time" option is selected.
+    this.uiLockService.setPopupOpenedForLockCheck();
+
     this.deviceTrustToastService.setupListeners$.pipe(takeUntilDestroyed()).subscribe();
 
     const langSubscription = this.documentLangSetter.start();

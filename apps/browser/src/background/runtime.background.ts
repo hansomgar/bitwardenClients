@@ -31,7 +31,6 @@ import { AutofillService } from "../autofill/services/abstractions/autofill.serv
 import { FORCE_TARGETING_RULES_UPDATE_COMMAND } from "../autofill/services/targeting-rules-data.service";
 import { BrowserApi } from "../platform/browser/browser-api";
 import { BrowserEnvironmentService } from "../platform/services/browser-environment.service";
-import { popupClosedPortName } from "../platform/services/popup-view-cache-background.service";
 import BrowserInitialInstallService from "../platform/services/browser-initial-install.service";
 import { BrowserPlatformUtilsService } from "../platform/services/platform-utils/browser-platform-utils.service";
 
@@ -125,19 +124,6 @@ export default class RuntimeBackground {
 
     // For messages that require the full on message interface
     BrowserApi.messageListener("runtime.background", backgroundMessageListener);
-
-    // Listen for popup lifetime so we can lock the UI when the popup closes
-    // if the user has selected the "every time" UI lock option.
-    // This reuses the existing popup-closed port opened by initPopupClosedListener().
-    if (chrome.runtime?.onConnect) {
-      chrome.runtime.onConnect.addListener((port) => {
-        if (port.name === popupClosedPortName) {
-          port.onDisconnect.addListener(() => {
-            void this.lockUiOnPopupCloseIfNeeded();
-          });
-        }
-      });
-    }
   }
 
   // Messages that need the chrome sender and send back a response need to be registered in this method.
@@ -543,18 +529,6 @@ export default class RuntimeBackground {
       );
       // Lock the UI on restart for any option other than "Never".
       if (timeout !== UiLockTimeoutStringType.Never) {
-        await this.main.uiLockService.lockNow(userId as UserId);
-      }
-    }
-  }
-
-  private async lockUiOnPopupCloseIfNeeded() {
-    const allUsers = await firstValueFrom(this.accountService.accounts$);
-    for (const userId in allUsers) {
-      const timeout = await firstValueFrom(
-        this.main.uiLockService.getUiLockTimeout$(userId as UserId),
-      );
-      if (timeout === UiLockTimeoutStringType.OnPopupClose) {
         await this.main.uiLockService.lockNow(userId as UserId);
       }
     }

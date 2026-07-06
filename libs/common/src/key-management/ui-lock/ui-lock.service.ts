@@ -30,10 +30,13 @@ export abstract class UiLockServiceAbstraction {
   abstract getSkipCheck(): Promise<boolean>;
   abstract lockNow(userId: UserId): Promise<void>;
   abstract clearManualLock(userId: UserId): Promise<void>;
+  abstract setPopupOpenedForLockCheck(): void;
+  abstract consumePopupOpenedForLockCheck(): boolean;
 }
 
 export class UiLockService implements UiLockServiceAbstraction {
   private uiLockTimeoutState;
+  private popupOpenedForLockCheck = false;
 
   constructor(
     private stateProvider: StateProvider,
@@ -42,6 +45,16 @@ export class UiLockService implements UiLockServiceAbstraction {
     private accountService: AccountService,
   ) {
     this.uiLockTimeoutState = this.stateProvider.getActive(UI_LOCK_TIMEOUT);
+  }
+
+  setPopupOpenedForLockCheck(): void {
+    this.popupOpenedForLockCheck = true;
+  }
+
+  consumePopupOpenedForLockCheck(): boolean {
+    const value = this.popupOpenedForLockCheck;
+    this.popupOpenedForLockCheck = false;
+    return value;
   }
 
   isUiLocked$(userId: UserId): Observable<boolean> {
