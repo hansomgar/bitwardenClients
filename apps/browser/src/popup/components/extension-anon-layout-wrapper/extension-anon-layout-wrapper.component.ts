@@ -5,7 +5,18 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute, Data, NavigationEnd, Router, RouterModule } from "@angular/router";
 import { Subject, filter, switchMap, takeUntil, tap } from "rxjs";
 
-import { BitwardenLogo, BitSvg } from "@bitwarden/assets/svg";
+import { BitSvg, svg } from "@bitwarden/assets/svg";
+
+const VaultwardenLogo = svg`
+  <svg viewBox="0 0 290 45" xmlns="http://www.w3.org/2000/svg">
+    <title>Vaultwarden</title>
+    <path class="tw-fill-marketing-logo" d="M32.041 24.546V5.95H18.848v33.035c2.336-1.22 4.427-2.547 6.272-3.98 4.614-3.565 6.921-7.051 6.921-10.46Zm5.654-22.314v22.314c0 1.665-.329 3.317-.986 4.953-.658 1.637-1.473 3.09-2.445 4.359-.971 1.268-2.13 2.503-3.475 3.704-1.345 1.2-2.586 2.199-3.725 2.993a46.963 46.963 0 0 1-3.563 2.251c-1.237.707-2.116 1.187-2.636 1.439-.52.251-.938.445-1.252.58-.235.117-.49.175-.765.175s-.53-.058-.766-.174c-.314-.136-.731-.33-1.252-.581-.52-.252-1.398-.732-2.635-1.439a47.003 47.003 0 0 1-3.564-2.251c-1.138-.794-2.38-1.792-3.725-2.993-1.345-1.2-2.503-2.436-3.475-3.704-.972-1.27-1.787-2.722-2.444-4.359C.329 27.863 0 26.211 0 24.546V2.232c0-.504.187-.94.56-1.308A1.823 1.823 0 0 1 1.885.372H35.81c.511 0 .953.184 1.326.552.373.368.56.804.56 1.308Z" />
+    <!-- 将文字拆分为两个 tspan，分别控制字号和样式 -->
+    <text x="48" y="36" class="tw-fill-marketing-logo" font-family="Arial, Helvetica, sans-serif">
+        <tspan font-weight="bold" font-style="italic" font-size="48">vault</tspan>
+        <tspan font-size="36">warden</tspan>
+    </text>
+</svg>`;
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import {
   SvgModule,
@@ -74,7 +85,7 @@ export class ExtensionAnonLayoutWrapperComponent implements OnInit, OnDestroy {
   protected secondaryContentLocation?: SecondaryContentLocationType;
 
   protected theme: string;
-  protected logo = BitwardenLogo;
+  protected logo = VaultwardenLogo;
 
   constructor(
     private router: Router,
