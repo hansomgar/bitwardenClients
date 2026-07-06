@@ -1532,6 +1532,7 @@ export default class MainBackground {
       this.lockService,
       this.billingAccountProfileStateService,
       this.browserInitialInstallService,
+      this.uiLockService,
     );
     this.nativeMessagingBackground = new NativeMessagingBackground(
       this.keyService,

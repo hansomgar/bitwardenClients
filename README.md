@@ -663,6 +663,9 @@ lockNow(userId)
 uiLockGuard 执行
   → 检查 uiLockSkipCheck，若为 true 则重置并放行（用于 lockNow 后导航）
   → 获取当前活跃用户 userId
+  → 若 consumeSkipAfterSessionUnlock() 返回 true（刚解锁会话锁）
+       → 调用 clearManualLock(userId) 清除手动上锁标志
+       → 调用 setLastUnlockTime(userId) 重置计时器，放行
   → 若 uiLockTimeout === "onPopupOpen" 且 consumePopupOpenedForLockCheck() 返回 true
        → 调用 lockNow(userId)
        → 重定向到 /ui-lock
@@ -693,6 +696,26 @@ unlock 成功处理
   → setLastUnlockTime()      // lastUnlockTime=Date.now()
   → 导航到 /tabs/vault
 ```
+
+#### 会话锁解锁后跳过 UI 锁
+
+当用户在 `/lock` 页面通过主密码/PIN/生物识别解锁会话锁后：
+
+```
+LockComponent 解锁成功
+  → this.messagingService.send("unlocked")
+  → runtime.background.ts 处理 "unlocked" 消息
+       → uiLockService.setSkipAfterSessionUnlock()
+       → 在 chrome.storage.session 写入一次性标记
+  → LockComponent 导航到 /tabs/current 或之前的 URL
+  → uiLockGuard 执行
+       → consumeSkipAfterSessionUnlock() 返回 true
+       → 调用 clearManualLock() 清除 uiLockManuallyLocked 标志
+       → 调用 setLastUnlockTime() 刷新计时器
+       → 放行
+```
+
+这样用户从会话锁进入主界面时，不会立即再弹出 UI 锁输入框。该标记为一次性，消费后立即清除；弹窗关闭或刷新后失效。
 
 #### 自动检测流程
 
@@ -914,6 +937,16 @@ get riskIconColor(): string {
 ### 11.4 影响范围
 
 UI 锁仅限制手动打开的扩展弹窗（popup），不影响浏览器自动调出的流程，例如自动填充内联菜单、保存/更新密码通知栏、右键菜单自动填充、后台自动填充、FIDO2/WebAuthn 等服务。
+
+### 11.5 会话锁与界面锁的联动
+
+当用户通过解锁会话锁（vault lock）进入主界面时，自动跳过本次 UI 锁检查，避免用户连续输入两次密码/PIN。
+
+实现方式：
+- 会话锁解锁成功后，background 向 `chrome.storage.session` 写入一次性标记。
+- 弹窗路由守卫在检查 UI 锁前先消费该标记。
+- 如果标记存在，则调用 `clearManualLock()` 清除 `uiLockManuallyLocked` 标志，并刷新 `uiLockLastUnlockTime`，然后放行；否则继续走正常的 UI 锁判定流程。
+- 该标记仅在一次导航中有效，弹窗关闭或刷新后即失效。
 
 ---
 

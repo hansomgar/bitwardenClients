@@ -27,6 +27,15 @@ export function uiLockGuard(): CanActivateFn {
       return true;
     }
 
+    // If the user just unlocked the session lock (vault lock), skip the UI lock
+    // for this navigation so they don't have to unlock twice.
+    const skipAfterSessionUnlock = await uiLockService.consumeSkipAfterSessionUnlock();
+    if (skipAfterSessionUnlock) {
+      await uiLockService.clearManualLock(userId);
+      await uiLockService.setLastUnlockTime(userId);
+      return true;
+    }
+
     const timeout = await firstValueFrom(uiLockService.getUiLockTimeout$(userId));
 
     // For "on popup open" option, lock on each fresh popup open.

@@ -13,6 +13,7 @@ import { ConfigService } from "@bitwarden/common/platform/abstractions/config/co
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { MessagingService } from "@bitwarden/common/platform/abstractions/messaging.service";
 import { MessageListener, isExternalMessage } from "@bitwarden/common/platform/messaging";
+import { UiLockServiceAbstraction } from "@bitwarden/common/key-management/ui-lock";
 import { Utils } from "@bitwarden/common/platform/misc/utils";
 import { UserId } from "@bitwarden/common/types/guid";
 import { CipherType } from "@bitwarden/common/vault/enums";
@@ -57,6 +58,7 @@ export default class RuntimeBackground {
     private readonly lockService: LockService,
     private billingAccountProfileStateService: BillingAccountProfileStateService,
     private browserInitialInstallService: BrowserInitialInstallService,
+    private uiLockService: UiLockServiceAbstraction,
   ) {
     // onInstalled listener must be wired up before anything else, so we do it in the ctor
     chrome.runtime.onInstalled.addListener((details: any) => {
@@ -277,6 +279,10 @@ export default class RuntimeBackground {
         }
 
         this.processReloadService.cancelProcessReload();
+
+        if (msg.command === "unlocked") {
+          await this.uiLockService.setSkipAfterSessionUnlock();
+        }
 
         if (item) {
           await BrowserApi.focusWindow(item.commandToRetry.sender.tab.windowId);

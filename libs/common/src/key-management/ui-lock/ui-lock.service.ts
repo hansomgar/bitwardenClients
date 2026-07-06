@@ -16,6 +16,7 @@ const UI_LOCK_FAILED_ATTEMPTS_KEY = "uiLockFailedAttempts";
 const UI_LOCK_BACKOFF_UNTIL_KEY = "uiLockBackoffUntil";
 const UI_LOCK_SKIP_CHECK_KEY = "uiLockSkipCheck";
 const UI_LOCK_MANUAL_LOCK_KEY = "uiLockManuallyLocked";
+const UI_LOCK_SKIP_AFTER_SESSION_UNLOCK_KEY = "uiLockSkipAfterSessionUnlock";
 
 export abstract class UiLockServiceAbstraction {
   abstract isUiLocked$(userId: UserId): Observable<boolean>;
@@ -32,6 +33,8 @@ export abstract class UiLockServiceAbstraction {
   abstract clearManualLock(userId: UserId): Promise<void>;
   abstract setPopupOpenedForLockCheck(): void;
   abstract consumePopupOpenedForLockCheck(): boolean;
+  abstract setSkipAfterSessionUnlock(): Promise<void>;
+  abstract consumeSkipAfterSessionUnlock(): Promise<boolean>;
 }
 
 export class UiLockService implements UiLockServiceAbstraction {
@@ -54,6 +57,19 @@ export class UiLockService implements UiLockServiceAbstraction {
   consumePopupOpenedForLockCheck(): boolean {
     const value = this.popupOpenedForLockCheck;
     this.popupOpenedForLockCheck = false;
+    return value;
+  }
+
+  async setSkipAfterSessionUnlock(): Promise<void> {
+    await chrome.storage.session.set({ [UI_LOCK_SKIP_AFTER_SESSION_UNLOCK_KEY]: true });
+  }
+
+  async consumeSkipAfterSessionUnlock(): Promise<boolean> {
+    const result = await chrome.storage.session.get(UI_LOCK_SKIP_AFTER_SESSION_UNLOCK_KEY);
+    const value = result[UI_LOCK_SKIP_AFTER_SESSION_UNLOCK_KEY] === true;
+    if (value) {
+      await chrome.storage.session.remove(UI_LOCK_SKIP_AFTER_SESSION_UNLOCK_KEY);
+    }
     return value;
   }
 
