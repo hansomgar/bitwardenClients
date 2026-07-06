@@ -8,6 +8,7 @@ import { AutofillOverlayVisibility, ExtensionCommand } from "@bitwarden/common/a
 import { AutofillSettingsServiceAbstraction } from "@bitwarden/common/autofill/services/autofill-settings.service";
 import { BillingAccountProfileStateService } from "@bitwarden/common/billing/abstractions/account/billing-account-profile-state.service";
 import { ProcessReloadServiceAbstraction } from "@bitwarden/common/key-management/abstractions/process-reload.service";
+import { UiLockTimeoutStringType } from "@bitwarden/common/key-management/ui-lock";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { MessagingService } from "@bitwarden/common/platform/abstractions/messaging.service";
@@ -526,7 +527,8 @@ export default class RuntimeBackground {
       const timeout = await firstValueFrom(
         this.main.uiLockService.getUiLockTimeout$(userId as UserId),
       );
-      if (timeout === "onRestart") {
+      // Lock the UI on restart for any option other than "Never".
+      if (timeout !== UiLockTimeoutStringType.Never) {
         await this.main.uiLockService.lockNow(userId as UserId);
       }
     }

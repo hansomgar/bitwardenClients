@@ -64,10 +64,15 @@ export class UiLockService implements UiLockServiceAbstraction {
       this.uiLockTimeoutState.state$.pipe(map((x) => x ?? UiLockTimeoutStringType.Never)),
     );
 
-    // When timeout is "Never", check if the user manually locked
+    // Manual lock (Lock Now / system lock / restart lock) takes precedence for all timeout types.
+    const manualResult = await chrome.storage.local.get(UI_LOCK_MANUAL_LOCK_KEY);
+    if ((manualResult[UI_LOCK_MANUAL_LOCK_KEY] as boolean) === true) {
+      return true;
+    }
+
+    // When timeout is "Never" and not manually locked, UI is not locked.
     if (timeout === UiLockTimeoutStringType.Never) {
-      const manualResult = await chrome.storage.local.get(UI_LOCK_MANUAL_LOCK_KEY);
-      return (manualResult[UI_LOCK_MANUAL_LOCK_KEY] as boolean) === true;
+      return false;
     }
 
     // String-based timeouts are handled outside of the regular timer check.
