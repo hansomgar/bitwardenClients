@@ -639,6 +639,7 @@ const routes: Routes = [
       },
       showReadonlyHostname: false,
       showAcctSwitcher: false,
+      showLockSessionButton: true,
       elevation: 1,
       doNotSaveUrl: true,
     } satisfies ExtensionAnonLayoutWrapperData & RouteDataProperties,

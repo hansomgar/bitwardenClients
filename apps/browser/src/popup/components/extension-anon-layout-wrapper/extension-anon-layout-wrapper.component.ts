@@ -3,8 +3,11 @@
 import { CommonModule } from "@angular/common";
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute, Data, NavigationEnd, Router, RouterModule } from "@angular/router";
-import { Subject, filter, switchMap, takeUntil, tap } from "rxjs";
+import { firstValueFrom, Subject, filter, switchMap, takeUntil, tap } from "rxjs";
 
+import { LockService } from "@bitwarden/auth/common";
+import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
+import { getUserId } from "@bitwarden/common/auth/services/account.service";
 import { BitSvg, svg } from "@bitwarden/assets/svg";
 
 const VaultwardenLogo = svg`
@@ -31,6 +34,8 @@ const VaultwardenLogo = svg`
 </svg>`;
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import {
+  ButtonModule,
+  IconButtonModule,
   SvgModule,
   Translation,
   AnonLayoutComponent,
@@ -56,6 +61,7 @@ export interface ExtensionAnonLayoutWrapperData extends AnonLayoutWrapperData {
   showAcctSwitcher?: boolean;
   showBackButton?: boolean;
   showLogo?: boolean;
+  showLockSessionButton?: boolean;
   hideFooter?: boolean;
 }
 
@@ -65,8 +71,10 @@ export interface ExtensionAnonLayoutWrapperData extends AnonLayoutWrapperData {
   templateUrl: "extension-anon-layout-wrapper.component.html",
   imports: [
     AnonLayoutComponent,
+    ButtonModule,
     CommonModule,
     CurrentAccountComponent,
+    IconButtonModule,
     I18nPipe,
     SvgModule,
     PopOutComponent,
@@ -81,6 +89,7 @@ export class ExtensionAnonLayoutWrapperComponent implements OnInit, OnDestroy {
   protected showAcctSwitcher: boolean;
   protected showBackButton: boolean;
   protected showLogo: boolean = true;
+  protected showLockSessionButton: boolean = false;
 
   protected pageTitle: string;
   protected pageSubtitle: string;
@@ -105,6 +114,8 @@ export class ExtensionAnonLayoutWrapperComponent implements OnInit, OnDestroy {
     private i18nService: I18nService,
     private extensionAnonLayoutWrapperDataService: AnonLayoutWrapperDataService,
     private accountSwitcherService: AccountSwitcherService,
+    private lockService: LockService,
+    private accountService: AccountService,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -174,6 +185,8 @@ export class ExtensionAnonLayoutWrapperComponent implements OnInit, OnDestroy {
     this.showBackButton =
       firstChildRouteData["showBackButton"] ?? EXTENSION_ANON_LAYOUT_DEFAULTS.showBackButton;
     this.showLogo = firstChildRouteData["showLogo"] ?? EXTENSION_ANON_LAYOUT_DEFAULTS.showLogo;
+    this.showLockSessionButton =
+      firstChildRouteData["showLockSessionButton"] ?? false;
     this.hideFooter =
       firstChildRouteData["hideFooter"] ?? EXTENSION_ANON_LAYOUT_DEFAULTS.hideFooter;
     this.secondaryContentLocation =
@@ -240,6 +253,10 @@ export class ExtensionAnonLayoutWrapperComponent implements OnInit, OnDestroy {
       this.showLogo = data.showLogo;
     }
 
+    if (data.showLockSessionButton !== undefined) {
+      this.showLockSessionButton = data.showLockSessionButton;
+    }
+
     if (data.hidePageIcon !== undefined) {
       this.hidePageIcon = data.hidePageIcon;
     }
@@ -275,6 +292,7 @@ export class ExtensionAnonLayoutWrapperComponent implements OnInit, OnDestroy {
     this.showAcctSwitcher = null;
     this.showBackButton = null;
     this.showLogo = null;
+    this.showLockSessionButton = false;
     this.maxWidth = null;
     this.hideFooter = null;
     this.hideCardWrapper = null;
@@ -283,6 +301,11 @@ export class ExtensionAnonLayoutWrapperComponent implements OnInit, OnDestroy {
     this.footerVerticalPadding = undefined;
     this.heroTextAlignment = undefined;
     this.secondaryContentLocation = undefined;
+  }
+
+  async lockSession() {
+    const userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getUserId));
+    await this.lockService.lock(userId);
   }
 
   ngOnDestroy() {
