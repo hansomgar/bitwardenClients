@@ -845,7 +845,13 @@
     "message": "超时时间"
   },
   "lockNow": {
-    "message": "立即锁定"
+    "message": "立即上锁"
+  },
+  "lockSession": {
+    "message": "上锁会话"
+  },
+  "lockUi": {
+    "message": "上锁界面"
   },
   "lockAll": {
     "message": "全部锁定"

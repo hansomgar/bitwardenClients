@@ -28,12 +28,14 @@ import {
   AutoConfirmState,
   AutomaticUserConfirmationService,
 } from "@bitwarden/auto-confirm/angular";
+import { LockService } from "@bitwarden/auth/common";
 import { InternalOrganizationServiceAbstraction } from "@bitwarden/common/admin-console/abstractions/organization/organization.service.abstraction";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { getUserId } from "@bitwarden/common/auth/services/account.service";
 import { BillingAccountProfileStateService } from "@bitwarden/common/billing/abstractions";
 import { EventCollectionService, EventType } from "@bitwarden/common/dirt/event-logs";
 import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
+import { UiLockServiceAbstraction } from "@bitwarden/common/key-management/ui-lock";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { CipherId, CollectionId, OrganizationId, UserId } from "@bitwarden/common/types/guid";
@@ -50,6 +52,7 @@ import {
   ToastService,
   TypographyModule,
   CalloutModule,
+  IconButtonModule,
 } from "@bitwarden/components";
 import {
   DecryptionFailureDialogComponent,
@@ -105,6 +108,7 @@ type VaultState = UnionOfValues<typeof VaultState>;
     AutofillVaultListItemsComponent,
     VaultListItemsContainerComponent,
     ButtonModule,
+    IconButtonModule,
     NewItemDropdownComponent,
     ScrollingModule,
     VaultHeaderComponent,
@@ -243,6 +247,8 @@ export class VaultComponent implements OnInit, OnDestroy {
     private eventCollectionService: EventCollectionService,
     private organizationService: InternalOrganizationServiceAbstraction,
     private premiumUpsellService: PremiumUpsellService,
+    private lockService: LockService,
+    private uiLockService: UiLockServiceAbstraction,
   ) {
     combineLatest([
       this.vaultPopupItemsService.emptyVault$,
@@ -363,6 +369,18 @@ export class VaultComponent implements OnInit, OnDestroy {
 
   async dismissVaultNudgeSpotlight(type: NudgeType) {
     await this.nudgesService.dismissNudge(type, this.activeUserId as UserId);
+  }
+
+  async lockSession() {
+    const userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getUserId));
+    await this.lockService.lock(userId);
+  }
+
+  async lockUi() {
+    const userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getUserId));
+    await this.uiLockService.lockNow(userId);
+    await this.router.navigate(["/ui-lock"]);
+    setTimeout(() => window.close(), 500);
   }
 
   protected readonly FeatureFlag = FeatureFlag;

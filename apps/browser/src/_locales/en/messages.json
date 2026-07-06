@@ -847,6 +847,12 @@
   "lockNow": {
     "message": "Lock now"
   },
+  "lockSession": {
+    "message": "Lock Session"
+  },
+  "lockUi": {
+    "message": "Lock UI"
+  },
   "lockAll": {
     "message": "Lock all"
   },
