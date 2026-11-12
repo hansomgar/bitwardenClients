@@ -6753,5 +6753,47 @@
   },
   "cannotSaveItemNoConfirmedOrgs": {
     "message": "无法保存项目。您必须先通过组织确认才能保存项目。"
+  },
+  "vaultListSortOrder": {
+    "message": "密码库列表排序"
+  },
+  "autofillListSortOrder": {
+    "message": "填充帐号列表排序"
+  },
+  "sortByLastUsed": {
+    "message": "最近使用优先"
+  },
+  "sortByNameAsc": {
+    "message": "名称 A → Z"
+  },
+  "sortByNameDesc": {
+    "message": "名称 Z → A"
+  },
+  "sortByUsernameAsc": {
+    "message": "帐号 A → Z"
+  },
+  "sortByUsernameDesc": {
+    "message": "帐号 Z → A"
+  },
+  "autofillSortBySetting": {
+    "message": "按设置"
+  },
+  "autofillSortByLastUsed": {
+    "message": "按最近"
+  },
+  "autofillSortByUsername": {
+    "message": "按帐号"
+  },
+  "autofillSortBySettingTooltip": {
+    "message": "当前按最近使用排序。点击改为按「密码库列表排序」设置排序"
+  },
+  "autofillSortByLastUsedTooltip": {
+    "message": "当前按设置排序。点击改为按最近使用排序（Bitwarden 默认行为）"
+  },
+  "autofillSortByUsernameTooltip": {
+    "message": "当前按最近使用排序。点击改为按帐号 A → Z 排序"
+  },
+  "sendNameOptionalHint": {
+    "message": "留空将自动使用时间 + 长度/大小命名"
   }
 }

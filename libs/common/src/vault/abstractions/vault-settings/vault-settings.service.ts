@@ -1,4 +1,6 @@
 import { Observable } from "rxjs";
+
+import { VaultListSortOrder } from "../../enums/vault-list-sort-order.enum";
 /**
  * Service for managing vault settings.
  */
@@ -32,6 +34,18 @@ export abstract class VaultSettingsService {
   abstract showAtRiskPasswordNotifications$: Observable<boolean>;
 
   /**
+   * An observable monitoring the sort order of the vault item list in the
+   * browser extension popup ("All items", "Favorites" and search results).
+   */
+  abstract vaultListSortOrder$: Observable<VaultListSortOrder>;
+
+  /**
+   * An observable monitoring the sort order of the cipher list rendered by the
+   * inline autofill menu (the account list shown on top of page form fields).
+   */
+  abstract autofillListSortOrder$: Observable<VaultListSortOrder>;
+
+  /**
    * Saves the enable passkeys setting to disk.
    * @param value The new value for the passkeys setting.
    */
@@ -57,4 +71,16 @@ export abstract class VaultSettingsService {
    * @param value The new value for the visibility of at-risk password notifications.
    */
   abstract setShowAtRiskPasswordNotifications(value: boolean): Promise<void>;
+
+  /**
+   * Saves the sort order of the vault item list in the browser extension popup to disk.
+   * @param value The new sort order.
+   */
+  abstract setVaultListSortOrder(value: VaultListSortOrder): Promise<void>;
+
+  /**
+   * Saves the sort order of the inline autofill menu cipher list to disk.
+   * @param value The new sort order.
+   */
+  abstract setAutofillListSortOrder(value: VaultListSortOrder): Promise<void>;
 }

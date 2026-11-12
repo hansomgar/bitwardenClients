@@ -3,12 +3,15 @@ import { Observable, combineLatest, map, shareReplay } from "rxjs";
 import { ActiveUserState, GlobalState, StateProvider } from "../../../platform/state";
 import { VaultSettingsService as VaultSettingsServiceAbstraction } from "../../abstractions/vault-settings/vault-settings.service";
 import { CipherType } from "../../enums";
+import { VaultListSortOrder } from "../../enums/vault-list-sort-order.enum";
 import {
   SHOW_CARDS_CURRENT_TAB,
   SHOW_IDENTITIES_CURRENT_TAB,
   USER_ENABLE_PASSKEYS,
   CLICK_ITEMS_AUTOFILL_VAULT_VIEW,
   SHOW_AT_RISK_PASSWORD_NOTIFICATIONS,
+  VAULT_LIST_SORT_ORDER,
+  AUTOFILL_LIST_SORT_ORDER,
 } from "../key-state/vault-settings.state";
 import { RestrictedItemTypesService } from "../restricted-item-types.service";
 
@@ -69,6 +72,22 @@ export class VaultSettingsService implements VaultSettingsServiceAbstraction {
   readonly showAtRiskPasswordNotifications$: Observable<boolean> =
     this.showAtRiskPasswordNotificationsState.state$.pipe(map((x) => x ?? true));
 
+  private vaultListSortOrderState: ActiveUserState<VaultListSortOrder> =
+    this.stateProvider.getActive(VAULT_LIST_SORT_ORDER);
+  /**
+   * {@link VaultSettingsServiceAbstraction.vaultListSortOrder$}
+   */
+  readonly vaultListSortOrder$: Observable<VaultListSortOrder> =
+    this.vaultListSortOrderState.state$.pipe(map((x) => x ?? VaultListSortOrder.LastUsed));
+
+  private autofillListSortOrderState: ActiveUserState<VaultListSortOrder> =
+    this.stateProvider.getActive(AUTOFILL_LIST_SORT_ORDER);
+  /**
+   * {@link VaultSettingsServiceAbstraction.autofillListSortOrder$}
+   */
+  readonly autofillListSortOrder$: Observable<VaultListSortOrder> =
+    this.autofillListSortOrderState.state$.pipe(map((x) => x ?? VaultListSortOrder.LastUsed));
+
   constructor(
     private stateProvider: StateProvider,
     private restrictedItemTypesService: RestrictedItemTypesService,
@@ -107,5 +126,19 @@ export class VaultSettingsService implements VaultSettingsServiceAbstraction {
    */
   async setShowAtRiskPasswordNotifications(value: boolean): Promise<void> {
     await this.showAtRiskPasswordNotificationsState.update(() => value);
+  }
+
+  /**
+   * {@link VaultSettingsServiceAbstraction.setVaultListSortOrder}
+   */
+  async setVaultListSortOrder(value: VaultListSortOrder): Promise<void> {
+    await this.vaultListSortOrderState.update(() => value);
+  }
+
+  /**
+   * {@link VaultSettingsServiceAbstraction.setAutofillListSortOrder}
+   */
+  async setAutofillListSortOrder(value: VaultListSortOrder): Promise<void> {
+    await this.autofillListSortOrderState.update(() => value);
   }
 }

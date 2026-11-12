@@ -38,6 +38,7 @@ import { UserId } from "@bitwarden/common/types/guid";
 import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.service";
 import { TotpService } from "@bitwarden/common/vault/abstractions/totp.service";
 import { VaultSettingsService } from "@bitwarden/common/vault/abstractions/vault-settings/vault-settings.service";
+import { VaultListSortOrder } from "@bitwarden/common/vault/enums/vault-list-sort-order.enum";
 import { CipherRepromptType, CipherType } from "@bitwarden/common/vault/enums";
 import { CipherView } from "@bitwarden/common/vault/models/view/cipher.view";
 import { Fido2CredentialView } from "@bitwarden/common/vault/models/view/fido2-credential.view";
@@ -78,6 +79,7 @@ import {
 import { ModifyLoginCipherFormData } from "./abstractions/overlay-notifications.background";
 import {
   FocusedFieldData,
+  InlineMenuCipherData,
   InlineMenuPosition,
   PageDetailsForTab,
   PasswordGenerateRequestSource,
@@ -109,6 +111,7 @@ describe("OverlayBackground", () => {
   let platformUtilsService: MockProxy<BrowserPlatformUtilsService>;
   let enablePasskeysMock$: BehaviorSubject<boolean>;
   let vaultSettingsServiceMock: MockProxy<VaultSettingsService>;
+  let autofillListSortOrderMock$: BehaviorSubject<VaultListSortOrder>;
   const policyService = mock<PolicyService>();
   let fido2ActiveRequestManager: Fido2ActiveRequestManager;
   let selectedThemeMock$: BehaviorSubject<ThemeType>;
@@ -212,6 +215,10 @@ describe("OverlayBackground", () => {
     enablePasskeysMock$ = new BehaviorSubject(true);
     vaultSettingsServiceMock = mock<VaultSettingsService>();
     vaultSettingsServiceMock.enablePasskeys$ = enablePasskeysMock$;
+    autofillListSortOrderMock$ = new BehaviorSubject<VaultListSortOrder>(
+      VaultListSortOrder.LastUsed,
+    );
+    vaultSettingsServiceMock.autofillListSortOrder$ = autofillListSortOrderMock$;
     fido2ActiveRequestManager = new Fido2ActiveRequestManager();
     selectedThemeMock$ = new BehaviorSubject(ThemeType.Light);
     inlineMenuFieldQualificationService = new InlineMenuFieldQualificationService();
@@ -3412,6 +3419,9 @@ describe("OverlayBackground", () => {
         const message = { command: "triggerDelayedAutofillInlineMenuClosure" };
         expect(buttonPortSpy.postMessage).not.toHaveBeenCalledWith(message);
         expect(listPortSpy.postMessage).not.toHaveBeenCalledWith(message);
+
+        jest.clearAllMocks();
+        jest.useRealTimers();
       });
 
       it("sends a message to the button and list ports that triggers a delayed closure of the inline menu", async () => {
@@ -3426,6 +3436,9 @@ describe("OverlayBackground", () => {
         const message = { command: "triggerDelayedAutofillInlineMenuClosure" };
         expect(buttonPortSpy.postMessage).toHaveBeenCalledWith(message);
         expect(listPortSpy.postMessage).toHaveBeenCalledWith(message);
+
+        jest.clearAllMocks();
+        jest.useRealTimers();
       });
 
       it("triggers a single delayed closure if called again within a 100ms threshold", async () => {
@@ -3435,21 +3448,24 @@ describe("OverlayBackground", () => {
           portKey,
         });
         await flushPromises();
-        jest.advanceTimersByTime(50);
+        await jest.advanceTimersByTimeAsync(50);
         sendPortMessage(buttonMessageConnectorSpy, {
           command: "triggerDelayedAutofillInlineMenuClosure",
           portKey,
         });
         await flushPromises();
-        jest.advanceTimersByTime(100);
+        await jest.advanceTimersByTimeAsync(100);
 
         const message = { command: "triggerDelayedAutofillInlineMenuClosure" };
-        expect(buttonPortSpy.postMessage).toHaveBeenCalledTimes(2);
-        expect(buttonPortSpy.postMessage).not.toHaveBeenNthCalledWith(1, message);
-        expect(buttonPortSpy.postMessage).toHaveBeenNthCalledWith(2, message);
-        expect(listPortSpy.postMessage).toHaveBeenCalledTimes(2);
-        expect(listPortSpy.postMessage).not.toHaveBeenNthCalledWith(1, message);
-        expect(listPortSpy.postMessage).toHaveBeenNthCalledWith(2, message);
+        // Both triggers land inside the same 100ms debounce window, so the closure is
+        // requested exactly once rather than once per trigger.
+        expect(buttonPortSpy.postMessage).toHaveBeenCalledTimes(1);
+        expect(buttonPortSpy.postMessage).toHaveBeenNthCalledWith(1, message);
+        expect(listPortSpy.postMessage).toHaveBeenCalledTimes(1);
+        expect(listPortSpy.postMessage).toHaveBeenNthCalledWith(1, message);
+
+        jest.clearAllMocks();
+        jest.useRealTimers();
       });
     });
 
@@ -4290,6 +4306,121 @@ describe("OverlayBackground", () => {
 
       expect(overlayBackground["inlineMenuListPort"]).toBeNull();
       expect(overlayBackground["inlineMenuButtonPort"]).toBeNull();
+    });
+  });
+
+  describe("sortInlineMenuCipherData", () => {
+    const buildCipher = (
+      name: string,
+      username?: string,
+      hasPasskey = false,
+    ): InlineMenuCipherData =>
+      ({
+        id: name,
+        name,
+        type: CipherType.Login,
+        reprompt: CipherRepromptType.None,
+        favorite: false,
+        icon: {},
+        login: {
+          username,
+          passkey: hasPasskey ? { rpName: "rp", userName: username ?? name } : null,
+        },
+      }) as InlineMenuCipherData;
+
+    beforeEach(() => {
+      cipherService.getSortingFunctionForOrder.mockImplementation((order: VaultListSortOrder) => {
+        if (order === VaultListSortOrder.NameAsc) {
+          return (a: InlineMenuCipherData, b: InlineMenuCipherData) =>
+            a.name.localeCompare(b.name);
+        }
+        if (order === VaultListSortOrder.NameDesc) {
+          return (a: InlineMenuCipherData, b: InlineMenuCipherData) =>
+            b.name.localeCompare(a.name);
+        }
+        return () => 0;
+      });
+    });
+
+    it("returns the list untouched for the LastUsed order", () => {
+      const ciphers = [buildCipher("charlie"), buildCipher("alpha")];
+
+      const result = overlayBackground["sortInlineMenuCipherData"](
+        ciphers,
+        VaultListSortOrder.LastUsed,
+      );
+
+      expect(result).toBe(ciphers);
+      expect(result.map((c) => c.name)).toEqual(["charlie", "alpha"]);
+      expect(cipherService.getSortingFunctionForOrder).not.toHaveBeenCalled();
+    });
+
+    it("sorts the whole list when passkey labels are not shown", () => {
+      overlayBackground["showPasskeysLabelsWithinInlineMenu"] = false;
+      const ciphers = [
+        buildCipher("charlie", undefined, true),
+        buildCipher("alpha"),
+        buildCipher("bravo"),
+      ];
+
+      const result = overlayBackground["sortInlineMenuCipherData"](
+        ciphers,
+        VaultListSortOrder.NameAsc,
+      );
+
+      expect(result.map((c) => c.name)).toEqual(["alpha", "bravo", "charlie"]);
+    });
+
+    it("keeps passkey entries grouped first when passkey labels are shown", () => {
+      overlayBackground["showPasskeysLabelsWithinInlineMenu"] = true;
+      const ciphers = [
+        buildCipher("alpha"),
+        buildCipher("zulu", undefined, true),
+        buildCipher("bravo"),
+        buildCipher("yankee", undefined, true),
+      ];
+
+      const result = overlayBackground["sortInlineMenuCipherData"](
+        ciphers,
+        VaultListSortOrder.NameAsc,
+      );
+
+      // Passkeys stay in their own group above the remaining entries, each group sorted.
+      expect(result.map((c) => c.name)).toEqual(["yankee", "zulu", "alpha", "bravo"]);
+      expect(result.slice(0, 2).every((c) => c.login?.passkey != null)).toBe(true);
+      expect(result.slice(2).every((c) => c.login?.passkey == null)).toBe(true);
+    });
+
+    it("sorts each passkey group in the requested direction", () => {
+      overlayBackground["showPasskeysLabelsWithinInlineMenu"] = true;
+      const ciphers = [
+        buildCipher("alpha"),
+        buildCipher("zulu", undefined, true),
+        buildCipher("bravo"),
+        buildCipher("yankee", undefined, true),
+      ];
+
+      const result = overlayBackground["sortInlineMenuCipherData"](
+        ciphers,
+        VaultListSortOrder.NameDesc,
+      );
+
+      expect(result.map((c) => c.name)).toEqual(["zulu", "yankee", "bravo", "alpha"]);
+    });
+
+    it("passes accessors so inline menu data does not need type casts", () => {
+      overlayBackground["sortInlineMenuCipherData"](
+        [buildCipher("alpha", "amy@example.com")],
+        VaultListSortOrder.UsernameAsc,
+      );
+
+      expect(cipherService.getSortingFunctionForOrder).toHaveBeenCalledWith(
+        VaultListSortOrder.UsernameAsc,
+        expect.objectContaining({
+          getName: expect.any(Function),
+          getUsername: expect.any(Function),
+        }),
+      );
     });
   });
 });

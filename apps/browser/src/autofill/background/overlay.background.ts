@@ -47,6 +47,7 @@ import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.servi
 import { TotpService } from "@bitwarden/common/vault/abstractions/totp.service";
 import { VaultSettingsService } from "@bitwarden/common/vault/abstractions/vault-settings/vault-settings.service";
 import { CipherType } from "@bitwarden/common/vault/enums";
+import { VaultListSortOrder } from "@bitwarden/common/vault/enums/vault-list-sort-order.enum";
 import { buildCipherIcon } from "@bitwarden/common/vault/icon/build-cipher-icon";
 import { CardView } from "@bitwarden/common/vault/models/view/card.view";
 import { CipherView } from "@bitwarden/common/vault/models/view/cipher.view";
@@ -383,6 +384,15 @@ export class OverlayBackground implements OverlayBackgroundInterface {
         this.clearCachedTargetedPageDetails();
         void this.broadcastTargetingRulesCacheInvalidation();
       });
+
+    // Re-render the inline menu list when the user changes the autofill list sort order,
+    // so the new order applies without requiring a page reload or a field refocus.
+    this.vaultSettingsService.autofillListSortOrder$
+      .pipe(
+        pairwise(),
+        filter(([previous, current]) => previous !== current),
+      )
+      .subscribe(() => this.updateOverlayCiphers(false));
   }
 
   /**
@@ -609,9 +619,10 @@ export class OverlayBackground implements OverlayBackgroundInterface {
    * objects that contain the cipher data needed for the inline menu list.
    */
   private async getInlineMenuCipherData(): Promise<InlineMenuCipherData[]> {
-    const [showFavicons, env] = await Promise.all([
+    const [showFavicons, env, sortOrder] = await Promise.all([
       firstValueFrom(this.domainSettingsService.showFavicons$),
       firstValueFrom(this.environmentService.environment$),
+      firstValueFrom(this.vaultSettingsService.autofillListSortOrder$),
     ]);
     const iconsServerUrl: string | null = env.getIconsUrl() ?? null;
     const inlineMenuCiphersArray = Array.from(this.inlineMenuCiphers);
@@ -632,8 +643,50 @@ export class OverlayBackground implements OverlayBackgroundInterface {
       );
     }
 
+    inlineMenuCipherData = this.sortInlineMenuCipherData(inlineMenuCipherData, sortOrder);
+
     this.currentInlineMenuCiphersCount = inlineMenuCipherData.length;
     return inlineMenuCipherData;
+  }
+
+  /**
+   * Applies the user selected {@link VaultListSortOrder} to the inline menu cipher list.
+   *
+   * Passkey entries are rendered under their own "Passkeys" heading and must stay grouped
+   * ahead of the remaining entries, so each group is sorted independently and then
+   * concatenated back together.
+   *
+   * `LastUsed` returns the list untouched: the entries were already produced in
+   * most-recently-used order by {@link getCipherViews}.
+   *
+   * @param cipherData - The cipher data about to be sent to the inline menu list.
+   * @param sortOrder - The sort order selected by the user.
+   */
+  private sortInlineMenuCipherData(
+    cipherData: InlineMenuCipherData[],
+    sortOrder: VaultListSortOrder,
+  ): InlineMenuCipherData[] {
+    if (sortOrder === VaultListSortOrder.LastUsed) {
+      return cipherData;
+    }
+
+    const comparator = this.cipherService.getSortingFunctionForOrder<InlineMenuCipherData>(
+      sortOrder,
+      {
+        getName: (cipher) => cipher.name,
+        // Passkey entries carry the credential's user handle rather than a login username.
+        getUsername: (cipher) => cipher.login?.username ?? cipher.login?.passkey?.userName,
+      },
+    );
+
+    if (!this.showPasskeysLabelsWithinInlineMenu) {
+      return cipherData.sort(comparator);
+    }
+
+    const passkeyCiphers = cipherData.filter((cipher) => cipher.login?.passkey != null);
+    const otherCiphers = cipherData.filter((cipher) => cipher.login?.passkey == null);
+
+    return [...passkeyCiphers.sort(comparator), ...otherCiphers.sort(comparator)];
   }
 
   /**

@@ -21,6 +21,10 @@ import { Theme, ThemeTypes } from "@bitwarden/common/platform/enums";
 import { ThemeStateService } from "@bitwarden/common/platform/theming/theme-state.service";
 import { VaultSettingsService } from "@bitwarden/common/vault/abstractions/vault-settings/vault-settings.service";
 import {
+  VAULT_LIST_SORT_ORDERS,
+  VaultListSortOrder,
+} from "@bitwarden/common/vault/enums/vault-list-sort-order.enum";
+import {
   CardComponent,
   CheckboxModule,
   FormFieldModule,
@@ -87,6 +91,8 @@ export class AppearanceComponent implements OnInit {
     width: "default" as PopupWidthOption,
     clickItemsToAutofillVaultView: false,
     showAtRiskNotifications: true,
+    vaultListSortOrder: VaultListSortOrder.LastUsed as VaultListSortOrder,
+    autofillListSortOrder: VaultListSortOrder.LastUsed as VaultListSortOrder,
   });
 
   /** To avoid flashes of inaccurate values, only show the form after the entire form is populated. */
@@ -101,6 +107,13 @@ export class AppearanceComponent implements OnInit {
     { label: this.i18nService.t("wide"), value: "wide" },
     { label: this.i18nService.t("narrow"), value: "narrow" },
   ];
+
+  /** Available list sort order options, shared by both sort dropdowns */
+  protected readonly sortOrderOptions: Option<VaultListSortOrder>[] =
+    VAULT_LIST_SORT_ORDERS.map((order) => ({
+      label: this.i18nService.t(this.sortOrderLabelKey(order)),
+      value: order,
+    }));
 
   constructor(
     private messagingService: MessagingService,
@@ -138,6 +151,10 @@ export class AppearanceComponent implements OnInit {
     const showAtRiskNotifications = await firstValueFrom(
       this.vaultSettingsService.showAtRiskPasswordNotifications$,
     );
+    const vaultListSortOrder = await firstValueFrom(this.vaultSettingsService.vaultListSortOrder$);
+    const autofillListSortOrder = await firstValueFrom(
+      this.vaultSettingsService.autofillListSortOrder$,
+    );
 
     // Set initial values for the form
     this.appearanceForm.setValue({
@@ -150,6 +167,8 @@ export class AppearanceComponent implements OnInit {
       width,
       clickItemsToAutofillVaultView,
       showAtRiskNotifications,
+      vaultListSortOrder,
+      autofillListSortOrder,
     });
 
     this.formLoading = false;
@@ -207,6 +226,43 @@ export class AppearanceComponent implements OnInit {
       .subscribe((showAtRiskNotifications) => {
         void this.updateShowAtRiskNotifications(showAtRiskNotifications);
       });
+
+    this.appearanceForm.controls.vaultListSortOrder.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((vaultListSortOrder) => {
+        void this.updateVaultListSortOrder(vaultListSortOrder);
+      });
+
+    this.appearanceForm.controls.autofillListSortOrder.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((autofillListSortOrder) => {
+        void this.updateAutofillListSortOrder(autofillListSortOrder);
+      });
+  }
+
+  /** @returns The i18n key holding the label for the passed sort order. */
+  private sortOrderLabelKey(order: VaultListSortOrder): string {
+    switch (order) {
+      case VaultListSortOrder.NameAsc:
+        return "sortByNameAsc";
+      case VaultListSortOrder.NameDesc:
+        return "sortByNameDesc";
+      case VaultListSortOrder.UsernameAsc:
+        return "sortByUsernameAsc";
+      case VaultListSortOrder.UsernameDesc:
+        return "sortByUsernameDesc";
+      case VaultListSortOrder.LastUsed:
+      default:
+        return "sortByLastUsed";
+    }
+  }
+
+  async updateVaultListSortOrder(vaultListSortOrder: VaultListSortOrder) {
+    await this.vaultSettingsService.setVaultListSortOrder(vaultListSortOrder);
+  }
+
+  async updateAutofillListSortOrder(autofillListSortOrder: VaultListSortOrder) {
+    await this.vaultSettingsService.setAutofillListSortOrder(autofillListSortOrder);
   }
 
   async updateClickItemsToAutofillVaultView(clickItemsToAutofillVaultView: boolean) {

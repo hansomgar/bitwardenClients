@@ -388,7 +388,7 @@ body * {
   }
   .circle-color {
     @include themify($themes) {
-      stroke: themed("primaryColor");
+      stroke: themed("totpRingColor");
     }
   }
   .circle-danger-color {

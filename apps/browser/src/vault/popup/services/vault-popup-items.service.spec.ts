@@ -18,6 +18,7 @@ import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.servi
 import { SearchService } from "@bitwarden/common/vault/abstractions/search.service";
 import { VaultSettingsService } from "@bitwarden/common/vault/abstractions/vault-settings/vault-settings.service";
 import { CipherType } from "@bitwarden/common/vault/enums";
+import { VaultListSortOrder } from "@bitwarden/common/vault/enums/vault-list-sort-order.enum";
 import { CipherData } from "@bitwarden/common/vault/models/data/cipher.data";
 import { LocalData } from "@bitwarden/common/vault/models/data/local.data";
 import { CipherView } from "@bitwarden/common/vault/models/view/cipher.view";
@@ -25,7 +26,10 @@ import {
   RestrictedCipherType,
   RestrictedItemTypesService,
 } from "@bitwarden/common/vault/services/restricted-item-types.service";
-import { CipherViewLikeUtils } from "@bitwarden/common/vault/utils/cipher-view-like-utils";
+import {
+  CipherViewLike,
+  CipherViewLikeUtils,
+} from "@bitwarden/common/vault/utils/cipher-view-like-utils";
 
 import { InlineMenuFieldQualificationService } from "../../../autofill/services/inline-menu-field-qualification.service";
 import { BrowserApi } from "../../../platform/browser/browser-api";
@@ -56,6 +60,12 @@ describe("VaultPopupItemsService", () => {
 
   const cipherServiceMock = mock<CipherService>();
   const vaultSettingsServiceMock = mock<VaultSettingsService>();
+  /**
+   * Recreated per test. Tests mutate this subject to exercise sort order changes, and a
+   * shared instance would let leftover subscriptions from previous tests re-emit and fail
+   * against the wrong test.
+   */
+  let vaultListSortOrder$: BehaviorSubject<VaultListSortOrder>;
   const organizationServiceMock = mock<OrganizationService>();
   const vaultPopupListFiltersServiceMock = mock<VaultPopupListFiltersService>();
   const searchService = mock<SearchService>();
@@ -110,6 +120,17 @@ describe("VaultPopupItemsService", () => {
     );
     vaultSettingsServiceMock.showCardsCurrentTab$ = new BehaviorSubject(false);
     vaultSettingsServiceMock.showIdentitiesCurrentTab$ = new BehaviorSubject(false);
+    vaultListSortOrder$ = new BehaviorSubject<VaultListSortOrder>(VaultListSortOrder.LastUsed);
+    vaultSettingsServiceMock.vaultListSortOrder$ = vaultListSortOrder$.asObservable();
+    cipherServiceMock.getSortingFunctionForOrder.mockImplementation(
+      (order: VaultListSortOrder) =>
+        order === VaultListSortOrder.NameAsc
+          ? (a: CipherViewLike, b: CipherViewLike) => a.name.localeCompare(b.name)
+          : (a: CipherViewLike, b: CipherViewLike) => 0,
+    );
+    // `LastUsed` delegates to the real last-used comparator, mirroring production behavior.
+    // It deliberately does NOT sort alphabetically, so tests can tell the two modes apart.
+    cipherServiceMock.sortCiphersByLastUsedThenName.mockImplementation(() => 0);
 
     vaultPopupListFiltersServiceMock.filters$ = new BehaviorSubject({
       organization: null,
@@ -292,7 +313,178 @@ describe("VaultPopupItemsService", () => {
             expectedTypeOrder[CipherViewLikeUtils.getType(next)],
           );
         }
-        expect(cipherServiceMock.sortCiphersByLastUsedThenName).toHaveBeenCalled();
+        expect(cipherServiceMock.getSortingFunctionForOrder).toHaveBeenCalledWith(
+          VaultListSortOrder.LastUsed,
+        );
+        done();
+      });
+    });
+
+    it("applies the vault list sort order within each type group once the toggle is on", (done) => {
+      vaultListSortOrder$.next(VaultListSortOrder.NameAsc);
+      cipherServiceMock.filterCiphersForUrl.mockResolvedValue(Object.values(allCiphers));
+      // The toggle starts off, so the user must opt in before the setting is honored.
+      service.toggleAutofillSortOrder();
+
+      const expectedTypeOrder: Record<CipherType, number> = {
+        [CipherType.Login]: 1,
+        [CipherType.Card]: 2,
+        [CipherType.Identity]: 3,
+        [CipherType.SecureNote]: 4,
+        [CipherType.SshKey]: 5,
+        [CipherType.BankAccount]: 6,
+        [CipherType.DriversLicense]: 7,
+        [CipherType.Passport]: 8,
+      };
+
+      service.autoFillCiphers$.subscribe((ciphers) => {
+        expect(cipherServiceMock.getSortingFunctionForOrder).toHaveBeenCalledWith(
+          VaultListSortOrder.NameAsc,
+        );
+
+        // Type grouping must still hold...
+        for (let i = 0; i < ciphers.length - 1; i++) {
+          expect(
+            expectedTypeOrder[CipherViewLikeUtils.getType(ciphers[i])],
+          ).toBeLessThanOrEqual(expectedTypeOrder[CipherViewLikeUtils.getType(ciphers[i + 1])]);
+        }
+
+        // ...and names must be ascending inside each group.
+        const namesByType = new Map<CipherType, string[]>();
+        ciphers.forEach((c) => {
+          const type = CipherViewLikeUtils.getType(c);
+          namesByType.set(type, [...(namesByType.get(type) ?? []), c.name]);
+        });
+        namesByType.forEach((names) => {
+          expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
+        });
+
+        done();
+      });
+    });
+
+    it("uses the official most-recently-used order by default even when a sort order is configured", (done) => {
+      vaultListSortOrder$.next(VaultListSortOrder.NameAsc);
+      cipherServiceMock.filterCiphersForUrl.mockResolvedValue(Object.values(allCiphers));
+      cipherServiceMock.getSortingFunctionForOrder.mockClear();
+
+      service.autoFillCiphers$.subscribe(() => {
+        // The filtered list still honors the setting, but the autofill section must not:
+        // with the toggle off it always sorts by most-recently-used.
+        const autofillSortOrders = cipherServiceMock.getSortingFunctionForOrder.mock.calls.map(
+          ([order]) => order,
+        );
+        expect(autofillSortOrders).toContain(VaultListSortOrder.LastUsed);
+        done();
+      });
+    });
+
+    it("sorts by account when the toggle is used while the setting is the default", (done) => {
+      // The setting is the default, so "follow the setting" would be indistinguishable from
+      // "most recent". The chip therefore offers account ordering instead — without this the
+      // toggle looks like a no-op for every user who never changed the setting.
+      vaultListSortOrder$.next(VaultListSortOrder.LastUsed);
+      cipherServiceMock.filterCiphersForUrl.mockResolvedValue(Object.values(allCiphers));
+      cipherServiceMock.getSortingFunctionForOrder.mockClear();
+
+      service.toggleAutofillSortOrder();
+
+      service.autoFillCiphers$.subscribe(() => {
+        const usedOrders = cipherServiceMock.getSortingFunctionForOrder.mock.calls.map(
+          ([order]) => order,
+        );
+
+        expect(usedOrders).toContain(VaultListSortOrder.UsernameAsc);
+        done();
+      });
+    });
+
+    it("exposes the account-ordering state so the chip can relabel itself", (done) => {
+      vaultListSortOrder$.next(VaultListSortOrder.LastUsed);
+      cipherServiceMock.filterCiphersForUrl.mockResolvedValue(Object.values(allCiphers));
+
+      service.toggleAutofillSortOrder();
+
+      service.autofillSortsByUsername$.subscribe((sortsByUsername) => {
+        expect(sortsByUsername).toBe(true);
+        done();
+      });
+    });
+
+    it("reports whether the configured order is the default", (done) => {
+      vaultListSortOrder$.next(VaultListSortOrder.LastUsed);
+
+      service.configuredSortIsLastUsed$.subscribe((isLastUsed) => {
+        expect(isLastUsed).toBe(true);
+        done();
+      });
+    });
+
+    it("follows the setting instead of account order when the setting is meaningful", (done) => {
+      vaultListSortOrder$.next(VaultListSortOrder.NameAsc);
+      cipherServiceMock.filterCiphersForUrl.mockResolvedValue(Object.values(allCiphers));
+      cipherServiceMock.getSortingFunctionForOrder.mockClear();
+
+      service.toggleAutofillSortOrder();
+
+      service.autoFillCiphers$.subscribe(() => {
+        const usedOrders = cipherServiceMock.getSortingFunctionForOrder.mock.calls.map(
+          ([order]) => order,
+        );
+
+        expect(usedOrders).toContain(VaultListSortOrder.NameAsc);
+        expect(usedOrders).not.toContain(VaultListSortOrder.UsernameAsc);
+        done();
+      });
+    });
+
+    it("actually re-sorts the autofill list when the toggle is turned on", (done) => {
+      // The headline behaviour: clicking the chip must change the rendered order, not just
+      // the chip label.
+      vaultListSortOrder$.next(VaultListSortOrder.NameAsc);
+
+      const scrambled = [
+        { id: "3", type: CipherType.Login, name: "Login zulu" },
+        { id: "1", type: CipherType.Login, name: "Login alpha" },
+        { id: "2", type: CipherType.Login, name: "Login mike" },
+      ] as unknown as PopupCipherViewLike[];
+      cipherServiceMock.filterCiphersForUrl.mockResolvedValue(scrambled);
+
+      // "Most recently used" keeps the incoming order so the two modes are distinguishable.
+      cipherServiceMock.sortCiphersByLastUsedThenName.mockImplementation(() => 0);
+
+      const seen: string[][] = [];
+      service.autoFillCiphers$.subscribe((ciphers) => {
+        seen.push(ciphers.map((c) => c.name));
+
+        if (seen.length === 1) {
+          service.toggleAutofillSortOrder();
+          return;
+        }
+
+        expect(seen[0]).toEqual(["Login zulu", "Login alpha", "Login mike"]);
+        expect(seen[1]).toEqual(["Login alpha", "Login mike", "Login zulu"]);
+        done();
+      });
+    });
+
+    it("keeps the toggle state when the configured order goes back to most-recently-used", (done) => {
+      vaultListSortOrder$.next(VaultListSortOrder.NameDesc);
+      service.toggleAutofillSortOrder();
+      cipherServiceMock.filterCiphersForUrl.mockResolvedValue(Object.values(allCiphers));
+
+      let emissions = 0;
+      service.autoFillCiphers$.subscribe(() => {
+        emissions++;
+
+        if (emissions === 1) {
+          // Configuration changes back to the official default. The toggle stays visible, so
+          // its state must not be reset out from under the user.
+          vaultListSortOrder$.next(VaultListSortOrder.LastUsed);
+          return;
+        }
+
+        expect(service["_autofillFollowsVaultSortOrder$"].getValue()).toBe(true);
         done();
       });
     });
@@ -330,6 +522,53 @@ describe("VaultPopupItemsService", () => {
       service.filteredCiphers$.subscribe((ciphers) => {
         // There are 10 ciphers but only 3 with "Login" in the name
         expect(ciphers.length).toBe(3);
+        done();
+      });
+    });
+
+    it("applies the configured vault list sort order", (done) => {
+      vaultListSortOrder$.next(VaultListSortOrder.NameAsc);
+
+      service.filteredCiphers$.subscribe((ciphers) => {
+        expect(cipherServiceMock.getSortingFunctionForOrder).toHaveBeenCalledWith(
+          VaultListSortOrder.NameAsc,
+        );
+
+        const names = ciphers.map((c) => c.name);
+        expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
+        done();
+      });
+    });
+
+    it("re-sorts when the sort order setting changes", (done) => {
+      let callCount = 0;
+
+      service.filteredCiphers$.subscribe(() => {
+        callCount++;
+
+        if (callCount === 1) {
+          vaultListSortOrder$.next(VaultListSortOrder.NameDesc);
+          return;
+        }
+
+        expect(cipherServiceMock.getSortingFunctionForOrder).toHaveBeenCalledWith(
+          VaultListSortOrder.NameDesc,
+        );
+        done();
+      });
+    });
+  });
+
+  describe("autoFillCiphers$ sort order", () => {
+    it("keeps sorting by type regardless of the vault list sort order", (done) => {
+      vaultListSortOrder$.next(VaultListSortOrder.NameAsc);
+      const spy = jest.spyOn(
+        service as unknown as { sortCiphersForAutofill: () => void },
+        "sortCiphersForAutofill",
+      );
+
+      service.autoFillCiphers$.subscribe(() => {
+        expect(spy).toHaveBeenCalled();
         done();
       });
     });

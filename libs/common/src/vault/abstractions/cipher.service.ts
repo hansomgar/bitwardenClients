@@ -11,6 +11,8 @@ import { SymmetricCryptoKey } from "../../platform/models/domain/symmetric-crypt
 import { CipherId, CollectionId, OrganizationId, UserId } from "../../types/guid";
 import { UserKey } from "../../types/key";
 import { CipherType } from "../enums/cipher-type";
+import { VaultListSortOrder } from "../enums/vault-list-sort-order.enum";
+import { SortableListAccessors } from "../types/sortable-list-accessors";
 import { CipherData } from "../models/data/cipher.data";
 import { LocalData } from "../models/data/local.data";
 import { Cipher } from "../models/domain/cipher";
@@ -253,6 +255,15 @@ export abstract class CipherService implements UserKeyRotationDataProvider<Ciphe
   abstract sortCiphersByLastUsed(a: CipherViewLike, b: CipherViewLike): number;
   abstract sortCiphersByLastUsedThenName(a: CipherViewLike, b: CipherViewLike): number;
   abstract getLocaleSortingFunction(): (a: CipherViewLike, b: CipherViewLike) => number;
+  /**
+   * Builds the comparator for a user selectable {@link VaultListSortOrder}, shared by the
+   * popup vault list and the inline autofill menu. Callers whose items are not
+   * {@link CipherViewLike} instances pass accessors describing how to read the sort keys.
+   */
+  abstract getSortingFunctionForOrder<T = CipherViewLike>(
+    order: VaultListSortOrder,
+    accessors?: SortableListAccessors<T>,
+  ): (a: T, b: T) => number;
   abstract softDelete(id: string | string[], userId: UserId): Promise<void>;
   abstract softDeleteWithServer(id: string, userId: UserId, asAdmin?: boolean): Promise<void>;
   abstract softDeleteManyWithServer(

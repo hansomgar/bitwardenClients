@@ -6762,5 +6762,47 @@
   },
   "cannotSaveItemNoConfirmedOrgs": {
     "message": "Unable to save item. You must be confirmed to the organization to save items."
+  },
+  "vaultListSortOrder": {
+    "message": "Vault list sort order"
+  },
+  "autofillListSortOrder": {
+    "message": "Autofill list sort order"
+  },
+  "sortByLastUsed": {
+    "message": "Recently used first"
+  },
+  "sortByNameAsc": {
+    "message": "Name (A to Z)"
+  },
+  "sortByNameDesc": {
+    "message": "Name (Z to A)"
+  },
+  "sortByUsernameAsc": {
+    "message": "Account (A to Z)"
+  },
+  "sortByUsernameDesc": {
+    "message": "Account (Z to A)"
+  },
+  "autofillSortBySetting": {
+    "message": "By setting"
+  },
+  "autofillSortByLastUsed": {
+    "message": "By recent"
+  },
+  "autofillSortByUsername": {
+    "message": "By account"
+  },
+  "autofillSortBySettingTooltip": {
+    "message": "Currently sorted by most recent. Click to use the vault list sort order instead"
+  },
+  "autofillSortByLastUsedTooltip": {
+    "message": "Currently using the vault list sort order. Click to sort by most recent (Bitwarden default)"
+  },
+  "autofillSortByUsernameTooltip": {
+    "message": "Currently sorted by most recent. Click to sort by account (A to Z)"
+  },
+  "sendNameOptionalHint": {
+    "message": "Leave blank to name it by timestamp plus length/size"
   }
 }

@@ -83,6 +83,170 @@ Security audits and feedback are welcome. Please open an issue or email us priva
 ### 1.4 列表项序号
 在 `buildFillCipherElement` 方法中为每个条目添加 `.cipher-index` span 元素（1-based 序号），在 `list.scss` 中添加对应样式。
 
+### 1.5 列表排序（版本 2026.6.1.1）
+在外观设置页（"外观"页面，与"显示动画"同级）新增两个下拉框，分别控制密码库列表与网页内联填充菜单的帐号排序。
+
+**可选排序方式（两处一致）：**
+
+| 选项值 | 中文 | 英文 |
+|--------|------|------|
+| `lastUsed`（默认） | 最近使用优先 | Recently used first |
+| `nameAsc` | 名称 A → Z | Name (A to Z) |
+| `nameDesc` | 名称 Z → A | Name (Z to A) |
+| `usernameAsc` | 帐号 A → Z | Account (A to Z) |
+| `usernameDesc` | 帐号 Z → A | Account (Z to A) |
+
+**行为说明：**
+
+1. **两个设置互相独立**，跟随帐号持久化（`UserKeyDefinition`，`clearOn: []`）。
+2. **密码库列表排序**作用于「所有项目」「收藏」「搜索结果」。自动填充建议**默认始终按最近使用优先**（与 Bitwarden 官方行为一致），两类列表都**保留类型分组**（登录 → 卡片 → 身份 → …）。
+3. **填充帐号列表排序**作用于网页内联填充菜单（含帐号创建场景）。当存在通行密钥条目时，**通行密钥分组始终置顶**，两组各自排序后拼接。
+4. **自动填充建议排序切换**：自动填充建议标题栏右侧**始终显示**一个切换按钮：
+   - 样式为 `bit-chip-action`（`variant="subtle"`、`size="small"`），带边框、圆角、背景与 hover/焦点态，与列表里的「填充」胶囊按钮一致，明确可点击
+   - 按钮文案描述**当前**排序方式，tooltip 描述**点击后**切换到的排序方式
+
+   **三种状态**：
+
+   | 设置值 | 当前排序 | 按钮显示 | 点击后 |
+   |--------|----------|----------|--------|
+   | 最近使用优先（默认） | 最近优先 | 按最近 | **按帐号 A → Z** |
+   | 最近使用优先（默认） | 按帐号 | 按帐号 | 回到按最近 |
+   | 名称/帐号等非默认值 | 最近优先 | 按最近 | 按「密码库列表排序」设置 |
+   | 名称/帐号等非默认值 | 按设置 | 按设置 | 回到按最近 |
+
+   - 设置为默认值时，若仍用「按设置」会导致点击无变化（两种排序等价），因此自动回退为「按帐号」排序，保证按钮始终有可见效果
+   - 该开关**不持久化**，每次打开弹窗都回到官方默认的最近使用优先
+
+   > **实现注意**：
+   > 1. `slot="title-end"` 的内容**必须**作为容器的静态子元素，不能包在 `@if` / `@for` 等内嵌视图里。Angular 不会把内嵌视图中的内容投影进 `ng-content select`，会导致标题栏右侧静默空白（官方原版的 `app-simplified-autofill-info` 也因同样原因从未显示过，本次一并修复）。
+   > 2. `autoFillCiphers$` 中**不要**加 `sortOrder !== LastUsed` 这类守卫。早期版本曾存在该守卫，导致按钮在设置为默认值「最近使用优先」时只切换文案、不改变排序（已修复）。
+5. 默认值 `lastUsed` 与改造前行为完全一致，老用户升级后无感知变化。
+6. 名称排序使用「名称 → 帐号」双键，帐号排序使用「帐号 → 名称」双键，保证图3 那种同名多帐号（如多个 `signup.live.com`）顺序确定。空值恒排最后。
+7. 修改填充帐号列表排序后，内联菜单会**自动刷新**，无需重载页面或重新聚焦输入框。
+
+**修改文件：**
+| 文件 | 改动 |
+|------|------|
+| `libs/common/src/vault/enums/vault-list-sort-order.enum.ts` | 新增 `VaultListSortOrder` 枚举与 `VAULT_LIST_SORT_ORDERS` 列表 |
+| `libs/common/src/vault/enums/index.ts` | 导出新枚举 |
+| `libs/common/src/vault/types/sortable-list-accessors.ts` | 新增 `SortableListAccessors`，供非 cipher 数据复用比较逻辑 |
+| `libs/common/src/vault/services/key-state/vault-settings.state.ts` | 新增 `VAULT_LIST_SORT_ORDER`、`AUTOFILL_LIST_SORT_ORDER` 两个 `UserKeyDefinition` |
+| `libs/common/src/vault/abstractions/vault-settings/vault-settings.service.ts` | 新增 2 个 `$` 与 2 个 setter 抽象 |
+| `libs/common/src/vault/services/vault-settings/vault-settings.service.ts` | 实现上述 4 个成员，默认 `lastUsed` |
+| `libs/common/src/vault/services/cipher.service.ts` | 新增 `getSortingFunctionForOrder` 统一比较器（泛型 + 可选 accessors） |
+| `libs/common/src/vault/abstractions/cipher.service.ts` | 声明 `getSortingFunctionForOrder` |
+| `apps/browser/src/vault/popup/services/vault-popup-items.service.ts` | 搜索后应用排序；自动填充建议默认最近优先，可用内存开关临时切换为跟随设置 |
+| `apps/browser/src/autofill/background/overlay.background.ts` | `sortInlineMenuCipherData` 内联菜单排序（通行密钥分区优先）+ 监听设置变化自动刷新 |
+| `apps/browser/src/vault/popup/settings/appearance.component.html` | 新增两个 `bit-select` |
+| `apps/browser/src/vault/popup/settings/appearance.component.ts` | 表单控件、初始值读取、变更订阅 |
+| `apps/browser/src/_locales/en/messages.json` | 新增 7 个翻译键 |
+| `apps/browser/src/_locales/zh_CN/messages.json` | 新增 7 个翻译键 |
+
+### 1.6 内联菜单盾牌图标改为品牌绿（版本 2026.6.1.2）
+
+网页输入框旁的内联填充按钮图标原先沿用 Bitwarden 品牌蓝 `#175DDC`，与插件主图标（绿色 `#08A647`）不一致。本次统一为主图标的绿色。
+
+**改动文件：**
+| 文件 | 改动 |
+|------|------|
+| `apps/browser/src/autofill/utils/svg-icons.ts` | `logoIcon` / `logoLockedIcon` 的 `fill` 由 `#175DDC` 改为 `#08A647` |
+| `apps/browser/src/autofill/overlay/inline-menu/pages/button/__snapshots__/autofill-inline-menu-button.spec.ts.snap` | 同步更新 2 处快照 |
+
+**说明：**
+- 只改动图标填充色，SVG 路径、尺寸、锁定态小锁样式均未变
+- `logoLockedIcon` 一并改色，否则账户锁定时图标会变回蓝色
+- 内联菜单其他主色（「填充」按钮、TOTP 圆环等）仍使用 `variables.scss` 中的 `$brand-primary-light`，本次未改；如需一并统一可另行处理
+
+### 1.7 TOTP 倒计时圆环改为品牌绿（版本 2026.6.1.2）
+
+内联菜单中带 TOTP 的条目会显示倒计时圆环，原为品牌蓝。本次单独改为品牌绿，**不影响其他主色元素**。
+
+**改动文件：**
+| 文件 | 改动 |
+|------|------|
+| `apps/browser/src/autofill/shared/styles/variables.scss` | 新增独立颜色键 `totpRingColor`（浅色 `#08a647` / 深色 `#4cd07d`） |
+| `apps/browser/src/autofill/overlay/inline-menu/pages/list/list.scss` | `.circle-color` 改用 `themed("totpRingColor")` |
+
+**说明：**
+- 未直接修改 `$brand-primary-light`，避免连带影响条目图标与「新增」按钮
+- 危险态 `.circle-danger-color` 仍用 `passwordSpecialColor`，倒计时告急仍变红
+
+### 1.8 新增「+ 登录」快捷按钮（版本 2026.6.1.2）
+
+密码库标题栏原先只有「+ 新增 ▾」一个按钮，新建登录需要点两次（展开菜单 → 选「登录」）。本次在其左侧新增「+ 登录」按钮，**一次点击**直达新建登录页。
+
+**改动文件：**
+| 文件 | 改动 |
+|------|------|
+| `apps/browser/src/vault/popup/components/vault/new-item-dropdown/new-item-dropdown.component.html` | 新增 `buttonType="secondary"` 的登录快捷按钮 |
+| `apps/browser/src/vault/popup/components/vault/new-item-dropdown/new-item-dropdown.component.ts` | 新增 `loginAllowed$`（策略禁用登录时隐藏按钮） |
+| `apps/browser/src/vault/popup/components/vault/new-item-dropdown/new-item-dropdown.component.spec.ts` | 新增 5 个测试 |
+
+**设计要点：**
+- 按钮顺序为「+ 新增 ▾」在左、「+ 登录」在右
+- 「+ 登录」为 `buttonType="primary"`（实心主色），「+ 新增 ▾」为 `buttonType="secondary"`（浅灰底 + 边框）。新建登录是日常最高频操作，故作为主操作；多种类型新建降为次操作
+- **主题适配**：颜色全部来自设计系统 token（`tw-bg-bg-brand` / `tw-bg-bg-secondary` 等），light / dark 主题自动适配，未写任何硬编码颜色
+- **i18n 适配**：复用现有 `login` 翻译键（中文「登录」/ 英文「Log in」），无需新增翻译，全部 60+ 语言目录自动生效
+- 复用 `buildQueryParams(CipherType.Login)`，自动带入当前标签页 URL 与名称，行为与下拉菜单中的「登录」完全一致
+- 当组织策略禁用「登录」类型时，按钮自动隐藏
+- 当 `PM32009NewItemTypes` 特性开关开启时（「新增」本身直达新建页），不显示该快捷按钮
+- 文案用「登录」而非「新增登录」，宽度可控，380px 窄窗口下仍能完整显示
+
+### 1.9 Send 界面新增按钮拆分为两个（版本 2026.6.1.3）
+
+Send 页标题栏原先只有「+ 新增 ▾」下拉按钮，新建文本 Send 需点两次。本次在浏览器端拆成两个并排按钮，**一次点击**直达。
+
+**布局：**
+| 位置 | 按钮 | 样式 | 行为 |
+|------|------|------|------|
+| 左 | **+ 文件 Send** | 次按钮（浅灰底 + 边框） | 有 Premium 直接进入；无 Premium 弹出升级提示 |
+| 右 | **+ 文本 Send** | 主按钮（实心主色） | 直接进入新建文本 Send |
+
+**改动文件：**
+| 文件 | 改动 |
+|------|------|
+| `libs/tools/send/send-ui/src/new-send-dropdown/new-send-dropdown.component.ts` | 新增 `@Input() useSplitButtons`（默认 `false`） |
+| `libs/tools/send/send-ui/src/new-send-dropdown/new-send-dropdown.component.html` | 按 `useSplitButtons` 分支渲染：拆分布局 或 原下拉布局 |
+| `libs/tools/send/send-ui/src/new-send-dropdown/new-send-dropdown.component.spec.ts` | 新增 7 个测试（两种模式、样式、Premium 分支） |
+| `apps/browser/src/tools/popup/send-v2/send-v2.component.html` | 两处调用点传入 `[useSplitButtons]="true"` |
+
+**设计要点：**
+- **跨端安全**：该组件被 Web 端共用（Desktop 用的是独立的 `tools-new-send-dropdown-v2`）。采用**可选 input 默认 `false`** 的方式，仅浏览器端显式开启，Web 端行为完全不变（已跑 Web 端测试确认通过）
+- **Premium 处理**：文件 Send 需要 Premium。拆分按钮点击时复用原有 `sendFileClick()`，无 Premium 时弹升级提示而非静默失败
+- **主题适配**：颜色全部来自设计系统 token，light / dark 自动适配
+- **i18n 适配**：复用现有 `sendTypeText`（文本 Send）/ `sendTypeFile`（文件 Send）键，无新增翻译
+- 空状态页的「创建 Send」按钮同样拆分，保持两处一致
+
+### 1.10 Send 名称改为可选，留空自动命名（版本 2026.6.1.3）
+
+原先 Send 的名称是必填项，不填无法保存。现改为可选，留空时自动用「时间 + 长度/大小」生成名称。
+
+**生成规则：**
+
+| 类型 | 格式 | 示例 |
+|------|------|------|
+| 文本 Send | `时间 ( length : 字符数 )` | `2026-11-12 12:00:09 ( length : 12678 )` |
+| 文件 Send | `时间 ( size : 文件大小 )` | `2026-11-12 12:00:09 ( size : 35.3KB )` |
+
+文件大小自动换算单位：`512B` → `35.3KB` → `1.5MB` → `1GB`（1024 进制，整数不带小数点）。
+
+**改动文件：**
+| 文件 | 改动 |
+|------|------|
+| `libs/tools/send/send-ui/src/send-form/utils/generate-send-name.ts` | **新建**，时间与大小格式化工具 |
+| `libs/tools/send/send-ui/src/send-form/utils/generate-send-name.spec.ts` | **新建**，11 个单测 |
+| `libs/tools/send/send-ui/src/send-form/components/send-details/send-details.component.ts` | 去掉 `name` 的 `Validators.required` |
+| `libs/tools/send/send-ui/src/send-form/components/send-details/send-details.component.html` | 新增留空提示 |
+| `libs/tools/send/send-ui/src/send-form/abstractions/send-form.service.ts` | 新增 `getFile(): File \| null` |
+| `libs/tools/send/send-ui/src/send-form/services/default-send-form.service.ts` | 提交时为空名称生成值 |
+| `apps/{browser,web,desktop}/.../messages.json` | 各端 locale 新增 `sendNameOptionalHint` |
+
+**设计要点：**
+- **仅新建时生成**：`mode === "add"` 才触发，编辑已有 Send 不会覆盖用户原本的名称
+- **文件大小取自原始 `File`**：`SendFileView.size` 要等加密后才有值，而 `file.size` 选完即可用，因此新增 `getFile()` 读取
+- **三端统一生效**：`send-form` 是浏览器 / Web / Desktop 共用的库，本次改动三端行为一致（已分别验证：Web 10/10、Desktop 20/20 通过）
+- **不依赖 locale**：时间格式手工拼接而非用 `Intl` 或日期管道，保证任何语言环境下生成的名称完全一致
+
 ---
 
 ## 二、界面上锁 (UI Lock) 功能
@@ -474,6 +638,24 @@ UI 锁仅限制手动打开的扩展弹窗（popup），不影响浏览器自动
 |-----|------|------|
 | `disableHttpWarning` | Disable HTTP page warning | 禁用 HTTP 页面警告 |
 | `vaultListDisplayCount` | Vault list display count | 列表显示数量 |
+
+### 列表排序
+
+| Key | 英文 | 中文 |
+|-----|------|------|
+| `vaultListSortOrder` | Vault list sort order | 密码库列表排序 |
+| `autofillListSortOrder` | Autofill list sort order | 填充帐号列表排序 |
+| `sortByLastUsed` | Recently used first | 最近使用优先 |
+| `sortByNameAsc` | Name (A to Z) | 名称 A → Z |
+| `sortByNameDesc` | Name (Z to A) | 名称 Z → A |
+| `sortByUsernameAsc` | Account (A to Z) | 帐号 A → Z |
+| `sortByUsernameDesc` | Account (Z to A) | 帐号 Z → A |
+| `autofillSortBySetting` | By setting | 按设置 |
+| `autofillSortByLastUsed` | By recent | 按最近 |
+| `autofillSortByUsername` | By account | 按帐号 |
+| `autofillSortBySettingTooltip` | Currently sorted by most recent. Click to use the vault list sort order instead | 当前按最近使用排序。点击改为按「密码库列表排序」设置排序 |
+| `autofillSortByLastUsedTooltip` | Currently using the vault list sort order. Click to sort by most recent (Bitwarden default) | 当前按设置排序。点击改为按最近使用排序（Bitwarden 默认行为） |
+| `autofillSortByUsernameTooltip` | Currently sorted by most recent. Click to sort by account (A to Z) | 当前按最近使用排序。点击改为按帐号 A → Z 排序 |
 
 ### 界面上锁
 

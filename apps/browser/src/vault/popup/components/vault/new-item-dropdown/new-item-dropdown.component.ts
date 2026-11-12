@@ -56,6 +56,14 @@ export class NewItemDropdownComponent implements OnInit {
       }),
     );
 
+  /**
+   * Whether the "add login" shortcut may be shown. Logins can be restricted by an
+   * organization policy, in which case the dropdown omits them and the shortcut must follow.
+   */
+  readonly loginAllowed$: Observable<boolean> = this.cipherMenuItems$.pipe(
+    map((menuItems) => menuItems.some((menuItem) => menuItem.type === CipherType.Login)),
+  );
+
   readonly useNewItemDialog = toSignal(
     this.configService.getFeatureFlag$(FeatureFlag.PM32009NewItemTypes),
     { initialValue: false },

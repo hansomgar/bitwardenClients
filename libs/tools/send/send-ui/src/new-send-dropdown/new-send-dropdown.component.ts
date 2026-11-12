@@ -26,6 +26,18 @@ export class NewSendDropdownComponent implements OnInit {
   // eslint-disable-next-line @angular-eslint/prefer-signals
   @Input() buttonType: ButtonType = "primary";
 
+  /**
+   * Renders two side-by-side buttons ("file" then "text") instead of the single dropdown
+   * trigger, saving a click for the common case. Opt-in so the web client keeps the existing
+   * dropdown behaviour.
+   *
+   * The text button keeps `buttonType`; the file button is always `secondary` so the two
+   * read as a primary/secondary pair.
+   */
+  // FIXME(https://bitwarden.atlassian.net/browse/CL-903): Migrate to Signals
+  // eslint-disable-next-line @angular-eslint/prefer-signals
+  @Input() useSplitButtons: boolean = false;
+
   sendType = SendType;
 
   hasNoPremium = false;
