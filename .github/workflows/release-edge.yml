@@ -1,0 +1,168 @@
+# 构建 Edge 扩展并发布到 GitHub Release。
+#
+# 触发方式：
+#   1. 推送形如 v2026.6.1.3 的 tag
+#   2. 在 Actions 页面手动触发（可指定版本号）
+#
+# 产物：
+#   - edge-<version>.zip       解压后可直接「加载解压缩的扩展」
+#   - 上传到对应 Release，并附带 SHA256 校验值
+name: Release Edge Extension
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "版本号（留空则读取 manifest）。例如 2026.6.1.3"
+        required: false
+        type: string
+      prerelease:
+        description: "标记为预发布"
+        required: false
+        default: false
+        type: boolean
+
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-edge-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build & Release
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Resolve version
+        id: version
+        run: |
+          set -euo pipefail
+          if [[ -n "${{ inputs.version }}" ]]; then
+            VERSION="${{ inputs.version }}"
+          elif [[ "${{ github.ref_type }}" == "tag" ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION=$(node -p "require('./apps/browser/src/manifest.v3.json').version")
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Resolved version: $VERSION"
+
+      - name: Align manifest version
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.version }}"
+          # 以发布版本为准同步三处版本号，避免与 tag 不一致
+          node -e '
+            const fs = require("fs");
+            const version = process.argv[1];
+            const files = [
+              "apps/browser/src/manifest.json",
+              "apps/browser/src/manifest.v3.json",
+              "apps/browser/package.json",
+            ];
+            for (const f of files) {
+              const j = JSON.parse(fs.readFileSync(f, "utf8"));
+              j.version = version;
+              fs.writeFileSync(f, JSON.stringify(j, null, 2) + "\n");
+            }
+          ' "$VERSION"
+          grep -h '"version"' apps/browser/src/manifest.v3.json apps/browser/package.json
+
+      - name: Build Edge extension
+        working-directory: apps/browser
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: npm run build:prod:edge
+
+      - name: Verify build output
+        run: |
+          set -euo pipefail
+          OUT=apps/browser/build
+          test -f "$OUT/manifest.json" || { echo "manifest.json 缺失"; exit 1; }
+          ACTUAL=$(node -p "require('./$OUT/manifest.json').version")
+          EXPECTED="${{ steps.version.outputs.version }}"
+          echo "构建产物版本: $ACTUAL"
+          if [[ "$ACTUAL" != "$EXPECTED" ]]; then
+            echo "版本不一致: 期望 $EXPECTED，实际 $ACTUAL"
+            exit 1
+          fi
+
+      - name: Package zip
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.version }}"
+          cd apps/browser/build
+          # 排除 source map，减小发布包体积
+          zip -r -q "../../../edge-${VERSION}.zip" . -x '*.map'
+          cd ../../..
+          ls -lh "edge-${VERSION}.zip"
+          sha256sum "edge-${VERSION}.zip" | tee "edge-${VERSION}.zip.sha256"
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: edge-extension-${{ steps.version.outputs.version }}
+          path: |
+            edge-${{ steps.version.outputs.version }}.zip
+            edge-${{ steps.version.outputs.version }}.zip.sha256
+          retention-days: 30
+
+      - name: Create or update release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.version }}"
+          TAG="v${VERSION}"
+          PRERELEASE="${{ inputs.prerelease }}"
+          if [[ "$PRERELEASE" != "true" ]]; then PRERELEASE="false"; fi
+
+          # 说明正文：优先使用仓库中的发布说明文件，缺失则用默认模板
+          BODY_FILE="docs/release-notes-${VERSION}.md"
+          if [[ -f "$BODY_FILE" ]]; then
+            BODY=$(cat "$BODY_FILE")
+          else
+            BODY="Vaultwarden HandsomeGuy Edition ${VERSION}
+          
+          - 基于官方 Bitwarden ${VERSION%.*} 定制
+          - 解压 \`edge-${VERSION}.zip\` 后，在 \`edge://extensions\` 中「加载解压缩的扩展」
+          - SHA256: 见附带校验文件
+          "
+          fi
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG 已存在，更新资产"
+            gh release upload "$TAG" "edge-${VERSION}.zip" "edge-${VERSION}.zip.sha256" --clobber
+          else
+            echo "创建 Release $TAG"
+            gh release create "$TAG" \
+              --title "Vaultwarden ${VERSION}" \
+              --notes "$BODY" \
+              --prerelease="$PRERELEASE" \
+              "edge-${VERSION}.zip" \
+              "edge-${VERSION}.zip.sha256"
+          fi
