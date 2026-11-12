@@ -17,6 +17,7 @@ import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/pl
 import { ThemeType } from "@bitwarden/common/platform/enums";
 import { ThemeStateService } from "@bitwarden/common/platform/theming/theme-state.service";
 import { VaultSettingsService } from "@bitwarden/common/vault/abstractions/vault-settings/vault-settings.service";
+import { VaultListSortOrder } from "@bitwarden/common/vault/enums/vault-list-sort-order.enum";
 
 import { PopupCompactModeService } from "../../../platform/popup/layout/popup-compact-mode.service";
 import { PopupHeaderComponent } from "../../../platform/popup/layout/popup-header.component";
@@ -73,6 +74,12 @@ describe("AppearanceComponent", () => {
   const setShowQuickCopyActions = jest.fn().mockResolvedValue(undefined);
   const setClickItemsToAutofillVaultView = jest.fn().mockResolvedValue(undefined);
   const setShowAtRiskPasswordNotifications = jest.fn().mockResolvedValue(undefined);
+  const vaultListSortOrder$ = new BehaviorSubject<VaultListSortOrder>(VaultListSortOrder.LastUsed);
+  const autofillListSortOrder$ = new BehaviorSubject<VaultListSortOrder>(
+    VaultListSortOrder.LastUsed,
+  );
+  const setVaultListSortOrder = jest.fn().mockResolvedValue(undefined);
+  const setAutofillListSortOrder = jest.fn().mockResolvedValue(undefined);
 
   const mockWidthService: Partial<PopupSizeService> = {
     width$: new BehaviorSubject("default"),
@@ -86,6 +93,10 @@ describe("AppearanceComponent", () => {
     setEnableRoutingAnimation.mockClear();
     setClickItemsToAutofillVaultView.mockClear();
     setShowAtRiskPasswordNotifications.mockClear();
+    setVaultListSortOrder.mockClear();
+    setAutofillListSortOrder.mockClear();
+    vaultListSortOrder$.next(VaultListSortOrder.LastUsed);
+    autofillListSortOrder$.next(VaultListSortOrder.LastUsed);
 
     const configService = mock<ConfigService>();
     configService.getFeatureFlag$.mockImplementation(
@@ -134,8 +145,12 @@ describe("AppearanceComponent", () => {
           useValue: {
             clickItemsToAutofillVaultView$: of(false),
             showAtRiskPasswordNotifications$: of(true),
+            vaultListSortOrder$: vaultListSortOrder$,
+            autofillListSortOrder$: autofillListSortOrder$,
             setClickItemsToAutofillVaultView,
             setShowAtRiskPasswordNotifications,
+            setVaultListSortOrder,
+            setAutofillListSortOrder,
           },
         },
         {
@@ -183,6 +198,8 @@ describe("AppearanceComponent", () => {
       width: "default",
       clickItemsToAutofillVaultView: false,
       showAtRiskNotifications: true,
+      vaultListSortOrder: VaultListSortOrder.LastUsed,
+      autofillListSortOrder: VaultListSortOrder.LastUsed,
     });
   });
 
@@ -227,6 +244,27 @@ describe("AppearanceComponent", () => {
       component.appearanceForm.controls.width.setValue("wide");
 
       expect(mockWidthService.setWidth).toHaveBeenCalledWith("wide");
+    });
+
+    it("updates the vault list sort order setting", () => {
+      component.appearanceForm.controls.vaultListSortOrder.setValue(VaultListSortOrder.NameAsc);
+
+      expect(setVaultListSortOrder).toHaveBeenCalledWith(VaultListSortOrder.NameAsc);
+    });
+
+    it("updates the autofill list sort order setting", () => {
+      component.appearanceForm.controls.autofillListSortOrder.setValue(
+        VaultListSortOrder.UsernameDesc,
+      );
+
+      expect(setAutofillListSortOrder).toHaveBeenCalledWith(VaultListSortOrder.UsernameDesc);
+    });
+
+    it("does not affect the other sort order setting when one of them changes", () => {
+      component.appearanceForm.controls.vaultListSortOrder.setValue(VaultListSortOrder.NameDesc);
+
+      expect(setVaultListSortOrder).toHaveBeenCalledWith(VaultListSortOrder.NameDesc);
+      expect(setAutofillListSortOrder).not.toHaveBeenCalled();
     });
   });
 

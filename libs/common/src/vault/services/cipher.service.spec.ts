@@ -35,6 +35,7 @@ import { CipherFileUploadService } from "../abstractions/file-upload/cipher-file
 import { FieldType } from "../enums";
 import { CipherRepromptType } from "../enums/cipher-reprompt-type";
 import { CipherType } from "../enums/cipher-type";
+import { VaultListSortOrder } from "../enums/vault-list-sort-order.enum";
 import { CipherPermissionsApi } from "../models/api/cipher-permissions.api";
 import { CipherData } from "../models/data/cipher.data";
 import { Cipher } from "../models/domain/cipher";
@@ -1957,6 +1958,125 @@ describe("Cipher Service", () => {
       expect(cipherEncryptionService.encrypt).toHaveBeenCalledWith(sdkCipherView, mockUserId);
       expect(apiService.putCipherCollections).not.toHaveBeenCalled();
       expect(result).toBe(encryptedCipher);
+    });
+  });
+
+  describe("getSortingFunctionForOrder()", () => {
+    function makeLogin(name: string, username?: string): CipherView {
+      const view = new CipherView(new Cipher({ ...cipherData, type: CipherType.Login } as any));
+      view.name = name;
+      view.login = { username } as any;
+      return view;
+    }
+
+    function sortNames(ciphers: CipherView[], order: VaultListSortOrder): string[] {
+      return [...ciphers].sort(cipherService.getSortingFunctionForOrder(order)).map((c) => c.name);
+    }
+
+    it("sorts by name ascending", () => {
+      const ciphers = [makeLogin("Charlie"), makeLogin("alpha"), makeLogin("Bravo")];
+
+      expect(sortNames(ciphers, VaultListSortOrder.NameAsc)).toEqual([
+        "alpha",
+        "Bravo",
+        "Charlie",
+      ]);
+    });
+
+    it("sorts by name descending", () => {
+      const ciphers = [makeLogin("Charlie"), makeLogin("alpha"), makeLogin("Bravo")];
+
+      expect(sortNames(ciphers, VaultListSortOrder.NameDesc)).toEqual([
+        "Charlie",
+        "Bravo",
+        "alpha",
+      ]);
+    });
+
+    it("sorts by username ascending, falling back to the name when there is no username", () => {
+      const ciphers = [
+        makeLogin("same", "zoe@example.com"),
+        makeLogin("zzz-no-username"),
+        makeLogin("same", "amy@example.com"),
+      ];
+
+      expect(sortNames(ciphers, VaultListSortOrder.UsernameAsc)).toEqual([
+        "same", // amy@example.com
+        "same", // zoe@example.com
+        "zzz-no-username", // falls back to name
+      ]);
+    });
+
+    it("sorts by username descending", () => {
+      const ciphers = [
+        makeLogin("same", "amy@example.com"),
+        makeLogin("same", "zoe@example.com"),
+      ];
+
+      const sorted = [...ciphers].sort(
+        cipherService.getSortingFunctionForOrder(VaultListSortOrder.UsernameDesc),
+      );
+
+      expect(sorted.map((c) => c.login.username)).toEqual([
+        "zoe@example.com",
+        "amy@example.com",
+      ]);
+    });
+
+    it("uses the username as a tie breaker when sorting by name", () => {
+      const ciphers = [
+        makeLogin("signup.live.com", "hansupergar@outlook.com"),
+        makeLogin("signup.live.com", "ahsogar@outlook.com"),
+      ];
+
+      const sorted = [...ciphers].sort(
+        cipherService.getSortingFunctionForOrder(VaultListSortOrder.NameAsc),
+      );
+
+      expect(sorted.map((c) => c.login.username)).toEqual([
+        "ahsogar@outlook.com",
+        "hansupergar@outlook.com",
+      ]);
+    });
+
+    it("sorts ciphers without a username last regardless of direction", () => {
+      const ciphers = [makeLogin("aaa", undefined), makeLogin("bbb", "zoe@example.com")];
+
+      expect(sortNames(ciphers, VaultListSortOrder.UsernameAsc)).toEqual([
+        "bbb",
+        "aaa", // no username, sorted last
+      ]);
+      expect(sortNames(ciphers, VaultListSortOrder.UsernameDesc)).toEqual([
+        "bbb",
+        "aaa", // still last
+      ]);
+    });
+
+    it("supports custom accessors for non cipher items", () => {
+      const items = [
+        { label: "Charlie", account: "c@example.com" },
+        { label: "alpha", account: "a@example.com" },
+      ];
+
+      const sorted = [...items].sort(
+        cipherService.getSortingFunctionForOrder<{ label: string; account?: string }>(
+          VaultListSortOrder.UsernameAsc,
+          { getName: (i) => i.label, getUsername: (i) => i.account },
+        ),
+      );
+
+      expect(sorted.map((i) => i.label)).toEqual(["alpha", "Charlie"]);
+    });
+
+    it("falls back to last used ordering for the LastUsed value", () => {
+      const spy = jest.spyOn(cipherService, "sortCiphersByLastUsedThenName");
+      const comparator = cipherService.getSortingFunctionForOrder(VaultListSortOrder.LastUsed);
+      const a = makeLogin("a");
+      const b = makeLogin("b");
+
+      comparator(a, b);
+
+      expect(spy).toHaveBeenCalledWith(a, b);
     });
   });
 });

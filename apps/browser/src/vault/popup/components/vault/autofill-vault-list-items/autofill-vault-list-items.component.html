@@ -13,8 +13,23 @@
     showAutofillButton
     (onRefresh)="refreshCurrentTab()"
   >
-    @if (ciphers.length) {
-      <app-simplified-autofill-info slot="title-end" />
-    }
+    <!--
+      These must stay static children of the container: Angular does not project content
+      that lives inside an embedded view (such as an @if block) into `ng-content select`,
+      which silently leaves the section header's `slot="title-end"` slot empty.
+      The section is not rendered at all when there are no ciphers, so no guard is needed.
+    -->
+    <button
+      type="button"
+      bit-chip-action
+      variant="subtle"
+      size="small"
+      class="tw-ms-5 tw-me-1.5"
+      [bitTooltip]="(sortChipTooltipKey$ | async) | i18n"
+      (click)="toggleAutofillSortOrder()"
+      [label]="(sortChipLabelKey$ | async) | i18n"
+      slot="title-end"
+    ></button>
+    <app-simplified-autofill-info slot="title-end" />
   </app-vault-list-items-container>
 }

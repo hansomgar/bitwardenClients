@@ -5,3 +5,4 @@ export * from "./field-type.enum";
 export * from "./linked-id-type.enum";
 export * from "./secure-note-type.enum";
 export * from "./extension-page-urls.enum";
+export * from "./vault-list-sort-order.enum";

@@ -51,6 +51,8 @@ import {
 import { CipherFileUploadService } from "../abstractions/file-upload/cipher-file-upload.service";
 import { FieldType } from "../enums";
 import { CipherType } from "../enums/cipher-type";
+import { VaultListSortOrder } from "../enums/vault-list-sort-order.enum";
+import { SortableListAccessors } from "../types/sortable-list-accessors";
 import { CipherData } from "../models/data/cipher.data";
 import { LocalData } from "../models/data/local.data";
 import { Attachment } from "../models/domain/attachment";
@@ -1599,6 +1601,127 @@ export class CipherService implements CipherServiceAbstraction {
     }
 
     return this.getLocaleSortingFunction()(a, b);
+  }
+
+  /**
+   * Builds the comparator for a user selectable {@link VaultListSortOrder}.
+   *
+   * This is the single source of truth for both the popup vault list and the inline
+   * autofill menu, so that both surfaces order items identically. Callers whose items are
+   * not {@link CipherViewLike} instances (for example the stripped down data objects sent
+   * to the inline menu) pass accessors describing how to read the sort keys off them.
+   *
+   * `LastUsed` requires real ciphers since it reads `localData`, and is therefore only
+   * meaningful for {@link CipherViewLike} items; pass-through ordering is the caller's
+   * responsibility in that case.
+   *
+   * @param order - The sort order the user selected.
+   * @param accessors - Optional accessors for non cipher items.
+   * @returns A comparator usable with `Array.prototype.sort()`.
+   */
+  getSortingFunctionForOrder<T = CipherViewLike>(
+    order: VaultListSortOrder,
+    accessors?: SortableListAccessors<T>,
+  ): (a: T, b: T) => number {
+    const { getName, getUsername } = this.resolveSortAccessors(accessors);
+
+    switch (order) {
+      case VaultListSortOrder.NameAsc:
+        return (a, b) => this.compareByKeys(a, b, getName, getUsername, false, true);
+      case VaultListSortOrder.NameDesc:
+        return (a, b) => this.compareByKeys(a, b, getName, getUsername, false, false);
+      case VaultListSortOrder.UsernameAsc:
+        return (a, b) => this.compareByKeys(a, b, getName, getUsername, true, true);
+      case VaultListSortOrder.UsernameDesc:
+        return (a, b) => this.compareByKeys(a, b, getName, getUsername, true, false);
+      case VaultListSortOrder.LastUsed:
+      default:
+        // Preserve the historical behavior. Unknown values fall back to it as well.
+        return (a, b) =>
+          this.sortCiphersByLastUsedThenName(a as unknown as CipherViewLike, b as unknown as CipherViewLike);
+    }
+  }
+
+  /**
+   * @returns Accessors for the supplied item type, falling back to the {@link CipherViewLike}
+   * readers when the caller did not provide any.
+   */
+  private resolveSortAccessors<T>(
+    accessors?: SortableListAccessors<T>,
+  ): SortableListAccessors<T> {
+    if (accessors) {
+      return accessors;
+    }
+
+    return {
+      getName: (item) => (item as unknown as CipherViewLike).name,
+      getUsername: (item) =>
+        CipherViewLikeUtils.getLogin(item as unknown as CipherViewLike)?.username,
+    };
+  }
+
+  /**
+   * Compares two items by name or by account username.
+   *
+   * Empty values are always sorted last regardless of direction, so that items which
+   * cannot be sorted by the selected key do not jump to the top of the list. Ties are
+   * broken by the other sortable key (name <-> username) so that the order is stable
+   * and deterministic, which matters for vaults holding several same-named logins.
+   *
+   * @param byUsername - Compare the account username instead of the item name.
+   * @param ascending - Sort ascending when `true`, descending otherwise.
+   */
+  private compareByKeys<T>(
+    a: T,
+    b: T,
+    getName: (item: T) => string | null | undefined,
+    getUsername: (item: T) => string | null | undefined,
+    byUsername: boolean,
+    ascending: boolean,
+  ): number {
+    const primary = byUsername ? getUsername : getName;
+    const secondary = byUsername ? getName : getUsername;
+
+    const primaryResult = this.compareSortableValues(primary(a), primary(b), ascending);
+    if (primaryResult !== 0) {
+      return primaryResult;
+    }
+
+    // The secondary key falls back to the item name for items without a username, so a
+    // missing secondary value must not be treated as "sorts last" here.
+    const aSecondary = secondary(a) ?? getName(a);
+    const bSecondary = secondary(b) ?? getName(b);
+
+    return this.compareSortableValues(aSecondary, bSecondary, ascending);
+  }
+
+  /**
+   * Compares two optional strings using the active locale collator.
+   * `null`/`undefined`/empty values always sort last, regardless of `ascending`.
+   */
+  private compareSortableValues(
+    aValue: string | null | undefined,
+    bValue: string | null | undefined,
+    ascending: boolean,
+  ): number {
+    const aMissing = aValue == null || aValue === "";
+    const bMissing = bValue == null || bValue === "";
+
+    if (aMissing && bMissing) {
+      return 0;
+    }
+    if (aMissing) {
+      return 1;
+    }
+    if (bMissing) {
+      return -1;
+    }
+
+    const result = this.i18nService.collator
+      ? this.i18nService.collator.compare(aValue, bValue)
+      : aValue.localeCompare(bValue);
+
+    return ascending ? result : -result;
   }
 
   getLocaleSortingFunction(): (a: CipherViewLike, b: CipherViewLike) => number {

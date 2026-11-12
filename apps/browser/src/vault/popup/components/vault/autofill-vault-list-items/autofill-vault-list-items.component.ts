@@ -7,7 +7,11 @@ import { JslibModule } from "@bitwarden/angular/jslib.module";
 import { VaultSettingsService } from "@bitwarden/common/vault/abstractions/vault-settings/vault-settings.service";
 import { CipherType } from "@bitwarden/common/vault/enums";
 import { CipherViewLikeUtils } from "@bitwarden/common/vault/utils/cipher-view-like-utils";
-import { TypographyModule } from "@bitwarden/components";
+import {
+  ChipActionComponent,
+  TypographyModule,
+  TooltipDirective,
+} from "@bitwarden/components";
 
 import BrowserPopupUtils from "../../../../../platform/browser/browser-popup-utils";
 import { VaultPopupAutofillService } from "../../../services/vault-popup-autofill.service";
@@ -25,6 +29,8 @@ import { VaultListItemsContainerComponent } from "../vault-list-items-container/
     VaultListItemsContainerComponent,
     JslibModule,
     SimplifiedAutofillInfoComponent,
+    TooltipDirective,
+    ChipActionComponent,
   ],
   selector: "app-autofill-vault-list-items",
   templateUrl: "autofill-vault-list-items.component.html",
@@ -52,6 +58,80 @@ export class AutofillVaultListItemsComponent {
   protected readonly groupByType = toSignal(
     this.vaultPopupItemsService.hasFilterApplied$.pipe(map((hasFilter) => !hasFilter)),
   );
+
+  /**
+   * Emits whether the autofill list is currently ordered by the configured sort order.
+   * @protected
+   */
+  protected autofillFollowsVaultSortOrder$: Observable<boolean> =
+    this.vaultPopupItemsService.autofillFollowsVaultSortOrder$;
+
+  /**
+   * Emits whether the autofill list is currently ordered by the account username.
+   * @protected
+   */
+  protected autofillSortsByUsername$: Observable<boolean> =
+    this.vaultPopupItemsService.autofillSortsByUsername$;
+
+  /**
+   * Emits whether the configured vault list sort order is the default
+   * (most-recently-used). In that case following the setting would be a no-op, so the
+   * toggle offers account ordering instead.
+   * @protected
+   */
+  protected configuredSortIsLastUsed$: Observable<boolean> =
+    this.vaultPopupItemsService.configuredSortIsLastUsed$;
+
+  /**
+   * Emits the chip label key for the current state. The label names the ordering the list
+   * is currently using.
+   * @protected
+   */
+  protected sortChipLabelKey$: Observable<string> = combineLatest([
+    this.autofillFollowsVaultSortOrder$,
+    this.autofillSortsByUsername$,
+  ]).pipe(
+    map(([followsSetting, sortsByUsername]: [boolean, boolean]) => {
+      if (sortsByUsername) {
+        return "autofillSortByUsername";
+      }
+      if (followsSetting) {
+        return "autofillSortBySetting";
+      }
+      return "autofillSortByLastUsed";
+    }),
+  );
+
+  /**
+   * Emits the chip tooltip key for the current state. The tooltip names the ordering the
+   * next click switches to.
+   * @protected
+   */
+  protected sortChipTooltipKey$: Observable<string> = combineLatest([
+    this.configuredSortIsLastUsed$,
+    this.autofillFollowsVaultSortOrder$,
+    this.autofillSortsByUsername$,
+  ]).pipe(
+    map(([configuredIsLastUsed, followsSetting, sortsByUsername]: [boolean, boolean, boolean]) => {
+      // Anything other than "currently most-recently-used" switches back to most recent.
+      if (sortsByUsername || followsSetting) {
+        return "autofillSortByLastUsedTooltip";
+      }
+      // Currently most-recently-used: the next click follows the setting, or falls back to
+      // account ordering when the setting is itself most-recently-used.
+      return configuredIsLastUsed
+        ? "autofillSortByUsernameTooltip"
+        : "autofillSortBySettingTooltip";
+    }),
+  );
+
+  /**
+   * Switches the autofill list between the configured sort order and most-recently-used.
+   * @protected
+   */
+  protected toggleAutofillSortOrder() {
+    this.vaultPopupItemsService.toggleAutofillSortOrder();
+  }
 
   /**
    * Observable that determines whether the empty autofill tip should be shown.

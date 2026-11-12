@@ -33,6 +33,16 @@
         <bit-label>{{ "showNumberOfAutofillSuggestions" | i18n }}</bit-label>
       </bit-form-control>
 
+      <bit-form-field>
+        <bit-label>{{ "vaultListSortOrder" | i18n }}</bit-label>
+        <bit-select formControlName="vaultListSortOrder" [items]="sortOrderOptions"></bit-select>
+      </bit-form-field>
+
+      <bit-form-field>
+        <bit-label>{{ "autofillListSortOrder" | i18n }}</bit-label>
+        <bit-select formControlName="autofillListSortOrder" [items]="sortOrderOptions"></bit-select>
+      </bit-form-field>
+
       <bit-form-control disableMargin>
         <input bitCheckbox formControlName="enableAnimations" type="checkbox" />
         <bit-label>{{ "showAnimations" | i18n }}</bit-label>

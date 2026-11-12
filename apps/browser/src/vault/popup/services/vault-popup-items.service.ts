@@ -1,6 +1,7 @@
 import { inject, Injectable, NgZone } from "@angular/core";
 import { toObservable } from "@angular/core/rxjs-interop";
 import {
+  BehaviorSubject,
   combineLatest,
   distinctUntilChanged,
   distinctUntilKeyChanged,
@@ -28,6 +29,7 @@ import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.servi
 import { SearchService } from "@bitwarden/common/vault/abstractions/search.service";
 import { VaultSettingsService } from "@bitwarden/common/vault/abstractions/vault-settings/vault-settings.service";
 import { CipherType } from "@bitwarden/common/vault/enums";
+import { VaultListSortOrder } from "@bitwarden/common/vault/enums/vault-list-sort-order.enum";
 import { RestrictedItemTypesService } from "@bitwarden/common/vault/services/restricted-item-types.service";
 import {
   CipherViewLike,
@@ -62,6 +64,60 @@ export class VaultPopupItemsService {
    * @private
    */
   private _ciphersLoading$ = new Subject<void>();
+
+  /**
+   * Whether the autofill suggestions section should follow the user's vault list sort
+   * order instead of the built-in most-recently-used ordering.
+   *
+   * Deliberately in-memory and reset to `false` on every popup open: the official
+   * behavior is most-recently-used first, and this toggle only exists so users can take a
+   * one-off look at the list in their configured order.
+   * @private
+   */
+  private readonly _autofillFollowsVaultSortOrder$ = new BehaviorSubject<boolean>(false);
+
+  /**
+   * Whether the autofill suggestions section should be sorted by account username,
+   * ascending.
+   *
+   * Only meaningful when the configured vault list sort order is most-recently-used: in
+   * that case "follow the setting" would be indistinguishable from "most recent", so the
+   * toggle offers account ordering instead of being a no-op.
+   * @private
+   */
+  private readonly _autofillSortsByUsername$ = new BehaviorSubject<boolean>(false);
+
+  /**
+   * Emits whether the autofill suggestions section is currently ordered by the vault list
+   * sort order rather than by most recently used.
+   */
+  readonly autofillFollowsVaultSortOrder$: Observable<boolean> =
+    this._autofillFollowsVaultSortOrder$.asObservable();
+
+  /**
+   * Emits whether the autofill suggestions section is currently ordered by account
+   * username instead of by most recently used.
+   */
+  readonly autofillSortsByUsername$: Observable<boolean> =
+    this._autofillSortsByUsername$.asObservable();
+
+  /**
+   * Emits `true` when the configured vault list sort order is most-recently-used, i.e. when
+   * the toggle has to fall back to account ordering instead of following the setting.
+   */
+  readonly configuredSortIsLastUsed$: Observable<boolean> =
+    this.vaultSettingsService.vaultListSortOrder$.pipe(
+      map((sortOrder) => sortOrder === VaultListSortOrder.LastUsed),
+      distinctUntilChanged(),
+      shareReplay({ bufferSize: 1, refCount: true }),
+    );
+
+  /**
+   * Last configured sort order observed from state. Kept in sync by a subscription in the
+   * constructor so {@link toggleAutofillSortOrder} can decide synchronously which flag to
+   * flip. Seeded with the default so an early toggle stays deterministic.
+   */
+  private _latestConfiguredSortOrder: VaultListSortOrder = VaultListSortOrder.LastUsed;
 
   private activeUserId$ = this.accountService.activeAccount$.pipe(
     map((a) => a?.id),
@@ -169,20 +225,20 @@ export class VaultPopupItemsService {
     this.searchText$,
     this.vaultPopupListFiltersService.filterFunction$,
     getUserId(this.accountService.activeAccount$),
+    this.vaultSettingsService.vaultListSortOrder$,
   ]).pipe(
     map(
-      ([ciphers, searchText, filterFunction, userId]): [PopupCipherViewLike[], string, UserId] => [
-        filterFunction(ciphers),
-        searchText,
-        userId,
-      ],
+      ([ciphers, searchText, filterFunction, userId, sortOrder]) =>
+        [filterFunction(ciphers), searchText, userId, sortOrder] as const,
     ),
-    switchMap(
-      ([ciphers, searchText, userId]) =>
-        this.searchService.searchCiphers(userId, null, searchText, ciphers) as Promise<
-          PopupCipherViewLike[]
-        >,
-    ),
+    switchMap(async ([ciphers, searchText, userId, sortOrder]) => {
+      const results = await this.searchService.searchCiphers(userId, null, searchText, ciphers);
+
+      // Sorting happens after search so that results keep the user selected order. The
+      // autofill suggestions section re-sorts its own list, so it is intentionally not
+      // affected by this setting.
+      return results.sort(this.cipherService.getSortingFunctionForOrder(sortOrder));
+    }),
     shareReplay({ refCount: true, bufferSize: 1 }),
   );
 
@@ -197,7 +253,12 @@ export class VaultPopupItemsService {
 
   /**
    * List of ciphers that can be used for autofill on the current tab. Includes cards and/or identities
-   * if enabled in the vault settings. Ciphers are sorted by type, then by last used date, then by name.
+   * if enabled in the vault settings.
+   *
+   * Ciphers are always grouped by type (Login, then Card, then Identity) so the section keeps its
+   * structure. Within each type group the ciphers are ordered by most-recently-used, which is the
+   * official behavior, unless the user temporarily opted into the configured sort order via
+   * {@link toggleAutofillSortOrder}.
    *
    * See {@link refreshCurrentTab} to trigger re-evaluation of the current tab.
    */
@@ -205,14 +266,47 @@ export class VaultPopupItemsService {
     this._filteredCipherList$,
     this._otherAutoFillTypes$,
     this.vaultPopupAutofillService.currentAutofillTab$,
+    this.vaultSettingsService.vaultListSortOrder$,
+    this._autofillFollowsVaultSortOrder$,
+    this._autofillSortsByUsername$,
   ]).pipe(
-    switchMap(([ciphers, otherTypes, tab]) => {
-      if (!tab || !tab.url) {
-        return of([]);
-      }
-      return this.cipherService.filterCiphersForUrl(ciphers, tab.url, otherTypes);
-    }),
-    map((ciphers) => ciphers.sort(this.sortCiphersForAutofill.bind(this))),
+    switchMap(
+      async ([
+        ciphers,
+        otherTypes,
+        tab,
+        sortOrder,
+        followsVaultSortOrder,
+        sortsByUsername,
+      ]) => {
+        if (!tab || !tab.url) {
+          return [];
+        }
+
+        const autofillCiphers = await this.cipherService.filterCiphersForUrl(
+          ciphers,
+          tab.url,
+          otherTypes,
+        );
+
+        // Three states, in priority order:
+        //  1. Explicit account ordering — used when the configured order is the default, so
+        //     the toggle can still produce a visible change.
+        //  2. Follow the configured vault list sort order.
+        //  3. Fall back to the official most-recently-used ordering.
+        //
+        // No `sortOrder !== LastUsed` short-circuit here: it used to make the toggle a no-op
+        // for every user who left the setting at its default value.
+        let effectiveSortOrder: VaultListSortOrder = VaultListSortOrder.LastUsed;
+        if (sortsByUsername) {
+          effectiveSortOrder = VaultListSortOrder.UsernameAsc;
+        } else if (followsVaultSortOrder) {
+          effectiveSortOrder = sortOrder;
+        }
+
+        return autofillCiphers.sort(this.sortCiphersForAutofill(effectiveSortOrder));
+      },
+    ),
     shareReplay({ refCount: false, bufferSize: 1 }),
   );
 
@@ -329,18 +423,54 @@ export class VaultPopupItemsService {
     private accountService: AccountService,
     private ngZone: NgZone,
     private restrictedItemTypesService: RestrictedItemTypesService,
-  ) {}
+  ) {
+    // Track the configured order so `toggleAutofillSortOrder` can pick the right flag
+    // synchronously. `takeUntilDestroyed` is not needed: the service lives as long as the
+    // popup, and `refCount: true` keeps this from pinning the state stream open.
+    this.vaultSettingsService.vaultListSortOrder$.subscribe((sortOrder) => {
+      this._latestConfiguredSortOrder = sortOrder;
+    });
+  }
 
   applyFilter(newSearchText: string) {
     this.cachedSearchText.set(newSearchText);
   }
 
   /**
-   * Sort function for ciphers to be used in the autofill section of the Vault tab.
-   * Sorts by type, then by last used date, and finally by name.
+   * Flips the autofill suggestions section between two orderings.
+   *
+   * When the configured vault list sort order is something meaningful, the toggle switches
+   * between that order and most-recently-used. When the configured order is the default
+   * (most-recently-used), following the setting would be a no-op, so the toggle switches
+   * between account ordering and most-recently-used instead.
+   *
+   * The two flags are mutually exclusive so the rendered list always has a single,
+   * predictable ordering.
+   */
+  toggleAutofillSortOrder() {
+    if (this._latestConfiguredSortOrder === VaultListSortOrder.LastUsed) {
+      this._autofillSortsByUsername$.next(!this._autofillSortsByUsername$.getValue());
+      this._autofillFollowsVaultSortOrder$.next(false);
+      return;
+    }
+
+    this._autofillFollowsVaultSortOrder$.next(!this._autofillFollowsVaultSortOrder$.getValue());
+    this._autofillSortsByUsername$.next(false);
+  }
+
+  /**
+   * Builds the comparator for ciphers in the autofill section of the Vault tab.
+   *
+   * Type grouping is always preserved (Login, Card, Identity, ...); the user selected
+   * sort order only decides the ordering *within* each type group.
+   *
+   * @param sortOrder - The vault list sort order selected by the user.
+   * @returns A comparator usable with `Array.prototype.sort()`.
    * @private
    */
-  private sortCiphersForAutofill(a: CipherViewLike, b: CipherViewLike): number {
+  private sortCiphersForAutofill(
+    sortOrder: VaultListSortOrder,
+  ): (a: CipherViewLike, b: CipherViewLike) => number {
     const typeOrder = {
       [CipherType.Login]: 1,
       [CipherType.Card]: 2,
@@ -349,18 +479,22 @@ export class VaultPopupItemsService {
       [CipherType.SshKey]: 5,
     } as Record<CipherType, number>;
 
-    const aType = CipherViewLikeUtils.getType(a);
-    const bType = CipherViewLikeUtils.getType(b);
+    const withinTypeComparator = this.cipherService.getSortingFunctionForOrder(sortOrder);
 
-    // Compare types first
-    if (typeOrder[aType] < typeOrder[bType]) {
-      return -1;
-    } else if (typeOrder[aType] > typeOrder[bType]) {
-      return 1;
-    }
+    return (a, b) => {
+      const aType = CipherViewLikeUtils.getType(a);
+      const bType = CipherViewLikeUtils.getType(b);
 
-    // If types are the same, then sort by last used then name
-    return this.cipherService.sortCiphersByLastUsedThenName(a, b);
+      // Compare types first so the sections keep their order
+      if (typeOrder[aType] < typeOrder[bType]) {
+        return -1;
+      } else if (typeOrder[aType] > typeOrder[bType]) {
+        return 1;
+      }
+
+      // Same type, so defer to the user selected sort order
+      return withinTypeComparator(a, b);
+    };
   }
 }
 

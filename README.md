@@ -83,7 +83,64 @@ Security audits and feedback are welcome. Please open an issue or email us priva
 ### 1.4 列表项序号
 在 `buildFillCipherElement` 方法中为每个条目添加 `.cipher-index` span 元素（1-based 序号），在 `list.scss` 中添加对应样式。
 
----
+### 1.5 列表排序（版本 2026.6.1.1）
+在外观设置页（"外观"页面，与"显示动画"同级）新增两个下拉框，分别控制密码库列表与网页内联填充菜单的帐号排序。
+
+**可选排序方式（两处一致）：**
+
+| 选项值 | 中文 | 英文 |
+|--------|------|------|
+| `lastUsed`（默认） | 最近使用优先 | Recently used first |
+| `nameAsc` | 名称 A → Z | Name (A to Z) |
+| `nameDesc` | 名称 Z → A | Name (Z to A) |
+| `usernameAsc` | 帐号 A → Z | Account (A to Z) |
+| `usernameDesc` | 帐号 Z → A | Account (Z to A) |
+
+**行为说明：**
+
+1. **两个设置互相独立**，跟随帐号持久化（`UserKeyDefinition`，`clearOn: []`）。
+2. **密码库列表排序**作用于「所有项目」「收藏」「搜索结果」。自动填充建议**默认始终按最近使用优先**（与 Bitwarden 官方行为一致），两类列表都**保留类型分组**（登录 → 卡片 → 身份 → …）。
+3. **填充帐号列表排序**作用于网页内联填充菜单（含帐号创建场景）。当存在通行密钥条目时，**通行密钥分组始终置顶**，两组各自排序后拼接。
+4. **自动填充建议排序切换**：自动填充建议标题栏右侧**始终显示**一个切换按钮：
+   - 样式为 `bit-chip-action`（`variant="subtle"`、`size="small"`），带边框、圆角、背景与 hover/焦点态，与列表里的「填充」胶囊按钮一致，明确可点击
+   - 按钮文案描述**当前**排序方式，tooltip 描述**点击后**切换到的排序方式
+
+   **三种状态**：
+
+   | 设置值 | 当前排序 | 按钮显示 | 点击后 |
+   |--------|----------|----------|--------|
+   | 最近使用优先（默认） | 最近优先 | 按最近 | **按帐号 A → Z** |
+   | 最近使用优先（默认） | 按帐号 | 按帐号 | 回到按最近 |
+   | 名称/帐号等非默认值 | 最近优先 | 按最近 | 按「密码库列表排序」设置 |
+   | 名称/帐号等非默认值 | 按设置 | 按设置 | 回到按最近 |
+
+   - 设置为默认值时，若仍用「按设置」会导致点击无变化（两种排序等价），因此自动回退为「按帐号」排序，保证按钮始终有可见效果
+   - 该开关**不持久化**，每次打开弹窗都回到官方默认的最近使用优先
+
+   > **实现注意**：
+   > 1. `slot="title-end"` 的内容**必须**作为容器的静态子元素，不能包在 `@if` / `@for` 等内嵌视图里。Angular 不会把内嵌视图中的内容投影进 `ng-content select`，会导致标题栏右侧静默空白（官方原版的 `app-simplified-autofill-info` 也因同样原因从未显示过，本次一并修复）。
+   > 2. `autoFillCiphers$` 中**不要**加 `sortOrder !== LastUsed` 这类守卫。早期版本曾存在该守卫，导致按钮在设置为默认值「最近使用优先」时只切换文案、不改变排序（已修复）。
+5. 默认值 `lastUsed` 与改造前行为完全一致，老用户升级后无感知变化。
+6. 名称排序使用「名称 → 帐号」双键，帐号排序使用「帐号 → 名称」双键，保证图3 那种同名多帐号（如多个 `signup.live.com`）顺序确定。空值恒排最后。
+7. 修改填充帐号列表排序后，内联菜单会**自动刷新**，无需重载页面或重新聚焦输入框。
+
+**修改文件：**
+| 文件 | 改动 |
+|------|------|
+| `libs/common/src/vault/enums/vault-list-sort-order.enum.ts` | 新增 `VaultListSortOrder` 枚举与 `VAULT_LIST_SORT_ORDERS` 列表 |
+| `libs/common/src/vault/enums/index.ts` | 导出新枚举 |
+| `libs/common/src/vault/types/sortable-list-accessors.ts` | 新增 `SortableListAccessors`，供非 cipher 数据复用比较逻辑 |
+| `libs/common/src/vault/services/key-state/vault-settings.state.ts` | 新增 `VAULT_LIST_SORT_ORDER`、`AUTOFILL_LIST_SORT_ORDER` 两个 `UserKeyDefinition` |
+| `libs/common/src/vault/abstractions/vault-settings/vault-settings.service.ts` | 新增 2 个 `$` 与 2 个 setter 抽象 |
+| `libs/common/src/vault/services/vault-settings/vault-settings.service.ts` | 实现上述 4 个成员，默认 `lastUsed` |
+| `libs/common/src/vault/services/cipher.service.ts` | 新增 `getSortingFunctionForOrder` 统一比较器（泛型 + 可选 accessors） |
+| `libs/common/src/vault/abstractions/cipher.service.ts` | 声明 `getSortingFunctionForOrder` |
+| `apps/browser/src/vault/popup/services/vault-popup-items.service.ts` | 搜索后应用排序；自动填充建议默认最近优先，可用内存开关临时切换为跟随设置 |
+| `apps/browser/src/autofill/background/overlay.background.ts` | `sortInlineMenuCipherData` 内联菜单排序（通行密钥分区优先）+ 监听设置变化自动刷新 |
+| `apps/browser/src/vault/popup/settings/appearance.component.html` | 新增两个 `bit-select` |
+| `apps/browser/src/vault/popup/settings/appearance.component.ts` | 表单控件、初始值读取、变更订阅 |
+| `apps/browser/src/_locales/en/messages.json` | 新增 7 个翻译键 |
+| `apps/browser/src/_locales/zh_CN/messages.json` | 新增 7 个翻译键 |
 
 ## 二、界面上锁 (UI Lock) 功能
 
@@ -474,6 +531,24 @@ UI 锁仅限制手动打开的扩展弹窗（popup），不影响浏览器自动
 |-----|------|------|
 | `disableHttpWarning` | Disable HTTP page warning | 禁用 HTTP 页面警告 |
 | `vaultListDisplayCount` | Vault list display count | 列表显示数量 |
+
+### 列表排序
+
+| Key | 英文 | 中文 |
+|-----|------|------|
+| `vaultListSortOrder` | Vault list sort order | 密码库列表排序 |
+| `autofillListSortOrder` | Autofill list sort order | 填充帐号列表排序 |
+| `sortByLastUsed` | Recently used first | 最近使用优先 |
+| `sortByNameAsc` | Name (A to Z) | 名称 A → Z |
+| `sortByNameDesc` | Name (Z to A) | 名称 Z → A |
+| `sortByUsernameAsc` | Account (A to Z) | 帐号 A → Z |
+| `sortByUsernameDesc` | Account (Z to A) | 帐号 Z → A |
+| `autofillSortBySetting` | By setting | 按设置 |
+| `autofillSortByLastUsed` | By recent | 按最近 |
+| `autofillSortByUsername` | By account | 按帐号 |
+| `autofillSortBySettingTooltip` | Currently sorted by most recent. Click to use the vault list sort order instead | 当前按最近使用排序。点击改为按「密码库列表排序」设置排序 |
+| `autofillSortByLastUsedTooltip` | Currently using the vault list sort order. Click to sort by most recent (Bitwarden default) | 当前按设置排序。点击改为按最近使用排序（Bitwarden 默认行为） |
+| `autofillSortByUsernameTooltip` | Currently sorted by most recent. Click to sort by account (A to Z) | 当前按最近使用排序。点击改为按帐号 A → Z 排序 |
 
 ### 界面上锁
 
