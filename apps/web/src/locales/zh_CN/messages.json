@@ -14434,5 +14434,8 @@
   },
   "cannotSaveItemNoConfirmedOrgs": {
     "message": "无法保存项目。您必须先通过组织确认才能保存项目。"
+  },
+  "sendNameOptionalHint": {
+    "message": "留空将自动使用时间 + 长度/大小命名"
   }
 }

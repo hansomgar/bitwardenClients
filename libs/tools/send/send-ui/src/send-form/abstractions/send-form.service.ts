@@ -69,6 +69,14 @@ export abstract class SendFormService {
   /** Sets the file to attach to the Send */
   abstract setFile(file: File): void;
 
+  /**
+   * Returns the file currently attached to the Send, or `null` when none has been chosen.
+   *
+   * Needed because the generated fallback name for a file Send embeds the file size, which
+   * is only available from the raw `File` before encryption.
+   */
+  abstract getFile(): File | null;
+
   /** A function that triggers a "Discard Edits?" dialog if there are any Send
    * edits that have not yet been saved. Returns `true` if the user does
    * not want to save the edits or there are no edits to save.

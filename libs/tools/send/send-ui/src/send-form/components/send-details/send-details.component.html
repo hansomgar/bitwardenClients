@@ -7,6 +7,9 @@
     <bit-form-field>
       <bit-label>Send {{ "name" | i18n | lowercase }}</bit-label>
       <input bitInput type="text" formControlName="name" [readonly]="!editing()" />
+      @if (editing()) {
+        <bit-hint>{{ "sendNameOptionalHint" | i18n }}</bit-hint>
+      }
     </bit-form-field>
 
     @if (sendFormService.sendFormConfig.sendType === SendType.Text) {

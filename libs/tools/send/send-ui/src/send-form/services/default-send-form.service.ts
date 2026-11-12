@@ -8,10 +8,12 @@ import { firstValueFrom, lastValueFrom } from "rxjs";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { getUserId } from "@bitwarden/common/auth/services/account.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
+import { Utils } from "@bitwarden/common/platform/misc/utils";
 import { Send } from "@bitwarden/common/tools/send/models/domain/send";
 import { SendView } from "@bitwarden/common/tools/send/models/view/send.view";
 import { SendApiService } from "@bitwarden/common/tools/send/services/send-api.service.abstraction";
 import { SendService } from "@bitwarden/common/tools/send/services/send.service.abstraction";
+import { SendType } from "@bitwarden/common/tools/send/types/send-type";
 import { DialogService, ToastService } from "@bitwarden/components";
 
 import { SendItemDialogResult } from "../../add-edit/send-add-edit-dialog.component";
@@ -23,6 +25,7 @@ import {
   UnsavedEditsDialogResult,
 } from "../components/unsaved-edits-dialog/unsaved-edits-dialog.component";
 import { SendForm } from "../send-form-container";
+import { buildFileSendName, buildTextSendName } from "../utils/generate-send-name";
 
 @Injectable()
 export class DefaultSendFormService implements SendFormService {
@@ -67,6 +70,10 @@ export class DefaultSendFormService implements SendFormService {
     this.file = file;
   }
 
+  getFile(): File | null {
+    return this.file ?? null;
+  }
+
   async initializeSendForm(config: SendFormConfig) {
     this.sendFormConfig = config;
     (Object.keys(this._sendForm.controls) as (keyof SendForm)[]).forEach((key) => {
@@ -93,6 +100,12 @@ export class DefaultSendFormService implements SendFormService {
       this._sendForm.markAllAsTouched();
       this._submitting.set(false);
       return;
+    }
+
+    // The name is optional. When the user leaves it blank on a new Send, fall back to a
+    // timestamp plus the content length or file size. Editing never regenerates the name.
+    if (this.sendFormConfig.mode === "add" && Utils.isNullOrWhitespace(this.updatedSendView.name)) {
+      this.updatedSendView.name = this.buildGeneratedSendName();
     }
 
     if (this.updatedSendView?.hideEmail === true) {
@@ -134,8 +147,23 @@ export class DefaultSendFormService implements SendFormService {
     return sendView;
   }
 
-  sendFormHasEdits() {
-    const replacer = (key: string, value: any) => {
+  /**
+   * Builds the fallback name used when the user leaves the name field blank on a new Send.
+   *
+   * File Sends embed the selected file's size, which is read from the raw `File` because the
+   * encrypted `SendFileView` is not available yet. Text Sends embed the body length.
+   */
+  private buildGeneratedSendName(): string {
+    const now = new Date();
+
+    if (this.updatedSendView.type === SendType.File) {
+      return buildFileSendName(now, this.getFile()?.size ?? 0);
+    }
+
+    return buildTextSendName(now, this.updatedSendView.text?.text?.length ?? 0);
+  }
+
+  sendFormHasEdits() {    const replacer = (key: string, value: any) => {
       if (key === "password") {
         // The password is not decrypted on the SendView, so the Send form uses "************" as a stand-in and disables the
         // field (which gives `undefined` in the form value). Therefore the old and new SendViews will never have the same

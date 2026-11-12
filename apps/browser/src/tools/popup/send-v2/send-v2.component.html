@@ -1,7 +1,10 @@
 <popup-page [hideOverflow]="showSkeletonsLoaders$ | async">
   <popup-header slot="header" [pageTitle]="'send' | i18n">
     <ng-container slot="end">
-      <tools-new-send-dropdown *ngIf="!sendsDisabled"></tools-new-send-dropdown>
+      <tools-new-send-dropdown
+        *ngIf="!sendsDisabled"
+        [useSplitButtons]="true"
+      ></tools-new-send-dropdown>
       <app-pop-out></app-pop-out>
       <app-current-account></app-current-account>
     </ng-container>
@@ -30,6 +33,7 @@
         *ngIf="!sendsDisabled"
         slot="button"
         [buttonType]="'secondary'"
+        [useSplitButtons]="true"
       ></tools-new-send-dropdown>
     </bit-no-items>
   </div>

@@ -192,6 +192,63 @@ Security audits and feedback are welcome. Please open an issue or email us priva
 - 当 `PM32009NewItemTypes` 特性开关开启时（「新增」本身直达新建页），不显示该快捷按钮
 - 文案用「登录」而非「新增登录」，宽度可控，380px 窄窗口下仍能完整显示
 
+### 1.9 Send 界面新增按钮拆分为两个（版本 2026.6.1.3）
+
+Send 页标题栏原先只有「+ 新增 ▾」下拉按钮，新建文本 Send 需点两次。本次在浏览器端拆成两个并排按钮，**一次点击**直达。
+
+**布局：**
+| 位置 | 按钮 | 样式 | 行为 |
+|------|------|------|------|
+| 左 | **+ 文件 Send** | 次按钮（浅灰底 + 边框） | 有 Premium 直接进入；无 Premium 弹出升级提示 |
+| 右 | **+ 文本 Send** | 主按钮（实心主色） | 直接进入新建文本 Send |
+
+**改动文件：**
+| 文件 | 改动 |
+|------|------|
+| `libs/tools/send/send-ui/src/new-send-dropdown/new-send-dropdown.component.ts` | 新增 `@Input() useSplitButtons`（默认 `false`） |
+| `libs/tools/send/send-ui/src/new-send-dropdown/new-send-dropdown.component.html` | 按 `useSplitButtons` 分支渲染：拆分布局 或 原下拉布局 |
+| `libs/tools/send/send-ui/src/new-send-dropdown/new-send-dropdown.component.spec.ts` | 新增 7 个测试（两种模式、样式、Premium 分支） |
+| `apps/browser/src/tools/popup/send-v2/send-v2.component.html` | 两处调用点传入 `[useSplitButtons]="true"` |
+
+**设计要点：**
+- **跨端安全**：该组件被 Web 端共用（Desktop 用的是独立的 `tools-new-send-dropdown-v2`）。采用**可选 input 默认 `false`** 的方式，仅浏览器端显式开启，Web 端行为完全不变（已跑 Web 端测试确认通过）
+- **Premium 处理**：文件 Send 需要 Premium。拆分按钮点击时复用原有 `sendFileClick()`，无 Premium 时弹升级提示而非静默失败
+- **主题适配**：颜色全部来自设计系统 token，light / dark 自动适配
+- **i18n 适配**：复用现有 `sendTypeText`（文本 Send）/ `sendTypeFile`（文件 Send）键，无新增翻译
+- 空状态页的「创建 Send」按钮同样拆分，保持两处一致
+
+### 1.10 Send 名称改为可选，留空自动命名（版本 2026.6.1.3）
+
+原先 Send 的名称是必填项，不填无法保存。现改为可选，留空时自动用「时间 + 长度/大小」生成名称。
+
+**生成规则：**
+
+| 类型 | 格式 | 示例 |
+|------|------|------|
+| 文本 Send | `时间 ( length : 字符数 )` | `2026-11-12 12:00:09 ( length : 12678 )` |
+| 文件 Send | `时间 ( size : 文件大小 )` | `2026-11-12 12:00:09 ( size : 35.3KB )` |
+
+文件大小自动换算单位：`512B` → `35.3KB` → `1.5MB` → `1GB`（1024 进制，整数不带小数点）。
+
+**改动文件：**
+| 文件 | 改动 |
+|------|------|
+| `libs/tools/send/send-ui/src/send-form/utils/generate-send-name.ts` | **新建**，时间与大小格式化工具 |
+| `libs/tools/send/send-ui/src/send-form/utils/generate-send-name.spec.ts` | **新建**，11 个单测 |
+| `libs/tools/send/send-ui/src/send-form/components/send-details/send-details.component.ts` | 去掉 `name` 的 `Validators.required` |
+| `libs/tools/send/send-ui/src/send-form/components/send-details/send-details.component.html` | 新增留空提示 |
+| `libs/tools/send/send-ui/src/send-form/abstractions/send-form.service.ts` | 新增 `getFile(): File \| null` |
+| `libs/tools/send/send-ui/src/send-form/services/default-send-form.service.ts` | 提交时为空名称生成值 |
+| `apps/{browser,web,desktop}/.../messages.json` | 各端 locale 新增 `sendNameOptionalHint` |
+
+**设计要点：**
+- **仅新建时生成**：`mode === "add"` 才触发，编辑已有 Send 不会覆盖用户原本的名称
+- **文件大小取自原始 `File`**：`SendFileView.size` 要等加密后才有值，而 `file.size` 选完即可用，因此新增 `getFile()` 读取
+- **三端统一生效**：`send-form` 是浏览器 / Web / Desktop 共用的库，本次改动三端行为一致（已分别验证：Web 10/10、Desktop 20/20 通过）
+- **不依赖 locale**：时间格式手工拼接而非用 `Intl` 或日期管道，保证任何语言环境下生成的名称完全一致
+
+---
+
 ## 二、界面上锁 (UI Lock) 功能
 
 ### 2.1 功能概述

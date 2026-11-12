@@ -162,7 +162,9 @@ export class SendDetailsComponent implements OnInit {
   );
 
   sendDetailsForm = this.formBuilder.group({
-    name: new FormControl("", Validators.required),
+    // Optional: when left blank, a name is generated from the timestamp plus the Send's
+    // length (text) or size (file). See `buildTextSendName` / `buildFileSendName`.
+    name: new FormControl(""),
     selectedDeletionDatePreset: new FormControl(DatePreset.SevenDays || "", Validators.required),
     authType: AuthType.None as AuthType,
     password: [null as string],
