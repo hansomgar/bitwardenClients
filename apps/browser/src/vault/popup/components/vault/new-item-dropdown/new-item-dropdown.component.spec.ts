@@ -17,8 +17,7 @@ import {
   RestrictedCipherType,
   RestrictedItemTypesService,
 } from "@bitwarden/common/vault/services/restricted-item-types.service";
-import { ButtonModule, DialogService, MenuModule, NoItemsModule } from "@bitwarden/components";
-import { GlobalStateProvider } from "@bitwarden/state";
+import { ButtonModule, DialogService, MenuModule, NoItemsModule } from "@bitwarden/components";import { GlobalStateProvider } from "@bitwarden/state";
 import { FakeGlobalStateProvider } from "@bitwarden/state-test-utils";
 
 import { BrowserApi } from "../../../../../platform/browser/browser-api";
@@ -57,6 +56,8 @@ describe("NewItemDropdownComponent", () => {
     };
 
     const i18nServiceMock = mock<I18nService>();
+    // Return the key itself so assertions can identify which string was rendered.
+    i18nServiceMock.t.mockImplementation((key: string) => key);
     const folderServiceMock = mock<FolderService>();
     const folderApiServiceAbstractionMock = mock<FolderApiServiceAbstraction>();
     const accountServiceMock = mock<AccountService>();
@@ -200,6 +201,81 @@ describe("NewItemDropdownComponent", () => {
         type: CipherType.BankAccount.toString(),
         collectionId: "777-888-999",
       });
+    });
+  });
+
+  describe("add login shortcut", () => {
+    const buttons = () => fixture.debugElement.queryAll(By.css("button[bitButton]"));
+
+    /** Looks a button up by its rendered label so assertions never depend on DOM order. */
+    const buttonLabelled = (label: string) =>
+      buttons().find((b) => (b.nativeElement.textContent || "").trim() === label);
+
+    it("renders the 'new' dropdown first, then the 'login' shortcut", async () => {
+      await fixture.whenStable();
+      fixture.detectChanges();
+
+      const rendered = buttons();
+      expect(rendered.length).toBe(2);
+      expect(rendered[0].nativeElement.textContent.trim()).toBe("new");
+      expect(rendered[1].nativeElement.textContent.trim()).toBe("login");
+    });
+
+    it("styles the 'login' shortcut as primary and the dropdown as secondary", async () => {
+      await fixture.whenStable();
+      fixture.detectChanges();
+
+      // Creating a login is the dominant action, so it carries the primary styling.
+      const loginButton = buttonLabelled("login")!.nativeElement as HTMLButtonElement;
+      expect(loginButton.className).toContain("tw-bg-bg-brand");
+
+      // The multi-type dropdown is demoted to secondary.
+      const newButton = buttonLabelled("new")!.nativeElement as HTMLButtonElement;
+      expect(newButton.className).toContain("tw-bg-bg-secondary");
+    });
+
+    it("links the shortcut to the add-cipher page for a login", async () => {
+      await fixture.whenStable();
+      fixture.detectChanges();
+
+      const shortcutDebug = buttonLabelled("login")!;
+      const shortcut = shortcutDebug.nativeElement as HTMLButtonElement;
+      const link = shortcutDebug.injector.get(RouterLink);
+
+      expect(shortcut.textContent.trim()).toBe("login");
+      expect(link.urlTree?.toString()).toContain("/add-cipher");
+      expect(link.urlTree?.queryParams["type"]).toBe(CipherType.Login.toString());
+    });
+
+    it("prefills name and uri from the current tab for the login shortcut", async () => {
+      await component.ngOnInit();
+      jest.spyOn(BrowserPopupUtils, "inPopout").mockReturnValue(false);
+      await fixture.whenStable();
+      fixture.detectChanges();
+
+      const link = buttonLabelled("login")!.injector.get(RouterLink);
+
+      expect(link.urlTree?.queryParams["prefillNameAndURIFromTab"]).toBe("true");
+    });
+
+    it("hides the shortcut when logins are restricted by policy", async () => {
+      (restrictedItemTypesServiceMock.restricted$ as BehaviorSubject<RestrictedCipherType[]>).next([
+        { cipherType: CipherType.Login },
+      ] as RestrictedCipherType[]);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+
+      expect(buttons().length).toBe(1);
+      expect(buttons()[0].nativeElement.textContent.trim()).toBe("new");
+    });
+
+    it("hides the shortcut when the new item dialog feature flag is on", () => {
+      featureFlagSubject.next(true);
+      fixture.detectChanges();
+
+      // The single "new" button navigates straight to the new item page, so no shortcut.
+      expect(buttons().length).toBe(1);
     });
   });
 

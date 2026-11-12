@@ -1,4 +1,4 @@
-﻿$dark-icon-themes: "theme_dark";
+$dark-icon-themes: "theme_dark";
 
 $font-family-sans-serif: Inter, "Helvetica Neue", Helvetica, Arial, sans-serif;
 $font-family-source-code-pro: "Source Code Pro", monospace;
@@ -13,6 +13,9 @@ $password-special-color-light: #b80017;
 $password-number-color-light: #1452c1;
 $success-color-light: #017e45;
 $error-color-light: #c83522;
+/* TOTP countdown ring. Kept separate from $brand-primary so the ring can follow the
+   extension's own brand colour without repainting buttons and icons. */
+$totp-ring-color-light: #08a647;
 
 $text-color-dark: #ffffff;
 $muted-text-color-dark: #bac0ce;
@@ -24,6 +27,8 @@ $password-special-color-dark: #ff8d85;
 $password-number-color-dark: #6f9df1;
 $success-color-dark: #8db89b;
 $error-color-dark: #ee9792;
+/* Lighter than the light-theme green so the ring stays legible on the dark surface. */
+$totp-ring-color-dark: #4cd07d;
 
 $muted-blue: #5a6d91;
 $muted-grey: #bac0ce;
@@ -50,6 +55,7 @@ $themes: (
     passkeysAuthenticating: $muted-blue,
     passwordSpecialColor: $password-special-color-light,
     passwordNumberColor: $password-number-color-light,
+    totpRingColor: $totp-ring-color-light,
   ),
   dark: (
     textColor: $text-color-dark,
@@ -68,6 +74,7 @@ $themes: (
     passkeysAuthenticating: $muted-grey,
     passwordSpecialColor: $password-special-color-dark,
     passwordNumberColor: $password-number-color-dark,
+    totpRingColor: $totp-ring-color-dark,
   ),
 );
 

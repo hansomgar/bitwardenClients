@@ -142,6 +142,56 @@ Security audits and feedback are welcome. Please open an issue or email us priva
 | `apps/browser/src/_locales/en/messages.json` | 新增 7 个翻译键 |
 | `apps/browser/src/_locales/zh_CN/messages.json` | 新增 7 个翻译键 |
 
+### 1.6 内联菜单盾牌图标改为品牌绿（版本 2026.6.1.2）
+
+网页输入框旁的内联填充按钮图标原先沿用 Bitwarden 品牌蓝 `#175DDC`，与插件主图标（绿色 `#08A647`）不一致。本次统一为主图标的绿色。
+
+**改动文件：**
+| 文件 | 改动 |
+|------|------|
+| `apps/browser/src/autofill/utils/svg-icons.ts` | `logoIcon` / `logoLockedIcon` 的 `fill` 由 `#175DDC` 改为 `#08A647` |
+| `apps/browser/src/autofill/overlay/inline-menu/pages/button/__snapshots__/autofill-inline-menu-button.spec.ts.snap` | 同步更新 2 处快照 |
+
+**说明：**
+- 只改动图标填充色，SVG 路径、尺寸、锁定态小锁样式均未变
+- `logoLockedIcon` 一并改色，否则账户锁定时图标会变回蓝色
+- 内联菜单其他主色（「填充」按钮、TOTP 圆环等）仍使用 `variables.scss` 中的 `$brand-primary-light`，本次未改；如需一并统一可另行处理
+
+### 1.7 TOTP 倒计时圆环改为品牌绿（版本 2026.6.1.2）
+
+内联菜单中带 TOTP 的条目会显示倒计时圆环，原为品牌蓝。本次单独改为品牌绿，**不影响其他主色元素**。
+
+**改动文件：**
+| 文件 | 改动 |
+|------|------|
+| `apps/browser/src/autofill/shared/styles/variables.scss` | 新增独立颜色键 `totpRingColor`（浅色 `#08a647` / 深色 `#4cd07d`） |
+| `apps/browser/src/autofill/overlay/inline-menu/pages/list/list.scss` | `.circle-color` 改用 `themed("totpRingColor")` |
+
+**说明：**
+- 未直接修改 `$brand-primary-light`，避免连带影响条目图标与「新增」按钮
+- 危险态 `.circle-danger-color` 仍用 `passwordSpecialColor`，倒计时告急仍变红
+
+### 1.8 新增「+ 登录」快捷按钮（版本 2026.6.1.2）
+
+密码库标题栏原先只有「+ 新增 ▾」一个按钮，新建登录需要点两次（展开菜单 → 选「登录」）。本次在其左侧新增「+ 登录」按钮，**一次点击**直达新建登录页。
+
+**改动文件：**
+| 文件 | 改动 |
+|------|------|
+| `apps/browser/src/vault/popup/components/vault/new-item-dropdown/new-item-dropdown.component.html` | 新增 `buttonType="secondary"` 的登录快捷按钮 |
+| `apps/browser/src/vault/popup/components/vault/new-item-dropdown/new-item-dropdown.component.ts` | 新增 `loginAllowed$`（策略禁用登录时隐藏按钮） |
+| `apps/browser/src/vault/popup/components/vault/new-item-dropdown/new-item-dropdown.component.spec.ts` | 新增 5 个测试 |
+
+**设计要点：**
+- 按钮顺序为「+ 新增 ▾」在左、「+ 登录」在右
+- 「+ 登录」为 `buttonType="primary"`（实心主色），「+ 新增 ▾」为 `buttonType="secondary"`（浅灰底 + 边框）。新建登录是日常最高频操作，故作为主操作；多种类型新建降为次操作
+- **主题适配**：颜色全部来自设计系统 token（`tw-bg-bg-brand` / `tw-bg-bg-secondary` 等），light / dark 主题自动适配，未写任何硬编码颜色
+- **i18n 适配**：复用现有 `login` 翻译键（中文「登录」/ 英文「Log in」），无需新增翻译，全部 60+ 语言目录自动生效
+- 复用 `buildQueryParams(CipherType.Login)`，自动带入当前标签页 URL 与名称，行为与下拉菜单中的「登录」完全一致
+- 当组织策略禁用「登录」类型时，按钮自动隐藏
+- 当 `PM32009NewItemTypes` 特性开关开启时（「新增」本身直达新建页），不显示该快捷按钮
+- 文案用「登录」而非「新增登录」，宽度可控，380px 窄窗口下仍能完整显示
+
 ## 二、界面上锁 (UI Lock) 功能
 
 ### 2.1 功能概述

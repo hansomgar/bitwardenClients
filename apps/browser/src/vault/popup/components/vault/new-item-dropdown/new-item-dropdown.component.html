@@ -13,11 +13,32 @@
     bitButton
     startIcon="bwi-plus"
     [bitMenuTriggerFor]="itemOptions"
-    buttonType="primary"
+    buttonType="secondary"
     type="button"
   >
     {{ "new" | i18n }}
   </button>
+  <!--
+    Shortcut for the most common action: creating a login. Saves the extra click through
+    the dropdown. Reuses `buildQueryParams` so the new item is prefilled from the current
+    tab exactly like the dropdown entry does.
+
+    Creating a login is the dominant everyday action, so it carries the primary styling while
+    the multi-type dropdown is demoted to secondary. All colours come from design-system
+    tokens, which adapt to the light and dark themes automatically.
+  -->
+  @if (loginAllowed$ | async) {
+    <button
+      bitButton
+      buttonType="primary"
+      type="button"
+      startIcon="bwi-plus"
+      [routerLink]="['/add-cipher']"
+      [queryParams]="buildQueryParams(cipherType.Login)"
+    >
+      {{ "login" | i18n }}
+    </button>
+  }
   <bit-menu #itemOptions>
     @for (menuItem of cipherMenuItems$ | async; track menuItem.type) {
       <a bitMenuItem [routerLink]="['/add-cipher']" [queryParams]="buildQueryParams(menuItem.type)">
